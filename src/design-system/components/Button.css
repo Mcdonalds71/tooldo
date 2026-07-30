@@ -1,0 +1,227 @@
+/*
+ * The neo-brutalist signature lives here: the hard shadow lifts toward the cursor on
+ * hover and the button snaps down onto it on press. Every value is a token, so the
+ * whole system restyles from tokens.css.
+ *
+ * The classes are global on purpose — a real <a> that should look like a button uses
+ * `buttonClass()` from Button.tsx rather than a second component.
+ */
+
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2xs);
+  border: var(--btn-border);
+  border-radius: var(--btn-radius);
+  box-shadow: var(--btn-shadow);
+  background-color: var(--color-card);
+  color: var(--color-ink);
+  font-family: var(--btn-font);
+  font-weight: var(--btn-weight);
+  letter-spacing: var(--tracking-tight);
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform var(--dur-press) var(--ease-out),
+    box-shadow var(--dur-press) var(--ease-out),
+    background-color var(--dur-base) var(--ease-out);
+}
+
+/* Pads the hit area out to the minimum touch target without changing the drawn
+   height, so the small button keeps its rhythm and still takes a thumb. */
+.btn::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: 50%;
+  height: max(100%, var(--tap-target-min));
+  translate: 0 -50%;
+}
+
+.btn:hover {
+  transform: translate(var(--brut-lift), var(--brut-lift));
+  box-shadow: var(--btn-shadow-hover);
+}
+
+.btn:active {
+  transform: translate(var(--brut-press), var(--brut-press));
+  box-shadow: var(--btn-shadow-press);
+}
+
+.btn:focus-visible {
+  outline: none;
+  border-color: var(--color-signal);
+  box-shadow: var(--btn-shadow-focus);
+}
+
+.btn--sm {
+  height: var(--btn-height-sm);
+  padding: var(--btn-padding-sm);
+  font-size: var(--btn-text-sm);
+}
+
+.btn--md {
+  height: var(--btn-height-md);
+  padding: var(--btn-padding-md);
+  font-size: var(--btn-text-md);
+}
+
+.btn--lg {
+  height: var(--btn-height-lg);
+  padding: var(--btn-padding-lg);
+  font-size: var(--btn-text-lg);
+}
+
+/*
+ * Ink on vermilion, not white: white on this orange lands at 3.6:1 and a primary CTA
+ * has to be readable. The hover is the shadow lifting, so the fill never shifts —
+ * which also keeps the label's contrast constant across every state.
+ */
+.btn--primary {
+  background-color: var(--color-signal);
+  color: var(--color-ink);
+}
+
+.btn--secondary {
+  background-color: var(--color-card);
+  color: var(--color-ink);
+}
+
+.btn--secondary:hover {
+  background-color: var(--color-paper-dim);
+}
+
+.btn--ink {
+  background-color: var(--color-ink);
+  color: var(--color-paper);
+}
+
+.btn--destructive {
+  background-color: var(--color-danger);
+  color: var(--color-white);
+}
+
+/* Ghost is the quiet register: no shadow, so it never lifts or snaps. */
+.btn--ghost {
+  background-color: transparent;
+  box-shadow: none;
+}
+
+.btn--ghost:hover {
+  background-color: var(--color-paper-dim);
+  transform: none;
+  box-shadow: none;
+}
+
+.btn--ghost:active {
+  transform: none;
+  box-shadow: none;
+}
+
+.btn--ghost:focus-visible {
+  box-shadow: var(--btn-shadow-focus);
+}
+
+.btn--icon {
+  aspect-ratio: 1;
+  padding: 0;
+  border-radius: var(--btn-icon-radius);
+}
+
+/* A loading button is busy, not unavailable, so it keeps its full weight — it is only
+   `disabled` so the action can't fire twice. The `:not()` keeps it out of the muted look. */
+.btn:disabled:not(.btn--loading) {
+  opacity: 0.45;
+  border-color: var(--color-ink-faint);
+  box-shadow: var(--btn-shadow-disabled);
+  cursor: not-allowed;
+}
+
+.btn:disabled:hover,
+.btn:disabled:active {
+  transform: none;
+}
+
+.btn:disabled:not(.btn--loading):hover,
+.btn:disabled:not(.btn--loading):active {
+  box-shadow: var(--btn-shadow-disabled);
+}
+
+.btn--loading {
+  cursor: progress;
+}
+
+.btn--ghost:disabled,
+.btn--ghost:disabled:hover {
+  box-shadow: none;
+}
+
+.btn__label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+}
+
+/* The label keeps its space while loading so the button can't change width mid-action. */
+.btn--loading .btn__label {
+  opacity: 0;
+}
+
+.btn__spinner {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.btn__spinner-ring {
+  width: 1em;
+  height: 1em;
+  border: var(--brut-border-width) solid currentColor;
+  border-right-color: transparent;
+  border-radius: var(--radius-full);
+  animation: btn-spin var(--dur-spin) linear infinite;
+}
+
+.btn__badge {
+  display: grid;
+  place-items: center;
+  width: var(--btn-badge-size);
+  height: var(--btn-badge-size);
+  margin-right: var(--btn-badge-offset);
+  border: var(--btn-badge-border-width) solid currentColor;
+  border-radius: var(--radius-full);
+  background-color: var(--color-ink);
+  color: var(--color-paper);
+  font-size: var(--text-sm);
+}
+
+.btn--primary .btn__badge {
+  background-color: var(--color-white);
+  color: var(--color-signal-dark);
+}
+
+@keyframes btn-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* A frozen spinner reads as a hung button, so the reduced-motion fallback pulses
+   opacity instead of stopping. Higher specificity than the global motion reset. */
+@media (prefers-reduced-motion: reduce) {
+  .btn__spinner-ring {
+    /* biome-ignore lint/complexity/noImportantStyles: has to beat the global motion
+       reset, which is itself !important. */
+    animation: btn-pulse var(--dur-slow) var(--ease-in-out) infinite alternate !important;
+  }
+}
+
+@keyframes btn-pulse {
+  to {
+    opacity: 0.3;
+  }
+}

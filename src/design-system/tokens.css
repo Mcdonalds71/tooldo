@@ -1,0 +1,200 @@
+/*
+ * Design tokens — "paper, ink & signal".
+ *
+ * Palette, type, radii and shadows live in @theme so Tailwind generates matching
+ * utilities (bg-paper, text-ink, shadow-brut) that resolve through the variable —
+ * which is what lets a theme swap stay a one-file edit.
+ * Component and motion tokens live in :root; they drive component CSS, not utilities.
+ */
+
+@theme {
+  /* Paper — backgrounds and surfaces */
+  --color-paper: #f4f0e7;
+  --color-paper-dim: #ebe6da;
+  --color-card: #fbf9f3;
+  --color-white: #ffffff;
+
+  /* Charcoal — the inverse surface: footer, CTA band, and the future dark paper */
+  --color-char: #1c1a15;
+  --color-char-dim: #211f19;
+  --color-char-raised: #26231b;
+
+  /* Ink — text */
+  --color-ink: #16130d;
+  --color-ink-soft: #57534a;
+  /* Nudged darker than the original #8a857a, which read at 3.2:1 on paper. Hints and
+     captions are text people actually need, so the faintest ink still clears AA. */
+  --color-ink-faint: #6f6a5f;
+
+  /* Warm lines */
+  --color-line: #d9d3c5;
+  --color-line-strong: #c4bcaa;
+
+  /*
+   * Signal — one hot accent. Primary action, focus, one moment of emphasis per view.
+   *
+   * The hot vermilion is a *surface* colour: it clears 3:1 against paper, which is the
+   * bar for focus rings, borders and display-size type, but not the 4.5:1 that small
+   * text needs. Vermilion set as text uses the dark step instead.
+   */
+  --color-signal: #ff3b14;
+  --color-signal-dark: #c92806;
+
+  /* Status */
+  --color-success: #1f8a4c;
+  --color-warning: #d97706;
+  --color-danger: #dc2626;
+
+  /* Type. Clash Display tops out at 700 — map any heavier heading down to 600/700. */
+  --font-display: "Clash Display", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.6rem;
+  --text-2xl: 2rem;
+  --text-3xl: 2.75rem;
+  --text-hero: clamp(2.5rem, 6vw, 5rem);
+
+  --tracking-tight: -0.02em;
+  --tracking-eyebrow: 0.14em;
+  --leading-tight: 1.04;
+  --leading-body: 1.6;
+
+  /* 4px base — keeps Tailwind's spacing utilities on the same grid as component CSS */
+  --spacing: 0.25rem;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-drop: 22px;
+  --radius-full: 999px;
+
+  /* Soft warm elevation — dense working UI only, never a hero surface */
+  --shadow-sm: 0 1px 2px rgb(22 19 13 / 0.05);
+  --shadow-md: 0 8px 24px rgb(22 19 13 / 0.08);
+  --shadow-lg: 0 20px 50px rgb(22 19 13 / 0.12);
+
+  /* Neo-brutalist hard shadows — zero blur, hero surfaces only */
+  --shadow-brut: 4px 4px 0 var(--color-ink);
+  --shadow-brut-lifted: 6px 6px 0 var(--color-ink);
+  --shadow-brut-flat: 0 0 0 var(--color-ink);
+  --shadow-brut-focus: 4px 4px 0 var(--color-signal);
+  --shadow-brut-muted: 4px 4px 0 var(--color-line);
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+:root {
+  /* Named spacing steps for component CSS — same 4px grid as the utilities above */
+  --space-3xs: 0.25rem;
+  --space-2xs: 0.5rem;
+  --space-xs: 0.75rem;
+  --space-sm: 1rem;
+  --space-md: 1.5rem;
+  --space-lg: 2rem;
+  --space-xl: 3rem;
+  --space-2xl: 4rem;
+  --space-3xl: 6rem;
+  --space-4xl: 8rem;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  /* Layout */
+  --width-content: 1200px;
+  --width-prose: 640px;
+  --grid-card-min: 17rem;
+  --gutter: var(--space-md);
+
+  /* Site chrome */
+  --nav-height: 70px;
+  --brand-mark-size: 30px;
+  --tool-icon-size: 46px;
+  --tool-icon-glyph: 1.375rem;
+
+  /* The quiet border for dense working UI, where a hard shadow would be too loud. */
+  --hairline: 1px solid var(--color-line);
+
+  /* The neo-brutalist signature: chunky ink border, hard shadow that lifts toward
+     the cursor on hover and snaps down onto itself on press. */
+  --brut-border-width: 2.5px;
+  --brut-border: var(--brut-border-width) solid var(--color-ink);
+  --brut-lift: -2px;
+  --brut-press: 4px;
+
+  /* Smallest control is 40px tall for rhythm; the hit area is padded out to 44px. */
+  --tap-target-min: 44px;
+
+  --btn-radius: var(--radius-full);
+  --btn-border: var(--brut-border);
+  --btn-shadow: var(--shadow-brut);
+  --btn-shadow-hover: var(--shadow-brut-lifted);
+  --btn-shadow-press: var(--shadow-brut-flat);
+  --btn-shadow-focus: var(--shadow-brut-focus);
+  --btn-shadow-disabled: var(--shadow-brut-muted);
+  --btn-font: var(--font-display);
+  --btn-weight: var(--weight-semibold);
+  --btn-height-sm: 40px;
+  --btn-height-md: 48px;
+  --btn-height-lg: 56px;
+  --btn-padding-sm: 0 1.25rem;
+  --btn-padding-md: 0 1.75rem;
+  --btn-padding-lg: 0 2rem;
+  --btn-text-sm: var(--text-sm);
+  --btn-text-md: var(--text-base);
+  --btn-text-lg: 1.125rem;
+  --btn-icon-radius: var(--radius-md);
+  --btn-badge-size: 1.625rem;
+  --btn-badge-offset: -0.5rem;
+  --btn-badge-border-width: 2px;
+
+  --card-radius: var(--radius-md);
+  --card-border: var(--brut-border);
+  --card-shadow: 3px 3px 0 var(--color-ink);
+  --card-shadow-hover: 8px 8px 0 var(--color-signal);
+  --card-lift: -3px;
+
+  --drop-radius: var(--radius-drop);
+  --drop-border: 3px dashed var(--color-ink);
+  --drop-border-active: 3px solid var(--color-signal);
+  --drop-shadow: 8px 8px 0 var(--color-ink);
+  --drop-shadow-active: 14px 14px 0 var(--color-signal);
+  --drop-lift: -4px;
+  --drop-tilt: -0.6deg;
+
+  --input-radius: var(--radius-full);
+  --input-border: var(--brut-border);
+  --input-shadow: var(--shadow-brut);
+  --input-shadow-focus: var(--shadow-brut-focus);
+  --input-height: 48px;
+
+  --dur-press: 120ms;
+  --dur-fast: 150ms;
+  --dur-base: 250ms;
+  --dur-slow: 450ms;
+  /* Outside the UI easing family on purpose: a spinner reads as mechanical, not eased. */
+  --dur-spin: 700ms;
+}
+
+/*
+ * Dark is deferred for v1 — light-first is the direction. The alias layer is ready
+ * for it (warm charcoal, never cool black), but nothing ships or is verified against
+ * it yet, so no component carries a dark-specific rule.
+ */
+[data-theme="dark"] {
+  --color-paper: var(--color-char);
+  --color-paper-dim: var(--color-char-dim);
+  --color-card: var(--color-char-raised);
+  --color-ink: #f4f0e7;
+  --color-ink-soft: #c9c4b6;
+  --color-ink-faint: #8f8a7c;
+  --color-line: #33302a;
+  --color-line-strong: #464238;
+}

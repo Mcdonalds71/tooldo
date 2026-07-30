@@ -1,0 +1,83 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../lib/site';
+---
+
+<BaseLayout
+  title={`Privacy promise — ${SITE.name}`}
+  description="How tooldo handles your files: it doesn't. Every tool runs in your browser, and nothing is uploaded, stored, or tracked."
+>
+  <article class="page">
+    <div class="shell page__inner">
+      <p class="eyebrow">the promise</p>
+      <h1>{SITE.promise}</h1>
+
+      <p class="page__lead">
+        Not as a policy we could quietly change — as a fact about how the site is built.
+        There is no server that could receive your file.
+      </p>
+
+      <h2>How it works</h2>
+      <p>
+        Every tool runs as code inside your browser tab, using WebAssembly and the same
+        APIs any web page has. When you drop in a PDF or a photo, it's read from your
+        disk into your own device's memory, worked on there, and handed back to you.
+        Close the tab and it's gone.
+      </p>
+
+      <h2>What we collect</h2>
+      <p>
+        Nothing. There are no accounts, no cookies, no analytics, and no error tracking.
+        We can't tell you how many people used a tool today, because we don't measure it.
+        If that ever changes, it will be a cookieless counter that records page views and
+        never touches a file, and this page will say so before it ships.
+      </p>
+
+      <h2>What stays on your device</h2>
+      <p>
+        Some tools remember your own settings so you don't retype them — invoice details,
+        for instance. That lives in your browser's local storage, on your machine, and
+        clearing your browser data removes it. It is never sent anywhere.
+      </p>
+
+      <h2>Checking for yourself</h2>
+      <p>
+        You don't have to take our word for it. Open your browser's network panel and
+        use any tool: you'll see the page and its code load, and nothing leave. The
+        source is public, so you can also read exactly what runs.
+      </p>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .page {
+    padding-block: var(--space-2xl) var(--space-3xl);
+  }
+
+  .page__inner {
+    max-width: var(--width-prose);
+  }
+
+  .page__inner h1 {
+    margin-top: var(--space-xs);
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-bold);
+  }
+
+  .page__inner h2 {
+    margin-top: var(--space-xl);
+    font-size: var(--text-xl);
+  }
+
+  .page__lead {
+    margin-top: var(--space-md);
+    font-size: var(--text-lg);
+    color: var(--color-ink-soft);
+  }
+
+  .page__inner p + p,
+  .page__inner h2 + p {
+    margin-top: var(--space-sm);
+  }
+</style>

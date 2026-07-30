@@ -1,0 +1,87 @@
+---
+import type { Tool } from '../lib/tools';
+
+interface Props {
+  tool: Tool;
+}
+
+const { tool } = Astro.props;
+const { icon: Glyph, status } = tool;
+const isLive = status === 'live';
+const Wrapper = isLive ? 'a' : 'div';
+---
+
+<Wrapper class="card" href={isLive ? `/${tool.slug}` : undefined} data-status={status}>
+  <span class="card__icon">
+    <Glyph size="var(--tool-icon-glyph)" weight="duotone" aria-hidden />
+  </span>
+  <h3 class="card__name">{tool.name}</h3>
+  <p class="card__description">{tool.description}</p>
+  {!isLive && <span class="card__status">Soon</span>}
+</Wrapper>
+
+<style>
+  .card {
+    position: relative;
+    display: block;
+    padding: var(--space-md);
+    border: var(--card-border);
+    border-radius: var(--card-radius);
+    box-shadow: var(--card-shadow);
+    background-color: var(--color-card);
+    color: inherit;
+    text-decoration: none;
+    transition:
+      transform var(--dur-base) var(--ease-out),
+      box-shadow var(--dur-base) var(--ease-out);
+  }
+
+  a.card:hover,
+  a.card:focus-visible {
+    transform: translate(var(--card-lift), var(--card-lift));
+    box-shadow: var(--card-shadow-hover);
+  }
+
+  .card__icon {
+    display: grid;
+    place-items: center;
+    width: var(--tool-icon-size);
+    height: var(--tool-icon-size);
+    margin-bottom: var(--space-sm);
+    border-radius: var(--radius-sm);
+    background-color: var(--color-paper-dim);
+    color: var(--color-ink);
+    transition:
+      background-color var(--dur-base) var(--ease-out),
+      color var(--dur-base) var(--ease-out),
+      rotate var(--dur-base) var(--ease-out);
+  }
+
+  a.card:hover .card__icon {
+    background-color: var(--color-signal);
+    color: var(--color-paper);
+    rotate: -6deg;
+  }
+
+  .card__name {
+    font-size: var(--text-base);
+    font-weight: var(--weight-bold);
+  }
+
+  .card__description {
+    margin-top: var(--space-3xs);
+    font-size: var(--text-sm);
+    color: var(--color-ink-soft);
+  }
+
+  .card__status {
+    position: absolute;
+    top: var(--space-md);
+    right: var(--space-md);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-eyebrow);
+    text-transform: uppercase;
+    color: var(--color-ink-faint);
+  }
+</style>

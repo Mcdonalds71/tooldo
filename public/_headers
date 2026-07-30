@@ -1,0 +1,28 @@
+# Cloudflare Pages headers.
+#
+# The CSP can stay this tight because the site has no backend and no third-party
+# origins: fonts, styles and scripts are all self-hosted, and the build emits no
+# inline <script> or <style>, so neither directive needs 'unsafe-inline'.
+#
+# blob: is allowed for images, media and workers because tools preview and download
+# their own output through object URLs — never a remote fetch.
+
+/*
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; worker-src 'self' blob:; media-src 'self' blob:; manifest-src 'self'; upgrade-insecure-requests
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: accelerometer=(), camera=(), display-capture=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-origin
+
+# ffmpeg.wasm needs SharedArrayBuffer, which needs full cross-origin isolation. Scope
+# COEP to the video route when that tool lands rather than turning it on site-wide,
+# where it would block anything the other tools legitimately load.
+
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable

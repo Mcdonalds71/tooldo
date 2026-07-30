@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.astro/
+
+# test output
+test-results/
+playwright-report/
+coverage/
+
+# local env + editor noise
+.env
+.env.*
+!.env.example
+*.local
+.DS_Store
+Thumbs.db

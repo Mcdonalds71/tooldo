@@ -1,0 +1,44 @@
+---
+import { buttonClass } from '../design-system/components/Button';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../lib/site';
+---
+
+<BaseLayout
+  title={`Page not found — ${SITE.name}`}
+  description="That page isn't here. Head back to the tools."
+  noindex
+>
+  <section class="missing">
+    <div class="shell">
+      <p class="eyebrow">404</p>
+      <h1>That page isn't here.</h1>
+      <p class="missing__sub">
+        The link might be old, or the tool you're after isn't built yet. Everything that
+        does exist is one click away.
+      </p>
+      <a class={buttonClass({ variant: 'primary', size: 'lg' })} href="/#tools">
+        See all the tools
+      </a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .missing {
+    padding-block: var(--space-3xl) var(--space-4xl);
+    text-align: center;
+  }
+
+  .missing h1 {
+    margin-top: var(--space-xs);
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-bold);
+  }
+
+  .missing__sub {
+    max-width: var(--width-prose);
+    margin: var(--space-sm) auto var(--space-lg);
+    color: var(--color-ink-soft);
+  }
+</style>

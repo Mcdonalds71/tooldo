@@ -1,0 +1,93 @@
+---
+import { buttonClass } from '../design-system/components/Button';
+import { SITE } from '../lib/site';
+---
+
+<header class="nav">
+  <div class="shell nav__inner">
+    <a class="nav__logo" href="/">
+      <span class="nav__mark" aria-hidden="true"></span>
+      {SITE.name}
+    </a>
+
+    <nav class="nav__links" aria-label="Main">
+      <a href="/#tools">All tools</a>
+      <a href="/privacy">Privacy</a>
+    </nav>
+
+    <a class={buttonClass({ variant: 'primary', size: 'sm' })} href="/#tools">Open the tools</a>
+  </div>
+</header>
+
+<style>
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background-color: color-mix(in srgb, var(--color-paper) 82%, transparent);
+    backdrop-filter: saturate(180%) blur(12px);
+    border-bottom: 1px solid transparent;
+  }
+
+  .nav__inner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    height: var(--nav-height);
+  }
+
+  .nav__logo {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    font-family: var(--font-display);
+    font-weight: var(--weight-bold);
+    font-size: var(--text-lg);
+    letter-spacing: var(--tracking-tight);
+    color: var(--color-ink);
+    text-decoration: none;
+  }
+
+  .nav__mark {
+    width: var(--brand-mark-size);
+    height: var(--brand-mark-size);
+    border-radius: var(--radius-sm);
+    background-color: var(--color-signal);
+    clip-path: polygon(50% 12%, 88% 50%, 50% 88%, 12% 50%);
+    transition: rotate var(--dur-slow) var(--ease-out);
+  }
+
+  .nav__logo:hover .nav__mark {
+    rotate: -8deg;
+  }
+
+  .nav__logo {
+    margin-inline-end: auto;
+  }
+
+  .nav__links {
+    display: none;
+    gap: var(--space-2xs);
+  }
+
+  .nav__links a {
+    padding: var(--space-2xs) var(--space-xs);
+    border-radius: var(--radius-sm);
+    color: var(--color-ink-soft);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    text-decoration: none;
+    transition: background-color var(--dur-base) var(--ease-out);
+  }
+
+  .nav__links a:hover {
+    background-color: var(--color-paper-dim);
+    color: var(--color-ink);
+  }
+
+  @media (width >= 40rem) {
+    .nav__links {
+      display: flex;
+    }
+  }
+</style>

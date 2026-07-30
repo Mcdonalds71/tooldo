@@ -1,0 +1,84 @@
+---
+import { SITE } from '../lib/site';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="shell footer__inner">
+    <div>
+      <p class="footer__brand">{SITE.name}</p>
+      <p class="footer__blurb">{SITE.tagline}. {SITE.promise}</p>
+    </div>
+
+    <nav class="footer__links" aria-label="Footer">
+      <a href="/#tools">All tools</a>
+      <a href="/privacy">Privacy promise</a>
+    </nav>
+  </div>
+
+  <div class="shell footer__bottom">
+    <p>
+      &copy; {year} {SITE.name} &middot; Built by
+      <a href={SITE.author.url}>{SITE.author.name}</a> for the people of the internet.
+    </p>
+  </div>
+</footer>
+
+<style>
+  /* The charcoal footer is an inverse surface: the ink scale is tuned for paper and
+     goes muddy here, so muted text steps up to the line tone instead. */
+  .footer {
+    margin-top: var(--space-4xl);
+    padding-block: var(--space-3xl) var(--space-lg);
+    background-color: var(--color-char);
+    color: var(--color-line);
+  }
+
+  .footer__inner {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-lg);
+  }
+
+  .footer__brand {
+    font-family: var(--font-display);
+    font-weight: var(--weight-bold);
+    font-size: var(--text-lg);
+    color: var(--color-paper);
+  }
+
+  .footer__blurb {
+    max-width: 32ch;
+    margin-top: var(--space-3xs);
+    font-size: var(--text-sm);
+    color: var(--color-line);
+  }
+
+  .footer__links {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3xs);
+    font-size: var(--text-sm);
+  }
+
+  .footer__links a,
+  .footer__bottom a {
+    color: var(--color-line);
+    text-decoration: none;
+  }
+
+  .footer__links a:hover,
+  .footer__bottom a:hover {
+    color: var(--color-paper);
+  }
+
+  .footer__bottom {
+    margin-top: var(--space-2xl);
+    padding-top: var(--space-md);
+    border-top: 1px solid color-mix(in srgb, var(--color-paper) 8%, transparent);
+    font-size: var(--text-sm);
+    color: var(--color-line);
+  }
+</style>

@@ -1,0 +1,39 @@
+tooldo bundles or depends on the third-party work listed below. tooldo itself is MIT
+licensed; see LICENSE.
+
+FONTS
+-----
+
+Inter — SIL Open Font License 1.1
+  Copyright (c) The Inter Project Authors
+  https://github.com/rsms/inter
+  Vendored as public/fonts/inter-latin-variable.woff2 and inter-latin-ext-variable.woff2,
+  taken from the @fontsource-variable/inter package.
+
+JetBrains Mono — SIL Open Font License 1.1
+  Copyright (c) JetBrains s.r.o.
+  https://github.com/JetBrains/JetBrainsMono
+  Vendored as public/fonts/jetbrains-mono-latin-variable.woff2 and
+  jetbrains-mono-latin-ext-variable.woff2, taken from the
+  @fontsource-variable/jetbrains-mono package.
+
+Clash Display — Fontshare / Indian Type Foundry Free Font Licence
+  Copyright (c) Indian Type Foundry
+  https://www.fontshare.com/fonts/clash-display
+  Not redistributed here. The licence covers use and self-hosting but not
+  redistribution of the font files, so it is downloaded per checkout — see
+  public/fonts/README.md.
+
+ICONS
+-----
+
+Phosphor Icons — MIT
+  Copyright (c) 2023 Phosphor Icons
+  https://github.com/phosphor-icons/react
+
+LIBRARIES
+---------
+
+Astro (MIT), React (MIT), Tailwind CSS (MIT), Motion (MIT), Biome (MIT or Apache-2.0),
+Vitest (MIT), Playwright (Apache-2.0). Full dependency licences resolve from the
+lockfile; run `pnpm licenses list` for the current tree.

@@ -1,0 +1,5 @@
+# Install scripts run only for the dependencies listed here. Anything else that asks
+# is a supply-chain decision to make deliberately, not a prompt to click through.
+allowBuilds:
+  esbuild: true
+  sharp: true

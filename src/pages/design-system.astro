@@ -1,0 +1,134 @@
+---
+import { DownloadSimpleIcon, TrashIcon } from '@phosphor-icons/react/dist/ssr';
+import { Button } from '../design-system/components/Button';
+import { IconButton } from '../design-system/components/IconButton';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../lib/site';
+
+const variants = ['primary', 'secondary', 'ink', 'ghost', 'destructive'] as const;
+const sizes = ['sm', 'md', 'lg'] as const;
+---
+
+<BaseLayout
+  title={`Design system — ${SITE.name}`}
+  description="Every button variant, size, and state in one place."
+  noindex
+>
+  <article class="guide">
+    <div class="shell guide__inner">
+      <p class="eyebrow">design system</p>
+      <h1>Neo-brutalism, in your palette.</h1>
+      <p class="guide__lead">
+        Hover and press everything. The hard shadow lifts toward the cursor on hover and
+        snaps down onto itself on press — that tactile snap is the whole vibe. Tab through
+        it too: focus flips the shadow to vermilion.
+      </p>
+
+      <h2>Variants</h2>
+      <div class="row">
+        {
+          variants.map((variant) => (
+            <figure>
+              <Button variant={variant}>Compress all</Button>
+              <figcaption>{variant}</figcaption>
+            </figure>
+          ))
+        }
+      </div>
+
+      <h2>Sizes</h2>
+      <div class="row">
+        {
+          sizes.map((size) => (
+            <figure>
+              <Button variant="primary" size={size}>
+                Open the tools
+              </Button>
+              <figcaption>{size}</figcaption>
+            </figure>
+          ))
+        }
+      </div>
+
+      <h2>States</h2>
+      <div class="row">
+        <figure>
+          <Button variant="primary" loading loadingLabel="Compressing">Compress all</Button>
+          <figcaption>loading</figcaption>
+        </figure>
+        <figure>
+          <Button disabled>Download all</Button>
+          <figcaption>disabled</figcaption>
+        </figure>
+        <figure>
+          <Button variant="ghost" disabled>Cancel</Button>
+          <figcaption>ghost disabled</figcaption>
+        </figure>
+      </div>
+
+      <h2>With an icon, a badge, or nothing but the icon</h2>
+      <div class="row">
+        <figure>
+          <Button variant="ink" icon={DownloadSimpleIcon}>Download all</Button>
+          <figcaption>leading icon</figcaption>
+        </figure>
+        <figure>
+          <Button variant="primary" badge="3">Download all</Button>
+          <figcaption>badge</figcaption>
+        </figure>
+        <figure>
+          <IconButton icon={TrashIcon} label="Remove file" />
+          <figcaption>icon only</figcaption>
+        </figure>
+        <figure>
+          <IconButton icon={TrashIcon} label="Remove file" variant="destructive" size="sm" />
+          <figcaption>icon only, destructive</figcaption>
+        </figure>
+      </div>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .guide {
+    padding-block: var(--space-2xl) var(--space-3xl);
+  }
+
+  .guide__inner h1 {
+    margin-top: var(--space-xs);
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-bold);
+  }
+
+  .guide__lead {
+    max-width: var(--width-prose);
+    margin-top: var(--space-md);
+    color: var(--color-ink-soft);
+  }
+
+  .guide__inner h2 {
+    margin-top: var(--space-2xl);
+    font-size: var(--text-xl);
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-md);
+    margin-top: var(--space-md);
+  }
+
+  figure {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2xs);
+  }
+
+  figcaption {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-ink-faint);
+  }
+</style>
