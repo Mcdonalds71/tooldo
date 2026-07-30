@@ -71,6 +71,36 @@
     translate: 0 0;
   }
 
+  /*
+   * The one lockup: mark plus a live-text wordmark, never a rasterised logo. Everything
+   * is sized in em from the wordmark, so setting font-size scales the whole thing and
+   * the proportions from the brand sheet hold — mark at 1.5em, gap at 0.35em, and
+   * clear space of roughly one o-height on every side.
+   */
+  .lockup {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    padding: 0.5em;
+    font-family: var(--font-display);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-tight);
+    line-height: 1;
+    color: var(--color-ink);
+    text-decoration: none;
+  }
+
+  .lockup__mark {
+    display: block;
+    width: 1.5em;
+    height: 1.5em;
+    transition: rotate var(--dur-slow) var(--ease-out);
+  }
+
+  .lockup:hover .lockup__mark {
+    rotate: -8deg;
+  }
+
   .eyebrow {
     font-family: var(--font-mono);
     font-size: var(--text-xs);

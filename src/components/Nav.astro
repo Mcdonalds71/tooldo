@@ -5,8 +5,8 @@ import { SITE } from '../lib/site';
 
 <header class="nav">
   <div class="shell nav__inner">
-    <a class="nav__logo" href="/">
-      <span class="nav__mark" aria-hidden="true"></span>
+    <a class="lockup nav__logo" href="/">
+      <img class="lockup__mark" src="/icon.svg" alt="" width="128" height="128" />
       {SITE.name}
     </a>
 
@@ -36,33 +36,11 @@ import { SITE } from '../lib/site';
     height: var(--nav-height);
   }
 
+  /* The clear space is padding on the lockup, so pull the row back by that much to
+     keep the mark optically aligned with the gutter. */
   .nav__logo {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2xs);
-    font-family: var(--font-display);
-    font-weight: var(--weight-bold);
     font-size: var(--text-lg);
-    letter-spacing: var(--tracking-tight);
-    color: var(--color-ink);
-    text-decoration: none;
-  }
-
-  .nav__mark {
-    width: var(--brand-mark-size);
-    height: var(--brand-mark-size);
-    border-radius: var(--radius-sm);
-    background-color: var(--color-signal);
-    clip-path: polygon(50% 12%, 88% 50%, 50% 88%, 12% 50%);
-    transition: rotate var(--dur-slow) var(--ease-out);
-  }
-
-  .nav__logo:hover .nav__mark {
-    rotate: -8deg;
-  }
-
-  .nav__logo {
-    margin-inline-end: auto;
+    margin-inline: -0.5em auto;
   }
 
   .nav__links {

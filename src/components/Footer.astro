@@ -7,7 +7,10 @@ const year = new Date().getFullYear();
 <footer class="footer">
   <div class="shell footer__inner">
     <div>
-      <p class="footer__brand">{SITE.name}</p>
+      <span class="lockup footer__brand">
+        <img class="lockup__mark" src="/icon.svg" alt="" width="128" height="128" />
+        {SITE.name}
+      </span>
       <p class="footer__blurb">{SITE.tagline}. {SITE.promise}</p>
     </div>
 
@@ -43,10 +46,9 @@ const year = new Date().getFullYear();
   }
 
   .footer__brand {
-    font-family: var(--font-display);
-    font-weight: var(--weight-bold);
-    font-size: var(--text-lg);
+    font-size: var(--text-xl);
     color: var(--color-paper);
+    margin-inline-start: -0.5em;
   }
 
   .footer__blurb {

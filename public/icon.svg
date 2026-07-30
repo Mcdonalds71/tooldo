@@ -1,0 +1,7 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="tooldo">
+  <rect x="22" y="22" width="92" height="92" rx="24" fill="#16130d"/>
+  <rect x="14" y="14" width="92" height="92" rx="24" fill="#ff3b14" stroke="#16130d" stroke-width="5"/>
+  <path d="M40 33 L40 55 Q40 60 45 60 L75 60 Q80 60 80 55 L80 33 L71 33 L71 50 L49 50 L49 33 Z" fill="#fbf9f3"/>
+  <rect x="51" y="57" width="18" height="35" rx="6" fill="#fbf9f3"/>
+  <rect x="55.5" y="68.5" width="9" height="9" rx="1.5" transform="rotate(45 60 73)" fill="#ff3b14"/>
+</svg>
