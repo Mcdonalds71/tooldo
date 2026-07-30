@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>tooldo — neo-brutalist button & upload style</title>
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f4f0e7; --paper-dim:#ebe6da; --card:#fbf9f3;
+    --ink:#16130d; --ink-soft:#57534a; --ink-faint:#8a857a;
+    --line:#d9d3c5; --signal:#ff3b14; --signal-dark:#d92c08; --success:#1f8a4c;
+    --display:'Clash Display',sans-serif; --sans:'Inter',system-ui,sans-serif; --mono:'JetBrains Mono',monospace;
+    --ease:cubic-bezier(.22,1,.36,1);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--sans);background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased;padding:56px 24px 80px}
+  .wrap{max-width:920px;margin:0 auto}
+  h1{font-family:var(--display);font-weight:700;font-size:34px;letter-spacing:-.02em}
+  .lead{color:var(--ink-soft);margin-top:8px;font-size:16px;max-width:640px}
+  .eyebrow{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--signal);margin:56px 0 6px}
+  h2{font-family:var(--display);font-weight:600;font-size:22px;letter-spacing:-.01em}
+  .note{color:var(--ink-soft);font-size:14px;margin-top:6px;max-width:640px}
+  .row{display:flex;gap:20px;flex-wrap:wrap;align-items:center;margin-top:26px}
+  .cell{display:flex;flex-direction:column;align-items:center;gap:10px}
+  .cap{font-family:var(--mono);font-size:11px;color:var(--ink-faint);letter-spacing:.04em}
+
+  /* ===== NEO-BRUTALIST BUTTON SYSTEM ===== */
+  .nb{font-family:var(--display);font-weight:600;font-size:16px;letter-spacing:-.01em;border:2.5px solid var(--ink);border-radius:999px;padding:14px 28px;cursor:pointer;display:inline-flex;align-items:center;gap:10px;background:var(--card);color:var(--ink);box-shadow:4px 4px 0 var(--ink);transition:transform .12s var(--ease),box-shadow .12s var(--ease),background .2s}
+  .nb:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink)}
+  .nb:active{transform:translate(4px,4px);box-shadow:0 0 0 var(--ink)}
+  .nb.primary{background:var(--signal);color:#fff}
+  .nb.primary:hover{background:var(--signal-dark)}
+  .nb.ink{background:var(--ink);color:var(--paper)}
+  .nb .badge{width:26px;height:26px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;font-size:13px;margin-right:-8px;border:2px solid var(--ink)}
+  .nb.primary .badge{background:#fff;color:var(--signal)}
+  .nb.sm{font-size:14px;padding:10px 20px;box-shadow:3px 3px 0 var(--ink)}
+  .nb.sm:hover{box-shadow:5px 5px 0 var(--ink)}
+  .nb.lg{font-size:18px;padding:17px 34px}
+  .nb.disabled{opacity:.45;cursor:not-allowed;box-shadow:4px 4px 0 var(--line);border-color:var(--ink-faint);color:var(--ink-faint)}
+  .nb.disabled:hover{transform:none;box-shadow:4px 4px 0 var(--line)}
+  .nb.ghost{background:transparent;box-shadow:none;border-color:var(--ink)}
+  .nb.ghost:hover{background:var(--paper-dim);transform:none;box-shadow:none}
+  .nb.loading{pointer-events:none}
+  .spinner{width:16px;height:16px;border:2.5px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .7s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* neo-brut input (the soft/tactile touch, done right) */
+  .nb-input{display:inline-flex;align-items:center;gap:10px;border:2.5px solid var(--ink);border-radius:999px;background:var(--card);padding:12px 20px;box-shadow:4px 4px 0 var(--ink);min-width:280px}
+  .nb-input input{border:none;background:none;outline:none;font-family:var(--sans);font-size:15px;color:var(--ink);flex:1}
+  .nb-input input::placeholder{color:var(--ink-faint)}
+  .nb-input:focus-within{box-shadow:4px 4px 0 var(--signal);border-color:var(--signal)}
+  .nb-input .mag{width:30px;height:30px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;font-size:14px}
+
+  /* ===== DRAMATIC UPLOAD / DROPZONE ===== */
+  .drop{position:relative;margin-top:26px;border:3px dashed var(--ink);border-radius:22px;background:var(--card);box-shadow:8px 8px 0 var(--ink);padding:56px 32px;text-align:center;cursor:pointer;overflow:hidden;transition:transform .2s var(--ease),box-shadow .2s var(--ease),border-color .2s,background .2s}
+  .drop:hover,.drop.drag{transform:translate(-4px,-4px) rotate(-.6deg);box-shadow:14px 14px 0 var(--signal);border-color:var(--signal);border-style:solid;background:#fff}
+  .drop .halo{position:absolute;inset:0;opacity:0;background:radial-gradient(400px 260px at 50% 40%,rgba(255,59,20,.14),transparent 65%);transition:opacity .3s}
+  .drop:hover .halo,.drop.drag .halo{opacity:1}
+  .drop .glyph{position:relative;z-index:2;width:96px;height:96px;margin:0 auto 20px;border:3px solid var(--ink);border-radius:24px;background:var(--paper);display:grid;place-items:center;transition:transform .35s var(--ease),background .2s,border-color .2s}
+  .drop:hover .glyph,.drop.drag .glyph{transform:translateY(-8px) rotate(6deg) scale(1.06);background:var(--signal);border-color:var(--ink)}
+  .drop .glyph svg{width:44px;height:44px;stroke:var(--ink);stroke-width:2.4;fill:none;transition:stroke .2s}
+  .drop:hover .glyph svg,.drop.drag .glyph svg{stroke:#fff}
+  .drop .arrow{position:absolute;left:50%;top:40px;transform:translateX(-50%);opacity:0;transition:opacity .3s,top .3s}
+  .drop:hover .arrow,.drop.drag .arrow{opacity:1;top:26px}
+  .drop h3{position:relative;z-index:2;font-family:var(--display);font-weight:600;font-size:24px;letter-spacing:-.01em}
+  .drop p{position:relative;z-index:2;color:var(--ink-soft);font-size:15px;margin-top:6px}
+  .drop .actions{position:relative;z-index:2;display:flex;gap:12px;justify-content:center;margin-top:22px;flex-wrap:wrap}
+  .drop .pk{position:absolute;font-family:var(--mono);font-size:11px;background:var(--ink);color:var(--paper);padding:4px 10px;border-radius:6px;transform:rotate(-4deg);z-index:2}
+  .pk1{top:26px;left:32px}.pk2{bottom:30px;right:34px;transform:rotate(5deg);background:var(--signal)}
+
+  .files{display:flex;flex-direction:column;gap:10px;margin-top:20px}
+  .frow{display:flex;align-items:center;gap:14px;border:2.5px solid var(--ink);border-radius:14px;background:var(--card);padding:12px 16px;box-shadow:3px 3px 0 var(--ink)}
+  .frow .th{width:40px;height:40px;border-radius:9px;border:2px solid var(--ink);background:var(--paper-dim);display:grid;place-items:center;font-size:16px}
+  .frow .meta{flex:1;text-align:left}
+  .frow .meta b{font-family:var(--display);font-weight:600;font-size:15px}
+  .frow .meta span{display:block;font-family:var(--mono);font-size:11.5px;color:var(--ink-faint)}
+  .frow .bar{width:120px;height:8px;border:2px solid var(--ink);border-radius:99px;overflow:hidden;background:var(--paper)}
+  .frow .bar i{display:block;height:100%;background:var(--signal);width:72%}
+  .frow .done{font-family:var(--mono);font-size:12px;color:var(--success);font-weight:500}
+
+  .tip{margin-top:14px;font-family:var(--mono);font-size:12px;color:var(--ink-faint)}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Neo-brutalism, in your palette.</h1>
+  <p class="lead">The “Subscribe” style, rebuilt in cream + ink + vermilion. Hover and click everything — the hard shadow lifts on hover and snaps down on press. That tactile snap is the whole vibe.</p>
+
+  <p class="eyebrow">primary buttons · click them</p>
+  <h2>The main action</h2>
+  <p class="note">Vermilion fill, ink border, hard offset shadow. One per view — this is the loud one.</p>
+  <div class="row">
+    <div class="cell"><button class="nb primary lg">Open the tools →</button><span class="cap">primary / large</span></div>
+    <div class="cell"><button class="nb primary">Compress all</button><span class="cap">primary</span></div>
+    <div class="cell"><button class="nb primary">Subscribe <span class="badge">↻</span></button><span class="cap">with badge</span></div>
+  </div>
+
+  <p class="eyebrow">supporting buttons</p>
+  <h2>Everything else</h2>
+  <div class="row">
+    <div class="cell"><button class="nb">Add more files</button><span class="cap">secondary</span></div>
+    <div class="cell"><button class="nb ink">Download all</button><span class="cap">ink</span></div>
+    <div class="cell"><button class="nb ghost">Cancel</button><span class="cap">ghost</span></div>
+    <div class="cell"><button class="nb sm">Try a sample</button><span class="cap">small</span></div>
+  </div>
+
+  <p class="eyebrow">states</p>
+  <h2>Every state, defined</h2>
+  <div class="row">
+    <div class="cell"><button class="nb primary loading"><span class="spinner"></span> Compressing…</button><span class="cap">loading</span></div>
+    <div class="cell"><button class="nb disabled">Disabled</button><span class="cap">disabled</span></div>
+    <div class="cell"><div class="nb-input"><input placeholder="Search tools…"><span class="mag">⌕</span></div><span class="cap">input (tactile, focus = vermilion)</span></div>
+  </div>
+
+  <p class="eyebrow">the dramatic part · hover the box</p>
+  <h2>Uploads that show off</h2>
+  <p class="note">This is the “dramatic upload” you wanted. Hover the zone — it lifts, tilts, the shadow floods vermilion, the glyph jumps, a drop-arrow appears. On a real drag it does the same. Every tool opens with this.</p>
+  <div class="drop" id="drop">
+    <div class="halo"></div>
+    <span class="pk pk1">.pdf</span><span class="pk pk2">.png</span>
+    <div class="arrow"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ff3b14" stroke-width="2.6"><path d="M12 19V5M6 11l6-6 6 6"/></svg></div>
+    <div class="glyph"><svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg></div>
+    <h3>Drop your files here</h3>
+    <p>or click to browse · they never leave your device</p>
+    <div class="actions">
+      <button class="nb primary" onclick="showFiles()">Choose files</button>
+      <button class="nb sm" onclick="showFiles()">Try a sample</button>
+    </div>
+  </div>
+  <p class="tip" id="tip">↑ hover it, or click “Try a sample” to see the queue</p>
+
+  <div class="files" id="files" style="display:none">
+    <div class="frow"><div class="th">▦</div><div class="meta"><b>beach-photo.heic</b><span>2.4 MB → compressing</span></div><div class="bar"><i></i></div></div>
+    <div class="frow"><div class="th">▤</div><div class="meta"><b>invoice-final.pdf</b><span>1.1 MB → 340 KB</span></div><div class="done">✓ done</div></div>
+    <div class="frow"><div class="th">▦</div><div class="meta"><b>screenshot.png</b><span>820 KB → 190 KB</span></div><div class="done">✓ done</div></div>
+  </div>
+</div>
+<script>
+  const drop=document.getElementById('drop');
+  ['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('drag')}));
+  ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('drag');if(ev==='drop')showFiles()}));
+  function showFiles(){document.getElementById('files').style.display='flex';document.getElementById('tip').style.display='none'}
+</script>
+</body>
+</html>

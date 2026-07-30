@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>tooldo — Free tools for everyday files</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f4f0e7; --paper-dim:#ebe6da; --card:#fbf9f3;
+    --ink:#16130d; --ink-soft:#57534a; --ink-faint:#8a857a;
+    --line:#d9d3c5; --line-strong:#c4bcaa;
+    --signal:#ff3b14; --signal-dark:#d92c08; --success:#1f8a4c;
+    --char:#1c1a15;
+    --radius-sm:8px; --radius:12px; --radius-lg:18px; --radius-full:999px;
+    --shadow-sm:0 1px 2px rgb(22 19 13/.05); --shadow-md:0 8px 24px rgb(22 19 13/.08); --shadow-lg:0 20px 50px rgb(22 19 13/.12);
+    --display:'Clash Display',sans-serif; --sans:'Inter',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
+    --ease:cubic-bezier(.22,1,.36,1);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--sans);background:var(--paper);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+  ::selection{background:var(--signal);color:var(--paper)}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+  h1,h2,h3{font-family:var(--display);letter-spacing:-.02em;line-height:1.04;font-weight:600}
+  .mono{font-family:var(--mono)}
+
+  /* NAV */
+  nav{position:sticky;top:0;z-index:60;backdrop-filter:saturate(180%) blur(12px);background:rgba(244,240,231,.82);border-bottom:1px solid transparent;transition:border-color .3s}
+  nav.scrolled{border-bottom-color:var(--line)}
+  .nav-in{display:flex;align-items:center;gap:8px;height:70px}
+  .logo{display:flex;align-items:center;gap:11px;font-family:var(--display);font-weight:700;font-size:18px;letter-spacing:-.02em;margin-right:14px}
+  .logo .dot{width:30px;height:30px;border-radius:8px;background:var(--signal);display:grid;place-items:center;color:var(--paper);font-size:15px;transition:transform .4s var(--ease)}
+  .logo:hover .dot{transform:rotate(-8deg) scale(1.08)}
+  .nav-item{position:relative}
+  .nav-trigger{display:inline-flex;align-items:center;gap:5px;font-size:14.5px;color:var(--ink-soft);padding:9px 12px;border-radius:var(--radius-sm);cursor:pointer;transition:color .2s,background .2s;background:none;border:none;font-family:inherit;font-weight:500}
+  .nav-trigger:hover{color:var(--ink);background:var(--paper-dim)}
+  .nav-trigger svg{width:14px;height:14px;transition:transform .3s}
+  .nav-item.open .nav-trigger svg{transform:rotate(180deg)}
+  .spacer{flex:1}
+  .mega{position:absolute;top:calc(100% + 8px);left:0;width:640px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-lg);padding:20px;display:none;grid-template-columns:1fr 1fr;gap:6px 26px;z-index:70}
+  .nav-item.open .mega{display:grid;animation:pop .28s var(--ease)}
+  @keyframes pop{from{opacity:0;transform:translateY(-8px)}}
+  .mega .grp{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);padding:8px 10px 4px;font-family:var(--mono)}
+  .mega a{display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:var(--radius-sm);font-size:14px;font-weight:500;transition:background .18s}
+  .mega a:hover{background:var(--paper-dim)}
+  .mega a .mi{width:30px;height:30px;border-radius:7px;display:grid;place-items:center;font-size:14px;flex-shrink:0;background:var(--paper-dim);color:var(--ink)}
+  .star{display:inline-flex;align-items:center;gap:7px;font-size:13.5px;font-weight:500;color:var(--ink-soft);border:1px solid var(--line-strong);border-radius:var(--radius-full);padding:8px 14px;transition:.2s}
+  .star:hover{color:var(--ink);background:var(--paper-dim)}
+  .btn{font-family:var(--display);font-weight:600;font-size:14.5px;cursor:pointer;border-radius:var(--radius-full);padding:11px 22px;border:2.5px solid var(--ink);box-shadow:3px 3px 0 var(--ink);transition:transform .12s var(--ease),box-shadow .12s var(--ease),background .2s;display:inline-flex;align-items:center;gap:8px}
+  .btn:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 var(--ink)}
+  .btn:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--ink)}
+  .btn-primary{background:var(--signal);color:#fff}
+  .btn-primary:hover{background:var(--signal-dark)}
+  .btn-ghost{background:var(--card);color:var(--ink)}.btn-ghost:hover{background:var(--paper-dim)}
+  .btn-lg{padding:15px 30px;font-size:16px;box-shadow:4px 4px 0 var(--ink)}
+  .btn-lg:hover{box-shadow:6px 6px 0 var(--ink)}
+
+  /* HERO */
+  header{position:relative;padding:88px 0 68px;overflow:hidden;text-align:center}
+  .grain{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.6;background:
+    radial-gradient(520px 380px at 20% 8%, rgba(255,59,20,.10), transparent 60%),
+    radial-gradient(480px 360px at 82% 4%, rgba(196,188,170,.35), transparent 60%),
+    radial-gradient(420px 320px at 50% 30%, rgba(255,59,20,.05), transparent 60%)}
+  .hero{position:relative;z-index:2;max-width:900px;margin:0 auto}
+  .pill{display:inline-flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius-full);padding:7px 15px;font-size:12.5px;font-weight:500;color:var(--ink-soft);box-shadow:var(--shadow-sm);margin-bottom:28px;font-family:var(--mono)}
+  .pill .live{width:7px;height:7px;border-radius:50%;background:var(--signal);box-shadow:0 0 0 0 rgba(255,59,20,.5);animation:pulse 2s infinite}
+  @keyframes pulse{70%{box-shadow:0 0 0 7px rgba(255,59,20,0)}}
+  .hero h1{font-size:clamp(2.8rem,6.6vw,5.1rem);font-weight:700;letter-spacing:-.03em}
+  .hero h1 .sig{color:var(--signal)}
+  .hero p.sub{font-size:clamp(1.06rem,2.2vw,1.3rem);color:var(--ink-soft);margin:26px auto 0;max-width:580px}
+  .cta-row{display:flex;gap:14px;justify-content:center;margin-top:38px;flex-wrap:wrap}
+  .trust{margin-top:28px;font-size:13px;color:var(--ink-faint);display:flex;gap:22px;justify-content:center;flex-wrap:wrap;font-family:var(--mono)}
+  .trust span{display:inline-flex;align-items:center;gap:7px}
+  .ic{width:14px;height:14px;stroke:var(--signal);stroke-width:2.6;fill:none}
+
+  /* DEMO */
+  .demo{position:relative;z-index:2;max-width:640px;margin:58px auto 0;background:var(--card);border:1px solid var(--line);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);overflow:hidden;text-align:left}
+  .demo-top{display:flex;align-items:center;gap:8px;padding:14px 18px;border-bottom:1px solid var(--line)}
+  .dt{width:11px;height:11px;border-radius:50%;background:var(--line-strong)}
+  .demo-top .label{margin-left:10px;font-size:12.5px;color:var(--ink-faint);font-family:var(--mono)}
+  .demo-body{padding:28px 26px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:18px}
+  .ba{border-radius:var(--radius);overflow:hidden;aspect-ratio:16/10;position:relative;border:1px solid var(--line)}
+  .ba.before{background:linear-gradient(135deg,#e8ddc8,#c9bda0)}
+  .ba.after{background:linear-gradient(135deg,#ffd9cd,#ff8f75)}
+  .ba .tag{position:absolute;left:10px;top:10px;background:rgba(251,249,243,.92);border-radius:var(--radius-full);font-size:11px;font-weight:600;padding:4px 11px;color:var(--ink);font-family:var(--mono)}
+  .ba .sz{position:absolute;left:10px;bottom:10px;background:rgba(22,19,13,.78);color:var(--paper);border-radius:6px;font-size:12px;padding:4px 9px;font-family:var(--mono)}
+  .arrow{width:34px;height:34px;border-radius:50%;background:var(--paper-dim);display:grid;place-items:center;color:var(--signal)}
+  .demo-foot{padding:0 26px 24px;text-align:center}
+  .saved{font-family:var(--display);font-weight:700;font-size:32px;color:var(--signal);letter-spacing:-.02em}
+  .demo-foot small{color:var(--ink-soft);font-size:13.5px;display:block;margin-top:2px}
+
+  /* SECTIONS */
+  section{padding:100px 0}
+  .eyebrow{font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--signal);text-align:center;font-family:var(--mono)}
+  .sec-h{font-size:clamp(2.1rem,4.4vw,3.1rem);font-weight:700;text-align:center;margin-top:14px;letter-spacing:-.02em}
+  .sec-sub{text-align:center;color:var(--ink-soft);max-width:560px;margin:16px auto 0;font-size:17px}
+
+  /* TOOL GRID */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:54px}
+  .card{background:var(--card);border:2.5px solid var(--ink);border-radius:var(--radius);padding:24px;cursor:pointer;transition:transform .3s var(--ease),box-shadow .3s var(--ease);position:relative;overflow:hidden;box-shadow:3px 3px 0 var(--ink)}
+  .card:hover{transform:translate(-3px,-3px);box-shadow:8px 8px 0 var(--signal)}
+  .card .ico{width:46px;height:46px;border-radius:11px;display:grid;place-items:center;font-size:22px;margin-bottom:16px;background:var(--paper-dim);color:var(--ink);transition:transform .35s var(--ease),background .3s,color .3s}
+  .card:hover .ico{transform:scale(1.08) rotate(-6deg);background:var(--signal);color:var(--paper)}
+  .card h3{font-size:17px;font-weight:700;font-family:var(--display);letter-spacing:-.01em}
+  .card p{font-size:14px;color:var(--ink-soft);margin-top:6px}
+  .card .go{position:absolute;right:20px;top:24px;color:var(--ink-faint);opacity:0;transform:translateX(-6px);transition:.3s var(--ease)}
+  .card:hover .go{opacity:1;transform:translateX(0);color:var(--signal)}
+
+  /* FEATURE ROWS */
+  .feature{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:64px;margin-top:70px}
+  .feature:first-of-type{margin-top:56px}
+  .feature.flip .ftext{order:2}
+  .feature .ftext h3{font-size:clamp(1.6rem,3vw,2.1rem);font-weight:600;letter-spacing:-.02em}
+  .feature .ftext p{color:var(--ink-soft);font-size:16.5px;margin-top:14px;max-width:440px}
+  .feature .flink{display:inline-flex;align-items:center;gap:7px;color:var(--signal);font-weight:600;font-size:15px;margin-top:20px}
+  .feature .flink svg{width:15px;height:15px;transition:transform .25s var(--ease)}
+  .feature .flink:hover svg{transform:translateX(4px)}
+  .fvis{aspect-ratio:5/4;border-radius:var(--radius-lg);border:1px solid var(--line);position:relative;overflow:hidden;display:grid;place-items:center;box-shadow:var(--shadow-md);background:var(--card)}
+  .fvis::before{content:"";position:absolute;inset:0;opacity:.5}
+  .fvis.v1::before{background:radial-gradient(300px 240px at 30% 20%,rgba(255,59,20,.12),transparent 60%)}
+  .fvis.v2::before{background:radial-gradient(300px 240px at 70% 30%,rgba(31,138,76,.14),transparent 60%)}
+  .fvis.v3::before{background:radial-gradient(300px 240px at 50% 40%,rgba(196,188,170,.4),transparent 60%)}
+  .fvis .big{font-size:60px;position:relative;z-index:2;color:var(--ink)}
+  .fvis .chip{position:absolute;z-index:3;background:var(--card);border:1px solid var(--line);border-radius:var(--radius-full);padding:8px 14px;font-size:12.5px;font-weight:500;box-shadow:var(--shadow-sm);display:flex;align-items:center;gap:7px;font-family:var(--mono)}
+  .fvis .c-a{top:22px;left:22px;animation:bob 5s ease-in-out infinite}
+  .fvis .c-b{bottom:22px;right:22px;animation:bob 6s ease-in-out infinite .5s}
+  @keyframes bob{50%{transform:translateY(-8px)}}
+
+  /* OFFLINE */
+  .offline{background:var(--card);border:1px solid var(--line);border-radius:24px;margin:0 24px;padding:0;display:grid;grid-template-columns:1.1fr .9fr;overflow:hidden;box-shadow:var(--shadow-sm)}
+  .offline .ot{padding:64px 56px}
+  .offline .eyebrow{text-align:left}
+  .offline h2{font-size:clamp(1.9rem,3.5vw,2.6rem);font-weight:600;margin-top:14px;letter-spacing:-.02em}
+  .offline p{color:var(--ink-soft);font-size:16.5px;margin-top:16px;max-width:400px}
+  .offline .pills{display:flex;gap:12px;margin-top:26px;flex-wrap:wrap}
+  .opill{display:inline-flex;align-items:center;gap:9px;background:var(--paper-dim);border-radius:var(--radius);padding:11px 16px;font-size:13.5px;font-weight:500}
+  .offline .ov{background:var(--char);display:grid;place-items:center;position:relative;min-height:340px;overflow:hidden}
+  .offline .ov::before{content:"";position:absolute;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(255,59,20,.4),transparent 70%);top:-120px}
+  .phone{width:150px;height:300px;background:#0f0e0a;border-radius:26px;border:5px solid #2a2720;display:grid;place-items:center;box-shadow:var(--shadow-lg);position:relative;z-index:2}
+  .phone .app{width:48px;height:48px;border-radius:12px;background:var(--signal);display:grid;place-items:center;color:var(--paper);font-size:24px}
+
+  /* PRICE */
+  .price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:52px}
+  .pcard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:32px 26px;text-align:center;transition:transform .35s var(--ease),box-shadow .35s var(--ease)}
+  .pcard:hover{transform:translateY(-5px);box-shadow:var(--shadow-md)}
+  .pcard .pi{width:52px;height:52px;border-radius:13px;background:var(--paper-dim);color:var(--signal);display:grid;place-items:center;font-size:26px;margin:0 auto 18px;font-family:var(--display);font-weight:700}
+  .pcard h3{font-size:19px;font-weight:600;font-family:var(--display)}
+  .pcard p{color:var(--ink-soft);font-size:14.5px;margin-top:8px}
+
+  /* TRUST */
+  .trust-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px 40px;margin-top:52px}
+  .tb{display:flex;gap:16px;align-items:flex-start;padding:8px 0}
+  .tb .tbi{width:44px;height:44px;border-radius:11px;background:var(--paper-dim);color:var(--signal);display:grid;place-items:center;font-size:20px;flex-shrink:0}
+  .tb h3{font-size:16px;font-weight:700;font-family:var(--display)}
+  .tb p{color:var(--ink-soft);font-size:14px;margin-top:4px}
+
+  /* CTA */
+  .band{text-align:center;background:var(--char);color:var(--paper);border-radius:28px;margin:0 24px;padding:80px 40px;position:relative;overflow:hidden}
+  .band::before{content:"";position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(255,59,20,.28),transparent 70%);top:-260px;left:50%;transform:translateX(-50%)}
+  .band-in{position:relative;z-index:2}
+  .band h2{font-size:clamp(2.1rem,4.2vw,3rem);font-weight:700;letter-spacing:-.02em}
+  .band p{color:rgba(244,240,231,.72);margin-top:14px;font-size:17px}
+  .band .btn-primary{margin-top:30px;border-color:var(--paper);box-shadow:4px 4px 0 var(--paper)}
+  .band .btn-primary:hover{box-shadow:6px 6px 0 var(--paper)}
+
+  /* FOOTER */
+  footer{background:var(--char);color:#c9c4b6;margin-top:100px;padding:70px 0 40px}
+  .foot-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:40px}
+  .foot-brand .logo{color:var(--paper);margin-bottom:14px}
+  .foot-brand p{font-size:14.5px;color:#8f8a7c;max-width:260px}
+  .foot-social{display:flex;gap:10px;margin-top:20px}
+  .foot-social a{width:38px;height:38px;border-radius:10px;background:rgba(244,240,231,.07);display:grid;place-items:center;transition:background .2s}
+  .foot-social a:hover{background:var(--signal)}
+  .foot-social svg{width:17px;height:17px;fill:#c9c4b6}
+  .foot-social a:hover svg{fill:var(--paper)}
+  .fcol h4{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#75705f;margin-bottom:16px;font-family:var(--mono)}
+  .fcol a{display:block;font-size:14.5px;color:#a8a394;padding:6px 0;transition:color .2s}
+  .fcol a:hover{color:var(--paper)}
+  .foot-bottom{border-top:1px solid rgba(244,240,231,.08);margin-top:52px;padding-top:26px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;font-size:13.5px;color:#807b6c}
+  .foot-bottom a{color:#c9c4b6}
+  .foot-bottom .heart{color:var(--signal)}
+
+  .reveal{opacity:0;transform:translateY(28px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+  .reveal.in{opacity:1;transform:none}
+
+  @media(max-width:900px){
+    .grid,.price-grid,.trust-grid{grid-template-columns:repeat(2,1fr)}
+    .feature,.offline{grid-template-columns:1fr;gap:32px}.feature.flip .ftext{order:0}
+    .offline .ot{padding:44px 32px}.offline .ov{min-height:260px}
+    .foot-grid{grid-template-columns:1fr 1fr}.nav-mid{display:none}.mega{width:92vw;left:-40px}
+  }
+  @media(max-width:560px){.grid,.price-grid,.trust-grid,.foot-grid{grid-template-columns:1fr}.demo-body{grid-template-columns:1fr}.arrow{transform:rotate(90deg);margin:0 auto}}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<nav id="nav"><div class="wrap nav-in">
+  <a class="logo" href="#"><span class="dot">◆</span>tooldo</a>
+  <div class="nav-mid" style="display:flex;align-items:center;gap:2px">
+    <div class="nav-item" id="mega-item">
+      <button class="nav-trigger" id="mega-btn">All tools <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
+      <div class="mega">
+        <div>
+          <div class="grp">Documents</div>
+          <a href="#"><span class="mi">▤</span>PDF Toolbox</a>
+          <a href="#"><span class="mi">▧</span>Invoice Generator</a>
+          <div class="grp">Data &amp; text</div>
+          <a href="#"><span class="mi">▥</span>CSV / JSON Viewer</a>
+          <a href="#"><span class="mi">✍</span>Text Toolbox</a>
+        </div>
+        <div>
+          <div class="grp">Images &amp; photo</div>
+          <a href="#"><span class="mi">▦</span>Image Converter</a>
+          <a href="#"><span class="mi">◐</span>Background Remover</a>
+          <a href="#"><span class="mi">▣</span>Screenshot Beautifier</a>
+          <div class="grp">Media &amp; utilities</div>
+          <a href="#"><span class="mi">▶</span>Video Compressor</a>
+          <a href="#"><span class="mi">▩</span>QR Code Studio</a>
+          <a href="#"><span class="mi">◔</span>Timezone Finder</a>
+        </div>
+      </div>
+    </div>
+    <a class="nav-trigger" href="#feel">Why it's different</a>
+    <a class="nav-trigger" href="#privacy">Privacy</a>
+  </div>
+  <span class="spacer"></span>
+  <a class="star" href="#"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7L12 18l-6.4 3.3L6.8 14 1.8 9.4l7-.9z"/></svg> Star on GitHub</a>
+  <a href="#tools" class="btn btn-primary">Open the tools</a>
+</div></nav>
+
+<header>
+  <div class="grain"></div>
+  <div class="wrap">
+    <div class="hero">
+      <span class="pill"><span class="live"></span> ten free tools · nothing leaves your browser</span>
+      <h1>We make everyday<br>files <span class="sig">easy.</span></h1>
+      <p class="sub">Convert, compress, and clean up your files with ten tools that run right in your browser. No account, no uploads, no catch.</p>
+      <div class="cta-row">
+        <a href="#tools" class="btn btn-primary btn-lg">Open the tools →</a>
+        <a href="#feel" class="btn btn-ghost btn-lg">Why it's different</a>
+      </div>
+      <div class="trust">
+        <span><svg class="ic" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> runs on your device</span>
+        <span><svg class="ic" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> no sign-up</span>
+        <span><svg class="ic" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> open source</span>
+      </div>
+    </div>
+
+    <div class="demo reveal">
+      <div class="demo-top"><span class="dt"></span><span class="dt"></span><span class="dt"></span><span class="label">tooldo.online/images — compress</span></div>
+      <div class="demo-body">
+        <div class="ba before"><span class="tag">original</span><span class="sz">2.4 MB</span></div>
+        <div class="arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+        <div class="ba after"><span class="tag">compressed</span><span class="sz">340 KB</span></div>
+      </div>
+      <div class="demo-foot">
+        <div class="saved" id="counter">0% smaller</div>
+        <small>Same quality. Processed on your device in 0.4 seconds.</small>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="tools">
+  <div class="wrap">
+    <p class="eyebrow reveal">the suite</p>
+    <h2 class="sec-h reveal">Ten tools. One clean home.</h2>
+    <p class="sec-sub reveal">The everyday fixes you keep googling — gathered in one place, made properly, always free.</p>
+    <div class="grid">
+      <div class="card reveal"><div class="ico">▤</div><span class="go">→</span><h3>PDF Toolbox</h3><p>Merge, split, compress and reorder pages.</p></div>
+      <div class="card reveal"><div class="ico">▦</div><span class="go">→</span><h3>Image Converter</h3><p>Convert and shrink images in bulk.</p></div>
+      <div class="card reveal"><div class="ico">◐</div><span class="go">→</span><h3>Background Remover</h3><p>Erase any background in one drop.</p></div>
+      <div class="card reveal"><div class="ico">▶</div><span class="go">→</span><h3>Video Compressor</h3><p>Shrink video for chat, email, or GIF.</p></div>
+      <div class="card reveal"><div class="ico">▧</div><span class="go">→</span><h3>Invoice Generator</h3><p>Fill a form, get a clean PDF.</p></div>
+      <div class="card reveal"><div class="ico">▣</div><span class="go">→</span><h3>Screenshot Beautifier</h3><p>Turn plain screenshots into share-ready shots.</p></div>
+      <div class="card reveal"><div class="ico">▥</div><span class="go">→</span><h3>CSV / JSON Viewer</h3><p>Open, read, and convert data cleanly.</p></div>
+      <div class="card reveal"><div class="ico">◔</div><span class="go">→</span><h3>Timezone Finder</h3><p>Find the overlap across cities.</p></div>
+      <div class="card reveal"><div class="ico">▩</div><span class="go">→</span><h3>QR Code Studio</h3><p>Design QR codes with your brand.</p></div>
+      <div class="card reveal"><div class="ico">✍</div><span class="go">→</span><h3>Text Toolbox</h3><p>Count, clean, convert, and compare text.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="feel" style="padding-top:0">
+  <div class="wrap">
+    <p class="eyebrow reveal">why it's different</p>
+    <h2 class="sec-h reveal">Keep the simple things simple.</h2>
+
+    <div class="feature reveal">
+      <div class="ftext">
+        <h3>Everything runs in your browser.</h3>
+        <p>There's no server doing the work, so your files never get uploaded and nobody sees them but you. Close the tab and they're gone for good.</p>
+        <a class="flink" href="#privacy">See the privacy promise <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+      <div class="fvis v1"><span class="chip c-a">🔒 0 uploads</span><span class="big">◐</span><span class="chip c-b">on your device</span></div>
+    </div>
+
+    <div class="feature flip reveal">
+      <div class="ftext">
+        <h3>Batch it, don't babysit it.</h3>
+        <p>Drop a whole folder, set your options once, and download the lot as a zip. No twenty clicks, no waiting on one file at a time.</p>
+        <a class="flink" href="#tools">Try the image converter <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+      <div class="fvis v2"><span class="chip c-a">48 files</span><span class="big">▦</span><span class="chip c-b">⬇ one zip</span></div>
+    </div>
+
+    <div class="feature reveal">
+      <div class="ftext">
+        <h3>One look across all ten.</h3>
+        <p>Every tool shares the same buttons, spacing, and motion — so the second one feels as familiar as the tenth. Learn it once, use it everywhere.</p>
+        <a class="flink" href="#tools">Browse the tools <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+      <div class="fvis v3"><span class="chip c-a">◆ one system</span><span class="big">▣</span><span class="chip c-b">ten tools</span></div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="offline reveal">
+    <div class="ot">
+      <p class="eyebrow">offline-ready</p>
+      <h2>Install it once, use it anywhere.</h2>
+      <p>Add tooldo to your home screen and it keeps working with no internet at all. A real app that happens to live in your browser.</p>
+      <div class="pills"><span class="opill">⚡ works offline</span><span class="opill">📲 add to home screen</span><span class="opill">◆ 0 KB to install</span></div>
+    </div>
+    <div class="ov"><div class="phone"><div class="app">◆</div></div></div>
+  </div>
+</section>
+
+<section id="privacy">
+  <div class="wrap">
+    <p class="eyebrow reveal">the price</p>
+    <h2 class="sec-h reveal">Free. Actually free.</h2>
+    <p class="sec-sub reveal">No trials that expire, no “upgrade to continue,” no watermarks stamped on your files. Here's the whole deal:</p>
+    <div class="price-grid">
+      <div class="pcard reveal"><div class="pi">◇</div><h3>No account</h3><p>Nothing to sign up for. Open a tool and start working.</p></div>
+      <div class="pcard reveal"><div class="pi">∞</div><h3>No limits</h3><p>Convert one file or a thousand. Same price, every time: zero.</p></div>
+      <div class="pcard reveal"><div class="pi">⊘</div><h3>No ads, no trackers</h3><p>We don't sell your attention or your data. There's nothing to sell.</p></div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="wrap">
+    <p class="eyebrow reveal">built on trust</p>
+    <h2 class="sec-h reveal">Why you can rely on it.</h2>
+    <div class="trust-grid">
+      <div class="tb reveal"><div class="tbi">🔒</div><div><h3>Nothing uploads</h3><p>Your files are processed on your device and never sent anywhere.</p></div></div>
+      <div class="tb reveal"><div class="tbi">◆</div><div><h3>Open source</h3><p>Every line is public on GitHub. Read it, fork it, check it yourself.</p></div></div>
+      <div class="tb reveal"><div class="tbi">⚡</div><div><h3>Works offline</h3><p>Once it's loaded, it runs with no connection needed.</p></div></div>
+      <div class="tb reveal"><div class="tbi">◇</div><div><h3>No accounts</h3><p>No email walls, no passwords, no profile to manage.</p></div></div>
+      <div class="tb reveal"><div class="tbi">⊘</div><div><h3>No ads or trackers</h3><p>A clean, quiet interface with nothing following you around.</p></div></div>
+      <div class="tb reveal"><div class="tbi">∞</div><div><h3>Free forever</h3><p>No trials, no tiers, no surprise paywall halfway through.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="band reveal"><div class="band-in">
+    <h2>Got a file to fix?</h2>
+    <p>Pick a tool and go. No sign-up, nothing to install.</p>
+    <a href="#tools" class="btn btn-primary btn-lg">Open the tools →</a>
+  </div></div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="logo" href="#"><span class="dot">◆</span>tooldo</a>
+        <p>Free tools for everyday files. Built to be fast, private, and actually nice to use.</p>
+        <div class="foot-social">
+          <a href="#" aria-label="GitHub"><svg viewBox="0 0 24 24"><path d="M12 2A10 10 0 002 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.22.66-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.9-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.89 1.52 2.34 1.08 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02a9.5 9.5 0 015 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.16.57.67.48A10 10 0 0022 12 10 10 0 0012 2z"/></svg></a>
+          <a href="#" aria-label="X"><svg viewBox="0 0 24 24"><path d="M18.9 2h3.3l-7.2 8.3L23.5 22h-6.6l-5.2-6.8L5.7 22H2.4l7.7-8.8L1.9 2h6.8l4.7 6.2zm-1.2 18h1.8L7.3 3.9H5.4z"/></svg></a>
+        </div>
+      </div>
+      <div class="fcol"><h4>Popular tools</h4><a href="#">PDF Toolbox</a><a href="#">Image Converter</a><a href="#">Background Remover</a><a href="#">Invoice Generator</a><a href="#">QR Code Studio</a></div>
+      <div class="fcol"><h4>More tools</h4><a href="#">Screenshot Beautifier</a><a href="#">Video Compressor</a><a href="#">CSV / JSON Viewer</a><a href="#">Timezone Finder</a><a href="#">Text Toolbox</a></div>
+      <div class="fcol"><h4>Project</h4><a href="#">About</a><a href="#">Privacy promise</a><a href="#">Source on GitHub</a><a href="#">Changelog</a></div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 tooldo · Built with <span class="heart">♥</span> by <a href="https://www.emmanuelonugwu.com">Emmanuel Onugwu</a> for the people of the internet.</span>
+      <span><a href="#">Privacy</a> · <a href="#">Terms</a></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const nav=document.getElementById('nav');
+  addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>10));
+  const megaItem=document.getElementById('mega-item'),megaBtn=document.getElementById('mega-btn');
+  megaBtn.addEventListener('click',e=>{e.stopPropagation();megaItem.classList.toggle('open')});
+  document.addEventListener('click',()=>megaItem.classList.remove('open'));
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+  const counter=document.getElementById('counter');
+  new IntersectionObserver((es,ob)=>es.forEach(e=>{if(e.isIntersecting){let v=0;const t=setInterval(()=>{v+=2;if(v>=86){v=86;clearInterval(t)}counter.textContent=v+'% smaller'},18);ob.unobserve(e.target)}}),{threshold:.6}).observe(counter);
+</script>
+</body>
+</html>
