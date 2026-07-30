@@ -7,8 +7,8 @@ export default defineConfig({
   site: 'https://tooldo.online',
   // The style guide is for us, not for search results.
   integrations: [react(), sitemap({ filter: (page) => !page.includes('/design-system') })],
-  // Keeping styles in files rather than inline <style> tags is what lets the CSP in
-  // public/_headers run without 'unsafe-inline'.
+  // Styles ship as files rather than inline <style> tags — fewer bytes duplicated
+  // across pages, and one less thing for the CSP to account for.
   build: { inlineStylesheets: 'never' },
   vite: {
     plugins: [tailwindcss()],

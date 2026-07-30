@@ -9,7 +9,8 @@ Our no-backend architecture removes most of the usual attack surface — no serv
 
 ## 1. Headers & CSP (Cloudflare Pages `_headers` or wrangler)
 
-- [ ] **Content-Security-Policy** — the big one. Lock `script-src`, `style-src`, `connect-src`, `img-src`, `font-src`, `worker-src` to `'self'` + only the exact CDNs/model hosts used. **No `unsafe-inline` for scripts** (use hashes/nonces). Tight CSP neutralises most XSS.
+- [ ] **Content-Security-Policy** — the big one. Lock `script-src`, `style-src`, `connect-src`, `img-src`, `font-src`, `worker-src` to `'self'` + only the exact CDNs/model hosts used. Tight CSP neutralises most XSS.
+- [ ] **`unsafe-inline` is a known, documented exception here, not a free pass.** Radix and Motion write inline style attributes, and Astro emits an inline bootstrap on every island page; hashing the scripts forces hashes onto `style-src`, which makes browsers ignore `'unsafe-inline'` and kills those animations. The reasoning lives in `public/_headers` — revisit it whenever Astro's CSP support gains per-directive control, and never widen the policy further without the same kind of note.
 - [ ] **Strict-Transport-Security** — long `max-age`, `includeSubDomains`, `preload`. Force HTTPS.
 - [ ] **X-Content-Type-Options: nosniff**.
 - [ ] **X-Frame-Options: DENY** (or CSP `frame-ancestors 'none'`) — anti-clickjacking.

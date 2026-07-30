@@ -1,0 +1,133 @@
+/*
+ * The dramatic moment every tool opens with. On drag-over the whole zone lifts and
+ * tilts, the hard shadow floods vermilion, and the glyph jumps — see
+ * docs/inspiration/button-and-upload-style.html.
+ *
+ * The file input covers the zone at zero opacity, so clicking anywhere opens the
+ * picker and the keyboard path is a real focusable input, not a handler on a div.
+ */
+.dropzone {
+  position: relative;
+  padding: var(--space-2xl) var(--space-lg);
+  border: var(--drop-border);
+  border-radius: var(--drop-radius);
+  box-shadow: var(--drop-shadow);
+  background-color: var(--color-card);
+  overflow: hidden;
+  transition:
+    transform var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out),
+    background-color var(--dur-base) var(--ease-out);
+}
+
+.dropzone__input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.dropzone__input:disabled {
+  cursor: not-allowed;
+}
+
+.dropzone:hover,
+.dropzone[data-dragging] {
+  transform: translate(var(--drop-lift), var(--drop-lift)) rotate(var(--drop-tilt));
+  border: var(--drop-border-active);
+  box-shadow: var(--drop-shadow-active);
+  background-color: var(--color-white);
+}
+
+/* The focus ring belongs on the zone, since the input it lives on is invisible. */
+.dropzone:has(.dropzone__input:focus-visible) {
+  border: var(--drop-border-active);
+  box-shadow: var(--drop-shadow-active);
+}
+
+.dropzone:has(.dropzone__input:disabled) {
+  opacity: 0.55;
+}
+
+.dropzone:has(.dropzone__input:disabled):hover {
+  transform: none;
+  border: var(--drop-border);
+  box-shadow: var(--drop-shadow);
+  background-color: var(--color-card);
+}
+
+.dropzone__halo {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: radial-gradient(
+    400px 260px at 50% 40%,
+    color-mix(in srgb, var(--color-signal) 14%, transparent),
+    transparent 65%
+  );
+  transition: opacity var(--dur-base) var(--ease-out);
+}
+
+.dropzone:hover .dropzone__halo,
+.dropzone[data-dragging] .dropzone__halo {
+  opacity: 1;
+}
+
+.dropzone__glyph {
+  display: grid;
+  place-items: center;
+  width: var(--drop-glyph-size);
+  height: var(--drop-glyph-size);
+  border: var(--drop-border-active);
+  border-color: var(--color-ink);
+  border-style: solid;
+  border-radius: var(--drop-glyph-radius);
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  animation: dropzone-breathe 4s var(--ease-in-out) infinite alternate;
+  transition:
+    transform var(--dur-slow) var(--ease-out),
+    background-color var(--dur-base) var(--ease-out),
+    color var(--dur-base) var(--ease-out);
+}
+
+.dropzone:hover .dropzone__glyph,
+.dropzone[data-dragging] .dropzone__glyph {
+  transform: translateY(-8px) rotate(6deg) scale(1.06);
+  background-color: var(--color-signal);
+  color: var(--color-ink);
+}
+
+/* The file types this tool takes, peeking out of the corners like stickers. */
+.dropzone__tag {
+  position: absolute;
+  padding: var(--space-3xs) var(--space-2xs);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-ink);
+  color: var(--color-paper);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+.dropzone__tag[data-slot="0"] {
+  top: var(--space-md);
+  left: var(--space-lg);
+  rotate: -4deg;
+}
+
+.dropzone__tag[data-slot="1"] {
+  right: var(--space-lg);
+  bottom: var(--space-md);
+  background-color: var(--color-signal);
+  color: var(--color-ink);
+  rotate: 5deg;
+}
+
+@keyframes dropzone-breathe {
+  to {
+    transform: translateY(-4px);
+  }
+}

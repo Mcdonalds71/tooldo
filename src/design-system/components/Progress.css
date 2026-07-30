@@ -1,0 +1,24 @@
+/* Native <progress> needs one rule per engine to restyle; all three draw the same bar. */
+.progress {
+  appearance: none;
+  display: block;
+  inline-size: 100%;
+  block-size: var(--progress-height);
+  border: var(--progress-border-width) solid var(--color-ink);
+  border-radius: var(--radius-full);
+  background-color: var(--progress-track);
+  overflow: hidden;
+}
+
+.progress::-webkit-progress-bar {
+  background-color: var(--progress-track);
+}
+
+.progress::-webkit-progress-value {
+  background-color: var(--progress-fill);
+  transition: inline-size var(--dur-base) var(--ease-out);
+}
+
+.progress::-moz-progress-bar {
+  background-color: var(--progress-fill);
+}

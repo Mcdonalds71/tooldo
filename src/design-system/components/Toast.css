@@ -1,0 +1,82 @@
+.toast__viewport {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  z-index: 80;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  width: min(24rem, 100vw);
+  padding: var(--space-sm);
+  margin: 0;
+  list-style: none;
+  outline: none;
+}
+
+.toast {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2xs);
+  padding: var(--space-xs) var(--space-sm);
+  border: var(--card-border);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  background-color: var(--color-card);
+}
+
+.toast[data-tone="success"] {
+  border-color: var(--color-success);
+}
+
+.toast[data-tone="error"] {
+  border-color: var(--color-danger);
+}
+
+.toast__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.toast__title {
+  font-family: var(--font-display);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-sm);
+}
+
+.toast__description {
+  margin-top: var(--space-3xs);
+  color: var(--color-ink-soft);
+  font-size: var(--text-sm);
+}
+
+/* Slides in from the edge it will be swiped back to. Transform and opacity only. */
+.toast[data-state="open"] {
+  animation: toast-in var(--dur-base) var(--ease-out);
+}
+
+.toast[data-state="closed"] {
+  animation: toast-out var(--dur-fast) var(--ease-out);
+}
+
+.toast[data-swipe="move"] {
+  transform: translateX(var(--radix-toast-swipe-move-x));
+}
+
+.toast[data-swipe="cancel"] {
+  transform: translateX(0);
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+@keyframes toast-out {
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}

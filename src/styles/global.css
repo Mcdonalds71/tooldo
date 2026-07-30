@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @import "../design-system/fonts.css";
 @import "../design-system/tokens.css";
-@import "../design-system/components/Button.css";
+@import "../design-system/components/index.css";
 
 @layer base {
   html {

@@ -1,0 +1,31 @@
+/* Sized in em and drawn in currentColor, so it inherits whatever control holds it. */
+.spinner {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  border: var(--brut-border-width) solid currentColor;
+  border-right-color: transparent;
+  border-radius: var(--radius-full);
+  animation: spinner-turn var(--dur-spin) linear infinite;
+}
+
+@keyframes spinner-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* A frozen spinner reads as a hung control, so reduced motion pulses opacity rather
+   than stopping. Specificity beats the global motion reset, which is also !important. */
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    /* biome-ignore lint/complexity/noImportantStyles: has to beat the global motion reset. */
+    animation: spinner-pulse var(--dur-slow) var(--ease-in-out) infinite alternate !important;
+  }
+}
+
+@keyframes spinner-pulse {
+  to {
+    opacity: 0.3;
+  }
+}

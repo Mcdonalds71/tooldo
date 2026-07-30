@@ -1,5 +1,6 @@
 import type { Icon } from '@phosphor-icons/react/lib';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import { Spinner } from './Spinner';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ink' | 'ghost' | 'destructive';
 export type ButtonSize = 'sm' | 'md' | 'lg';
@@ -62,7 +63,7 @@ export function Button({
       </span>
       {loading ? (
         <span className="btn__spinner">
-          <span className="btn__spinner-ring" />
+          <Spinner />
           <span className="sr-only">{loadingLabel}</span>
         </span>
       ) : null}

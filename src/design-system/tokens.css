@@ -155,6 +155,11 @@
   --btn-badge-offset: -0.5rem;
   --btn-badge-border-width: 2px;
 
+  --progress-height: 8px;
+  --progress-border-width: 2px;
+  --progress-track: var(--color-paper);
+  --progress-fill: var(--color-signal);
+
   --card-radius: var(--radius-md);
   --card-border: var(--brut-border);
   --card-shadow: 3px 3px 0 var(--color-ink);
@@ -168,6 +173,8 @@
   --drop-shadow-active: 14px 14px 0 var(--color-signal);
   --drop-lift: -4px;
   --drop-tilt: -0.6deg;
+  --drop-glyph-size: 96px;
+  --drop-glyph-radius: 24px;
 
   --input-radius: var(--radius-full);
   --input-border: var(--brut-border);

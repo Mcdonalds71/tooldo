@@ -2,6 +2,10 @@
 import { DownloadSimpleIcon, TrashIcon } from '@phosphor-icons/react/dist/ssr';
 import { Button } from '../design-system/components/Button';
 import { IconButton } from '../design-system/components/IconButton';
+import { EmptyStateShowcase } from '../design-system/examples/EmptyStateShowcase';
+import { InteractiveShowcase } from '../design-system/examples/InteractiveShowcase';
+import { SurfaceShowcase } from '../design-system/examples/SurfaceShowcase';
+import '../design-system/examples/showcase.css';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE } from '../lib/site';
 
@@ -85,6 +89,23 @@ const sizes = ['sm', 'md', 'lg'] as const;
           <figcaption>icon only, destructive</figcaption>
         </figure>
       </div>
+
+      <h2>Surfaces, progress, and the payoff</h2>
+      <SurfaceShowcase />
+
+      <h2>The dropzone, the queue, and the noisy bits</h2>
+      <p class="guide__note">
+        Drag a file over the zone, or paste one. Everything below this line needs
+        JavaScript, so it's the only part of the page that hydrates.
+      </p>
+      <InteractiveShowcase client:load />
+
+      <h2>The other three empties</h2>
+      <p class="guide__note">
+        No results, an error, and offline. Each names what happened and offers the next
+        move — never a dead end.
+      </p>
+      <EmptyStateShowcase />
     </div>
   </article>
 </BaseLayout>
@@ -109,6 +130,13 @@ const sizes = ['sm', 'md', 'lg'] as const;
   .guide__inner h2 {
     margin-top: var(--space-2xl);
     font-size: var(--text-xl);
+  }
+
+  .guide__note {
+    max-width: var(--width-prose);
+    margin-top: var(--space-2xs);
+    color: var(--color-ink-soft);
+    font-size: var(--text-sm);
   }
 
   .row {

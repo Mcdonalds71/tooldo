@@ -177,15 +177,6 @@
   place-items: center;
 }
 
-.btn__spinner-ring {
-  width: 1em;
-  height: 1em;
-  border: var(--brut-border-width) solid currentColor;
-  border-right-color: transparent;
-  border-radius: var(--radius-full);
-  animation: btn-spin var(--dur-spin) linear infinite;
-}
-
 .btn__badge {
   display: grid;
   place-items: center;
@@ -202,26 +193,4 @@
 .btn--primary .btn__badge {
   background-color: var(--color-white);
   color: var(--color-signal-dark);
-}
-
-@keyframes btn-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* A frozen spinner reads as a hung button, so the reduced-motion fallback pulses
-   opacity instead of stopping. Higher specificity than the global motion reset. */
-@media (prefers-reduced-motion: reduce) {
-  .btn__spinner-ring {
-    /* biome-ignore lint/complexity/noImportantStyles: has to beat the global motion
-       reset, which is itself !important. */
-    animation: btn-pulse var(--dur-slow) var(--ease-in-out) infinite alternate !important;
-  }
-}
-
-@keyframes btn-pulse {
-  to {
-    opacity: 0.3;
-  }
 }

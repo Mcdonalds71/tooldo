@@ -1,0 +1,40 @@
+.result {
+  padding: var(--space-md);
+  text-align: center;
+}
+
+.result__headline {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-semibold);
+}
+
+.result__stat {
+  margin-top: var(--space-xs);
+}
+
+/* The payoff line — the one moment a tool gets to be loud about its own result. */
+.result__value {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-2xl);
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-signal-dark);
+}
+
+.result__label {
+  color: var(--color-ink-soft);
+  font-size: var(--text-sm);
+}
+
+.result__preview {
+  margin-top: var(--space-md);
+}
+
+.result__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2xs);
+  margin-top: var(--space-md);
+}

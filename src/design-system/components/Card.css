@@ -1,0 +1,14 @@
+.card-surface {
+  border-radius: var(--card-radius);
+  background-color: var(--color-card);
+}
+
+.card-surface--brut {
+  border: var(--card-border);
+  box-shadow: var(--card-shadow);
+}
+
+/* Quiet where the work happens: a hairline instead of the hard shadow. */
+.card-surface--calm {
+  border: var(--hairline);
+}
