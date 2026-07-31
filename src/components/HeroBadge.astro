@@ -4,7 +4,15 @@
  * rather than letters positioned one by one, so it stays legible at any size and a
  * screen reader never has to read it — the link at its centre carries the meaning.
  */
-const ring = 'Convert · Compress · Clean · Merge · ';
+/**
+ * Non-breaking spaces, because XML whitespace handling trims the run at the end of the
+ * string — which is exactly where the ring closes, pinching the gap before the first
+ * word while every other gap stayed wide.
+ */
+const SPACE = String.fromCharCode(160);
+const ring = ['Convert', 'Compress', 'Clean', 'Merge']
+  .map((word) => `${word}${SPACE}·${SPACE}`)
+  .join('');
 ---
 
 <div class="badge">
