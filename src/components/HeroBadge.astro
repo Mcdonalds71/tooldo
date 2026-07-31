@@ -102,12 +102,13 @@ const ring = ['Convert', 'Compress', 'Clean', 'Merge']
     }
   }
 
-  /* Stacked, it returns to normal flow above the card. */
+  /* Stacked, it returns to normal flow and moves ahead of the showcase, so the order
+     down the page is headline, stamp, then the two cards. */
   @media (width < 56rem) {
     .badge {
       position: static;
+      order: -1;
       margin-inline: auto;
-      margin-block-end: var(--space-md);
     }
   }
 </style>

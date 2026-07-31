@@ -72,6 +72,12 @@ import HeroPromise from './HeroPromise.astro';
     .hero__bento {
       grid-template-columns: 1fr;
     }
+
+    /* Dissolving the wrapper promotes the stamp and the card to grid items in their
+       own right, which is what lets the stamp reorder above the showcase. */
+    .hero__aside {
+      display: contents;
+    }
   }
 </style>
 
