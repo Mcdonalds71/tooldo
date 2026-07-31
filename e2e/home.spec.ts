@@ -22,6 +22,18 @@ test('no tool card links to a page that does not exist yet', async ({ page }) =>
   }
 });
 
+/**
+ * Runs under the reduced-motion project too, which is the point: the deck has to reach
+ * its finished state from CSS alone, without waiting on GSAP.
+ */
+test('the hero deck deals out five files and lands on the total', async ({ page }) => {
+  await page.goto('/');
+
+  await expect(page.locator('.deck__card')).toHaveCount(5);
+  await expect(page.getByRole('list', { name: /five everyday files/i })).toBeVisible();
+  await expect(page.locator('.deck__saved')).toHaveText('85% smaller');
+});
+
 test('the keyboard path starts with a skip link', async ({ page }) => {
   await page.goto('/');
   await page.keyboard.press('Tab');

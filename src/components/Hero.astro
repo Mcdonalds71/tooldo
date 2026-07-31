@@ -1,0 +1,71 @@
+---
+import { buttonClass } from '../design-system/components/Button';
+import { SITE } from '../lib/site';
+import HeroDeck from './HeroDeck.astro';
+---
+
+<section class="hero">
+  <div class="shell">
+    <p class="hero__pill">ten free tools &middot; nothing leaves your browser</p>
+
+    <h1 class="hero__headline">
+      We make everyday<br />files <span class="hero__accent">easy.</span>
+    </h1>
+
+    <p class="hero__sub">{SITE.description}</p>
+
+    <div class="hero__actions">
+      <a class={buttonClass({ variant: 'primary', size: 'lg' })} href="#tools">Open the tools</a>
+      <a class={buttonClass({ variant: 'secondary', size: 'lg' })} href="/privacy">
+        Read the privacy promise
+      </a>
+    </div>
+
+    <HeroDeck />
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding-block: var(--space-2xl) var(--space-3xl);
+    text-align: center;
+    overflow-x: clip;
+  }
+
+  .hero__pill {
+    display: inline-block;
+    padding: var(--space-3xs) var(--space-xs);
+    border: var(--hairline);
+    border-radius: var(--radius-full);
+    background-color: var(--color-card);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-ink-soft);
+  }
+
+  .hero__headline {
+    margin-top: var(--space-md);
+    font-size: var(--text-hero);
+    font-weight: var(--weight-bold);
+    letter-spacing: -0.035em;
+  }
+
+  .hero__accent {
+    color: var(--color-signal);
+  }
+
+  .hero__sub {
+    max-width: var(--width-prose);
+    margin: var(--space-md) auto 0;
+    font-size: var(--text-lg);
+    color: var(--color-ink-soft);
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-xs);
+    margin-top: var(--space-lg);
+  }
+</style>

@@ -1,6 +1,6 @@
 ---
+import Hero from '../components/Hero.astro';
 import ToolCard from '../components/ToolCard.astro';
-import { buttonClass } from '../design-system/components/Button';
 import Reveal from '../design-system/motion/Reveal.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE } from '../lib/site';
@@ -8,28 +8,7 @@ import { tools } from '../lib/tools';
 ---
 
 <BaseLayout title={`${SITE.name} — ${SITE.tagline}`}>
-  <section class="hero">
-    <div class="shell">
-      <p class="hero__pill">ten free tools &middot; nothing leaves your browser</p>
-      <h1 class="hero__headline">
-        We make everyday<br />files <span class="hero__accent">easy.</span>
-      </h1>
-      <p class="hero__sub">{SITE.description}</p>
-
-      <div class="hero__actions">
-        <a class={buttonClass({ variant: 'primary', size: 'lg' })} href="#tools">Open the tools</a>
-        <a class={buttonClass({ variant: 'secondary', size: 'lg' })} href="/privacy">
-          Read the privacy promise
-        </a>
-      </div>
-
-      <ul class="hero__trust">
-        <li>runs on your device</li>
-        <li>no sign-up</li>
-        <li>open source</li>
-      </ul>
-    </div>
-  </section>
+  <Hero />
 
   <section id="tools" class="tools">
     <div class="shell">
@@ -55,59 +34,6 @@ import { tools } from '../lib/tools';
 </BaseLayout>
 
 <style>
-  .hero {
-    padding-block: var(--space-3xl) var(--space-2xl);
-    text-align: center;
-  }
-
-  .hero__pill {
-    display: inline-block;
-    padding: var(--space-3xs) var(--space-xs);
-    border: var(--hairline);
-    border-radius: var(--radius-full);
-    background-color: var(--color-card);
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    color: var(--color-ink-soft);
-  }
-
-  .hero__headline {
-    margin-top: var(--space-md);
-    font-size: var(--text-hero);
-    font-weight: var(--weight-bold);
-  }
-
-  .hero__accent {
-    color: var(--color-signal);
-  }
-
-  .hero__sub {
-    max-width: var(--width-prose);
-    margin: var(--space-md) auto 0;
-    font-size: var(--text-lg);
-    color: var(--color-ink-soft);
-  }
-
-  .hero__actions {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: var(--space-xs);
-    margin-top: var(--space-lg);
-  }
-
-  .hero__trust {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: var(--space-md);
-    margin-top: var(--space-lg);
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-    color: var(--color-ink-faint);
-    list-style: none;
-  }
-
   .tools {
     padding-block: var(--space-2xl);
     text-align: center;
