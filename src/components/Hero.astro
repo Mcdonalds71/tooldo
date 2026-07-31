@@ -1,71 +1,110 @@
 ---
-import { buttonClass } from '../design-system/components/Button';
-import { SITE } from '../lib/site';
-import HeroDeck from './HeroDeck.astro';
+import HeroBadge from './HeroBadge.astro';
+import HeroPreview from './HeroPreview.astro';
+import HeroPromise from './HeroPromise.astro';
+
+/**
+ * Editorial: the headline is the whole top of the page, set in caps at display size
+ * and ranged left, with the bento carrying the argument underneath.
+ *
+ * The copy stays sentence case in the markup and is uppercased by CSS, so the voice
+ * rules hold and the treatment is typographic rather than baked into the words.
+ */
 ---
 
 <section class="hero">
   <div class="shell">
-    <p class="hero__pill">ten free tools &middot; nothing leaves your browser</p>
+    <p class="hero__eyebrow">Ten free tools &middot; nothing leaves your browser</p>
 
-    <h1 class="hero__headline">
-      We make everyday<br />files <span class="hero__accent">easy.</span>
-    </h1>
+    <div class="hero__top">
+      <h1 class="hero__headline">
+        We make everyday<br />files <span class="hero__accent">easy.</span>
+      </h1>
 
-    <p class="hero__sub">{SITE.description}</p>
-
-    <div class="hero__actions">
-      <a class={buttonClass({ variant: 'primary', size: 'lg' })} href="#tools">Open the tools</a>
-      <a class={buttonClass({ variant: 'secondary', size: 'lg' })} href="/privacy">
-        Read the privacy promise
-      </a>
+      <HeroBadge />
     </div>
 
-    <HeroDeck />
+    <div class="hero__bento">
+      <HeroPreview />
+      <HeroPromise />
+    </div>
   </div>
 </section>
 
 <style>
   .hero {
     padding-block: var(--space-2xl) var(--space-3xl);
-    text-align: center;
-    overflow-x: clip;
   }
 
-  .hero__pill {
-    display: inline-block;
-    padding: var(--space-3xs) var(--space-xs);
-    border: var(--hairline);
-    border-radius: var(--radius-full);
-    background-color: var(--color-card);
+  .hero__eyebrow {
     font-family: var(--font-mono);
     font-size: var(--text-xs);
+    letter-spacing: var(--tracking-eyebrow);
+    text-transform: uppercase;
     color: var(--color-ink-soft);
   }
 
   .hero__headline {
-    margin-top: var(--space-md);
+    margin-top: var(--space-sm);
     font-size: var(--text-hero);
     font-weight: var(--weight-bold);
-    letter-spacing: -0.035em;
+    line-height: 0.92;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
   }
 
   .hero__accent {
     color: var(--color-signal);
   }
 
-  .hero__sub {
-    max-width: var(--width-prose);
-    margin: var(--space-md) auto 0;
-    font-size: var(--text-lg);
-    color: var(--color-ink-soft);
+  /* The stamp takes the wedge of paper the ragged headline leaves on the right. */
+  .hero__top {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: var(--space-lg);
   }
 
-  .hero__actions {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: var(--space-xs);
-    margin-top: var(--space-lg);
+  .hero__bento {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: var(--space-sm);
+    margin-top: var(--space-xl);
+  }
+
+  @media (width < 64rem) {
+    .hero__top {
+      grid-template-columns: 1fr;
+      justify-items: center;
+      gap: var(--space-md);
+    }
+
+    .hero__headline {
+      justify-self: start;
+    }
+  }
+
+  @media (width < 56rem) {
+    .hero__bento {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
+
+<script>
+  import gsap from 'gsap';
+
+  const cards = gsap.utils.toArray<HTMLElement>('.hero__bento > *, .badge');
+
+  // The resting layout is the CSS one, so reduced motion and no-JS both land there.
+  gsap.matchMedia().add('(prefers-reduced-motion: no-preference)', () => {
+    gsap.from(cards, {
+      y: 28,
+      opacity: 0,
+      duration: 0.7,
+      ease: 'back.out(1.4)',
+      stagger: 0.09,
+      delay: 0.15,
+    });
+  });
+</script>

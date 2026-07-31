@@ -1,4 +1,13 @@
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
+
+/**
+ * Astro drops the `ssr` attribute once an island has hydrated. Waiting on that beats
+ * waiting on a timeout: a click that lands before React attaches its handlers does
+ * nothing at all, which is what made these tests flaky under parallel load.
+ */
+async function hydrated(page: Page) {
+  await expect(page.locator('astro-island[ssr]')).toHaveCount(0);
+}
 
 /**
  * The style guide is the only page that hydrates, so it is where a broken island shows
@@ -22,6 +31,7 @@ test('the island hydrates and stays quiet', async ({ page }) => {
   page.on('pageerror', (error) => crashes.push(error.message));
 
   await page.goto('/design-system');
+  await hydrated(page);
 
   await page.getByRole('button', { name: 'Success toast' }).click();
   await expect(page.locator('.toast__title')).toHaveText('Files compressed');
@@ -32,6 +42,7 @@ test('the island hydrates and stays quiet', async ({ page }) => {
 
 test('the dropzone takes a file it can read and explains the one it cannot', async ({ page }) => {
   await page.goto('/design-system');
+  await hydrated(page);
 
   const input = page.locator('.dropzone__input');
 
@@ -55,6 +66,7 @@ test('the dropzone takes a file it can read and explains the one it cannot', asy
 
 test('the processing overlay can be cancelled', async ({ page }) => {
   await page.goto('/design-system');
+  await hydrated(page);
 
   const overlay = page.locator('.overlay');
 

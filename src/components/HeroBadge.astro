@@ -1,0 +1,83 @@
+---
+/**
+ * The rotating stamp, and the hero's primary action. The ring is a real <textPath>
+ * rather than letters positioned one by one, so it stays legible at any size and a
+ * screen reader never has to read it — the link at its centre carries the meaning.
+ */
+const ring = 'Convert · Compress · Clean · Merge · ';
+---
+
+<div class="badge">
+  <svg class="badge__ring" viewBox="0 0 200 200" aria-hidden="true">
+    <defs>
+      <path
+        id="badge-path"
+        fill="none"
+        d="M 100,100 m -76,0 a 76,76 0 1,1 152,0 a 76,76 0 1,1 -152,0"
+      />
+    </defs>
+    <text>
+      {/* textLength pins the phrase to the circumference (2πr, r=76), so it closes the
+          ring exactly instead of overlapping itself or leaving a gap. */}
+      <textPath href="#badge-path" startOffset="0" textLength="477" lengthAdjust="spacing">
+        {ring}
+      </textPath>
+    </text>
+  </svg>
+
+  <a class="badge__action" href="#tools">Start here</a>
+</div>
+
+<style>
+  /* Bare, not carded: it floats on the paper beside the headline the way a stamp
+     sits on a poster. */
+  .badge {
+    display: grid;
+    place-items: center;
+  }
+
+  .badge > * {
+    grid-area: 1 / 1;
+  }
+
+  .badge__ring {
+    width: var(--badge-size);
+    height: var(--badge-size);
+    fill: var(--color-ink-soft);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    text-transform: uppercase;
+    animation: badge-turn var(--badge-spin) linear infinite;
+  }
+
+  .badge__action {
+    display: grid;
+    place-items: center;
+    width: calc(var(--badge-size) * 0.52);
+    height: calc(var(--badge-size) * 0.52);
+    border: var(--brut-border);
+    border-radius: var(--radius-full);
+    background-color: var(--color-signal);
+    color: var(--color-ink);
+    font-family: var(--font-display);
+    font-weight: var(--weight-semibold);
+    font-size: var(--text-sm);
+    text-align: center;
+    text-decoration: none;
+    transition: scale var(--dur-base) var(--ease-out);
+  }
+
+  .badge:hover .badge__action {
+    scale: 1.06;
+  }
+
+  .badge__action:active {
+    scale: 0.97;
+  }
+
+  @keyframes badge-turn {
+    to {
+      rotate: 360deg;
+    }
+  }
+</style>
