@@ -42,9 +42,12 @@ const ring = ['Convert', 'Compress', 'Clean', 'Merge']
 </div>
 
 <style>
-  /* Bare, not carded: it floats on the paper beside the headline the way a stamp
-     sits on a poster. */
+  /* Sits directly above the information card, a fixed 24px clear of it — the same gap
+     the two cards keep between themselves, so the three read as one arrangement. */
   .badge {
+    position: absolute;
+    bottom: calc(100% + var(--space-md));
+    right: 0;
     display: grid;
     place-items: center;
   }
@@ -96,6 +99,15 @@ const ring = ['Convert', 'Compress', 'Clean', 'Merge']
   @keyframes badge-turn {
     to {
       transform: rotate(360deg);
+    }
+  }
+
+  /* Stacked, it returns to normal flow above the card. */
+  @media (width < 56rem) {
+    .badge {
+      position: static;
+      margin-inline: auto;
+      margin-block-end: var(--space-md);
     }
   }
 </style>
