@@ -2,7 +2,13 @@ import { defineConfig, devices } from '@playwright/test';
 
 // biome-ignore lint/complexity/useLiteralKeys: the dot form fails noPropertyAccessFromIndexSignature.
 const isCI = Boolean(process.env['CI']);
-const baseURL = 'http://localhost:4321';
+
+/**
+ * A port of its own, away from `pnpm dev` on 4321. These tests check the built output,
+ * and reusing whatever happens to be serving that port means a stale dev server can
+ * fail the suite for reasons that have nothing to do with the code.
+ */
+const baseURL = 'http://localhost:4322';
 
 export default defineConfig({
   testDir: 'e2e',
@@ -21,9 +27,9 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'pnpm build && pnpm preview',
+    command: 'pnpm build && pnpm exec astro preview --port 4322',
     url: baseURL,
-    reuseExistingServer: !isCI,
-    timeout: 120_000,
+    reuseExistingServer: false,
+    timeout: 180_000,
   },
 });

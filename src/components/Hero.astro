@@ -14,11 +14,9 @@ import HeroPromise from './HeroPromise.astro';
 
 <section class="hero">
   <div class="shell">
-    <p class="hero__eyebrow">Ten free tools &middot; nothing leaves your browser</p>
-
     <div class="hero__top">
       <h1 class="hero__headline">
-        We make everyday<br />files <span class="hero__accent">easy.</span>
+        Fix any file.<br /><span class="hero__accent">Upload nothing.</span>
       </h1>
 
       <HeroBadge />
@@ -33,23 +31,15 @@ import HeroPromise from './HeroPromise.astro';
 
 <style>
   .hero {
-    padding-block: var(--space-2xl) var(--space-3xl);
+    padding-block: var(--space-lg) var(--space-3xl);
   }
 
-  .hero__eyebrow {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    letter-spacing: var(--tracking-eyebrow);
-    text-transform: uppercase;
-    color: var(--color-ink-soft);
-  }
-
+  /* 700 is the top of Clash Display's axis — there is no heavier cut to reach for. */
   .hero__headline {
-    margin-top: var(--space-sm);
     font-size: var(--text-hero);
     font-weight: var(--weight-bold);
-    line-height: 0.92;
-    letter-spacing: -0.03em;
+    line-height: 0.9;
+    letter-spacing: -0.035em;
     text-transform: uppercase;
   }
 
@@ -69,7 +59,7 @@ import HeroPromise from './HeroPromise.astro';
     display: grid;
     grid-template-columns: 1.6fr 1fr;
     gap: var(--space-sm);
-    margin-top: var(--space-xl);
+    margin-top: var(--space-lg);
   }
 
   @media (width < 64rem) {
@@ -79,8 +69,10 @@ import HeroPromise from './HeroPromise.astro';
       gap: var(--space-md);
     }
 
+    /* Full bleed across the column, so the caps set edge to edge. */
     .hero__headline {
-      justify-self: start;
+      justify-self: stretch;
+      font-size: var(--text-hero-narrow);
     }
   }
 

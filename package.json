@@ -10,7 +10,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "node scripts/fetch-fonts.mjs && astro build",
     "preview": "astro preview",
     "test": "vitest run",
     "test:e2e": "playwright test",

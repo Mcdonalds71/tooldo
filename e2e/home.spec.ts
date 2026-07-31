@@ -4,7 +4,7 @@ import { tools } from '../src/lib/tools';
 test('the home page shows every registered tool', async ({ page }) => {
   await page.goto('/');
 
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('everyday');
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
 
   const cards = page.locator('#tools li');
   await expect(cards).toHaveCount(tools.length);

@@ -15,20 +15,22 @@ const popular = popularTools();
       {SITE.name}
     </a>
 
-    <button type="button" class="nav__trigger" aria-expanded="false" aria-controls="all-tools">
-      All tools
-      <CaretDownIcon size="0.8em" weight="bold" aria-hidden />
-    </button>
+    <div class="nav__items">
+      <button type="button" class="nav__trigger" aria-expanded="false" aria-controls="all-tools">
+        All tools
+        <CaretDownIcon size="0.8em" weight="bold" aria-hidden />
+      </button>
 
-    <ul class="nav__popular">
-      {
-        popular.map((tool) => (
-          <li>
-            <a href={toolHref(tool)}>{tool.name}</a>
-          </li>
-        ))
-      }
-    </ul>
+      <ul class="nav__popular">
+        {
+          popular.map((tool) => (
+            <li>
+              <a href={toolHref(tool)}>{tool.name}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
 
     <a class={`${buttonClass({ variant: 'primary', size: 'sm' })} nav__cta`} href="/#tools">
       Open the tools
@@ -74,10 +76,12 @@ const popular = popularTools();
 
   /* One padding value all round, so the mark sits as far from the stroke on the left
      as the button does on the right. */
+  /* Two gap scales: the bar's own gap sets the outer rhythm — logo to items, items to
+     button — while the items sit closer to each other so they read as one group. */
   .nav__bar {
     display: flex;
     align-items: center;
-    gap: var(--space-2xs);
+    gap: var(--nav-gap-outer);
     width: fit-content;
     max-width: 100%;
     margin-inline: auto;
@@ -91,10 +95,29 @@ const popular = popularTools();
     -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   }
 
-  /* The capsule's own padding is the clear space here, so the lockup drops its own. */
+  /* The capsule's own padding is the clear space here, so the lockup drops its own.
+     The mark matches the button's height, and the wordmark outweighs the links. */
   .nav__logo {
-    font-size: var(--text-base);
+    font-size: var(--text-lg);
     padding: 0;
+    gap: var(--space-2xs);
+  }
+
+  .nav__logo .lockup__mark {
+    width: var(--btn-height-sm);
+    height: var(--btn-height-sm);
+  }
+
+  .nav__items {
+    display: flex;
+    align-items: center;
+    gap: var(--nav-gap-inner);
+  }
+
+  .nav__popular {
+    display: flex;
+    gap: var(--nav-gap-inner);
+    list-style: none;
   }
 
   /* A hard shadow inside a glass capsule reads as a sticker on a window. The hover
@@ -114,7 +137,7 @@ const popular = popularTools();
     align-items: center;
     gap: var(--space-3xs);
     height: var(--btn-height-sm);
-    padding-inline: var(--space-xs);
+    padding-inline: var(--space-2xs);
     border: none;
     border-radius: var(--radius-full);
     background-color: transparent;
@@ -149,17 +172,11 @@ const popular = popularTools();
     rotate: 180deg;
   }
 
-  .nav__popular {
-    display: flex;
-    gap: var(--space-3xs);
-    list-style: none;
-  }
-
   .nav__popular a {
     display: inline-flex;
     align-items: center;
     height: var(--btn-height-sm);
-    padding-inline: var(--space-xs);
+    padding-inline: var(--space-2xs);
     border-radius: var(--radius-full);
     color: var(--color-ink-soft);
     font-size: var(--text-sm);

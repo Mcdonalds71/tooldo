@@ -57,8 +57,11 @@
   --text-xl: 1.6rem;
   --text-2xl: 2rem;
   --text-3xl: 2.75rem;
-  /* Set in caps, so it carries further than the number suggests. */
-  --text-hero: clamp(2.25rem, 8.6vw, 7rem);
+  /* Set in caps, so it carries further than the number suggests. Sized to keep the
+     longer line unbroken beside the stamp; the hero overrides it on small screens,
+     where the stamp drops below and the full column is available. */
+  --text-hero: clamp(3.25rem, 7vw, 6rem);
+  --text-hero-narrow: clamp(1.75rem, 8.8vw, 3.5rem);
 
   --tracking-tight: -0.02em;
   --tracking-eyebrow: 0.14em;
@@ -137,8 +140,11 @@
     inset 0 1px 0 color-mix(in srgb, var(--color-white) 90%, transparent),
     inset 0 -1px 0 color-mix(in srgb, var(--color-white) 22%, transparent);
 
-  /* Site chrome */
+  /* Site chrome. The outer gap is wider than the inner one so the three links read as
+     one group rather than as five equally spaced things. */
   --nav-float: var(--space-xs);
+  --nav-gap-outer: var(--space-sm);
+  --nav-gap-inner: var(--space-xs);
   --tool-icon-size: 46px;
 
   /* Hero bento */

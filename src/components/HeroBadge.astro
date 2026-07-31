@@ -16,13 +16,18 @@ const ring = 'Convert · Compress · Clean · Merge · ';
         d="M 100,100 m -76,0 a 76,76 0 1,1 152,0 a 76,76 0 1,1 -152,0"
       />
     </defs>
-    <text>
-      {/* textLength pins the phrase to the circumference (2πr, r=76), so it closes the
-          ring exactly instead of overlapping itself or leaving a gap. */}
-      <textPath href="#badge-path" startOffset="0" textLength="477" lengthAdjust="spacing">
-        {ring}
-      </textPath>
-    </text>
+    {/* The group spins, not the <svg>. Rotating the element itself would swell its
+        bounding box to 1.41x and push the page sideways, even though the art is a
+        circle and looks identical. */}
+    <g class="badge__spin">
+      <text>
+        {/* textLength pins the phrase to the circumference (2πr, r=76), so it closes
+            the ring exactly instead of overlapping itself or leaving a gap. */}
+        <textPath href="#badge-path" startOffset="0" textLength="477" lengthAdjust="spacing">
+          {ring}
+        </textPath>
+      </text>
+    </g>
   </svg>
 
   <a class="badge__action" href="#tools">Start here</a>
@@ -47,6 +52,11 @@ const ring = 'Convert · Compress · Clean · Merge · ';
     font-family: var(--font-mono);
     font-size: 12px;
     text-transform: uppercase;
+  }
+
+  .badge__spin {
+    transform-box: view-box;
+    transform-origin: center;
     animation: badge-turn var(--badge-spin) linear infinite;
   }
 
@@ -77,7 +87,7 @@ const ring = 'Convert · Compress · Clean · Merge · ';
 
   @keyframes badge-turn {
     to {
-      rotate: 360deg;
+      transform: rotate(360deg);
     }
   }
 </style>
