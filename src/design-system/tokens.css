@@ -145,6 +145,9 @@
   --nav-float: var(--space-xs);
   --nav-gap-outer: var(--space-sm);
   --nav-gap-inner: var(--space-xs);
+  /* Its own step rather than a new rung on the spacing scale: the clear paper under a
+     floating capsule is a specific measurement, not a general one. */
+  --hero-top: 2.5rem;
   --tool-icon-size: 46px;
 
   /* Hero bento */
