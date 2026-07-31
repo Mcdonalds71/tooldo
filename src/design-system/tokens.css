@@ -114,18 +114,27 @@
   --gutter: var(--space-md);
 
   /*
-   * Frosted glass, iOS-style: a translucent tint, a heavy blur that also lifts
-   * saturation so colour bleeds through warm rather than grey, and a light catching
-   * the top edge. It sits *under* the neo-brut border, never instead of it.
+   * Frosted glass. Three things make a pane read as glass rather than a tinted box:
+   * you can see that something is behind it, light rakes across its face, and its top
+   * edge catches a highlight. Tint alone gets none of that.
+   *
+   * Legibility comes from the blur, not from opacity — heavy enough that whatever sits
+   * behind becomes diffuse light, which is what lets the tint stay genuinely
+   * see-through. It all sits under the neo-brut border, never instead of it.
    */
-  /* Opaque enough to read against: a menu floating over display type has to win. */
-  --glass-tint: color-mix(in srgb, var(--color-paper) 74%, transparent);
-  --glass-tint-strong: color-mix(in srgb, var(--color-card) 94%, transparent);
-  /* High enough that what shows through reads as diffuse light rather than legible
-     shapes — display type behind a menu must not be readable through it. */
-  --glass-blur: 40px;
-  --glass-saturate: 180%;
-  --glass-sheen: inset 0 1px 0 color-mix(in srgb, var(--color-white) 70%, transparent);
+  --glass-tint: color-mix(in srgb, var(--color-paper) 55%, transparent);
+  --glass-tint-strong: color-mix(in srgb, var(--color-card) 66%, transparent);
+  --glass-blur: 64px;
+  --glass-saturate: 200%;
+  --glass-gradient: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-white) 60%, transparent),
+    color-mix(in srgb, var(--color-white) 10%, transparent) 55%,
+    color-mix(in srgb, var(--color-white) 30%, transparent)
+  );
+  --glass-sheen:
+    inset 0 1px 0 color-mix(in srgb, var(--color-white) 90%, transparent),
+    inset 0 -1px 0 color-mix(in srgb, var(--color-white) 22%, transparent);
 
   /* Site chrome */
   --nav-float: var(--space-xs);

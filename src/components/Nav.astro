@@ -30,7 +30,9 @@ const popular = popularTools();
       }
     </ul>
 
-    <a class={buttonClass({ variant: 'primary', size: 'sm' })} href="/#tools">Open the tools</a>
+    <a class={`${buttonClass({ variant: 'primary', size: 'sm' })} nav__cta`} href="/#tools">
+      Open the tools
+    </a>
   </div>
 
   {/* Outside the bar on purpose: an element with backdrop-filter becomes a backdrop
@@ -70,6 +72,8 @@ const popular = popularTools();
     padding-inline: var(--gutter);
   }
 
+  /* One padding value all round, so the mark sits as far from the stroke on the left
+     as the button does on the right. */
   .nav__bar {
     display: flex;
     align-items: center;
@@ -77,18 +81,32 @@ const popular = popularTools();
     width: fit-content;
     max-width: 100%;
     margin-inline: auto;
-    padding: var(--space-3xs);
+    padding: var(--space-2xs);
     border: var(--brut-border);
     border-radius: var(--radius-full);
     box-shadow: var(--shadow-brut), var(--glass-sheen);
     background-color: var(--glass-tint);
+    background-image: var(--glass-gradient);
     backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
     -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   }
 
+  /* The capsule's own padding is the clear space here, so the lockup drops its own. */
   .nav__logo {
     font-size: var(--text-base);
-    padding: 0 var(--space-2xs) 0 var(--space-3xs);
+    padding: 0;
+  }
+
+  /* A hard shadow inside a glass capsule reads as a sticker on a window. The hover
+     lift stays, so the button still answers the cursor. */
+  .nav__cta,
+  .nav__cta:hover,
+  .nav__cta:active {
+    box-shadow: none;
+  }
+
+  .nav__cta:focus-visible {
+    box-shadow: var(--btn-shadow-focus);
   }
 
   .nav__trigger {
@@ -174,6 +192,7 @@ const popular = popularTools();
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-brut), var(--glass-sheen);
     background-color: var(--glass-tint-strong);
+    background-image: var(--glass-gradient);
     backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
     -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
     opacity: 0;
