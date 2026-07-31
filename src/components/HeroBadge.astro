@@ -42,13 +42,9 @@ const ring = ['Convert', 'Compress', 'Clean', 'Merge']
 </div>
 
 <style>
-  /* Hangs off the information card's top-right corner, into the bite cut out for it.
-     The card's own CSS derives that bite from these same values. */
+  /* Bare, not carded: it floats on the paper beside the headline the way a stamp
+     sits on a poster. */
   .badge {
-    position: absolute;
-    top: calc(-1 * (var(--badge-size) - var(--badge-overlap)));
-    right: var(--badge-inset);
-    z-index: 2;
     display: grid;
     place-items: center;
   }
@@ -100,14 +96,6 @@ const ring = ['Convert', 'Compress', 'Clean', 'Merge']
   @keyframes badge-turn {
     to {
       transform: rotate(360deg);
-    }
-  }
-
-  @media (width < 64rem) {
-    .badge {
-      position: static;
-      margin-inline: auto;
-      margin-block-end: var(--space-md);
     }
   }
 </style>

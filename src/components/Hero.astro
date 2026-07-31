@@ -14,17 +14,17 @@ import HeroPromise from './HeroPromise.astro';
 
 <section class="hero">
   <div class="shell">
-    <h1 class="hero__headline">
-      Fix any file.<br />Keep it private.
-    </h1>
+    <div class="hero__top">
+      <h1 class="hero__headline">
+        Fix any file.<br />Keep it private.
+      </h1>
+
+      <HeroBadge />
+    </div>
 
     <div class="hero__bento">
       <HeroPreview />
-
-      <div class="hero__aside">
-        <HeroBadge />
-        <HeroPromise />
-      </div>
+      <HeroPromise />
     </div>
   </div>
 </section>
@@ -43,20 +43,23 @@ import HeroPromise from './HeroPromise.astro';
     text-transform: uppercase;
   }
 
-  /* Both cards land on one baseline. The stamp belongs to the information card now,
-     so the headline has the full width to itself. */
+  /* The stamp hangs at the foot of the headline rather than floating level with it,
+     so it drops into the paper left open above the information card. */
+  .hero__top {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: var(--space-3xl);
+  }
+
+  /* Both cards land on one baseline. The information card is the shorter of the two,
+     so the space falls above it — which is where the stamp comes to rest. */
   .hero__bento {
     display: grid;
     grid-template-columns: 1.9fr 1fr;
     align-items: end;
     gap: var(--space-md);
-    margin-top: var(--space-4xl);
-  }
-
-  /* The stamp is positioned against this box, which is why it can hang above the
-     card and sit in the bite taken out of its corner. */
-  .hero__aside {
-    position: relative;
+    margin-top: var(--space-lg);
   }
 
   @media (width < 64rem) {
@@ -75,9 +78,7 @@ import HeroPromise from './HeroPromise.astro';
     }
   }
 
-  /* Below this the stamp cannot nest without swallowing the card, so the two
-     columns stack and the interlock is dropped. */
-  @media (width < 64rem) {
+  @media (width < 56rem) {
     .hero__bento {
       grid-template-columns: 1fr;
     }

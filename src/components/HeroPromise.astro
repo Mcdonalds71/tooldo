@@ -19,56 +19,16 @@ import { ArrowRightIcon } from '@phosphor-icons/react/dist/ssr';
 </article>
 
 <style>
-  /*
-   * The stamp overlaps this card's top-right corner and the card is cut away around
-   * it, so the two lock together rather than sitting near one another. The hole is a
-   * mask rather than a clip-path because it has to take the border with it — a border
-   * drawn round a rectangle would run straight through the bite.
-   *
-   * Centre and radius are derived from the stamp's own size and overlap, so moving the
-   * stamp moves the bite with it.
-   */
   .promise {
-    --notch-r: calc(var(--badge-size) / 2 + var(--notch-gap));
-    --notch-x: calc(100% - var(--badge-inset) - var(--badge-size) / 2);
-    --notch-y: calc(var(--badge-overlap) - var(--badge-size) / 2);
-
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     gap: var(--space-md);
     padding: var(--space-lg);
-    /* Clears the deepest point of the bite, so no line ever runs under it. */
-    padding-top: calc(var(--notch-r) + var(--notch-y) + var(--space-md));
     border: var(--card-border);
     border-radius: var(--bento-radius);
     box-shadow: var(--card-shadow);
     background-color: var(--color-card);
-    overflow: hidden;
-    mask-image: radial-gradient(
-      circle var(--notch-r) at var(--notch-x) var(--notch-y),
-      #0000 98%,
-      #000 100%
-    );
-    /* Same origin as the ring below, so the two agree on where the centre is. */
-    mask-origin: padding-box;
-  }
-
-  /*
-   * The stroke along the cut. It is a whole circle sitting just outside the hole; the
-   * mask removes its inside and `overflow: hidden` trims everything beyond the card,
-   * which leaves exactly the arc where card meets stamp.
-   */
-  .promise::after {
-    content: "";
-    position: absolute;
-    top: calc(var(--notch-y) - var(--notch-r) - var(--brut-border-width));
-    right: calc(var(--badge-inset) + var(--badge-size) / 2 - var(--notch-r) - var(--brut-border-width));
-    width: calc((var(--notch-r) + var(--brut-border-width)) * 2);
-    height: calc((var(--notch-r) + var(--brut-border-width)) * 2);
-    border: var(--brut-border);
-    border-radius: var(--radius-full);
-    pointer-events: none;
   }
 
   /* Display face at reading case — it carries the claims, so it should read as a line
@@ -117,18 +77,5 @@ import { ArrowRightIcon } from '@phosphor-icons/react/dist/ssr';
 
   .promise__go:hover .promise__go-icon {
     translate: 3px 0;
-  }
-
-  /* Stacked, the stamp sits above the card in normal flow, so there is nothing to
-     cut around. */
-  @media (width < 64rem) {
-    .promise {
-      mask-image: none;
-      padding-top: var(--space-lg);
-    }
-
-    .promise::after {
-      display: none;
-    }
   }
 </style>

@@ -60,7 +60,7 @@
   /* Set in caps, so it carries further than the number suggests. Sized to keep the
      longer line unbroken beside the stamp; the hero overrides it on small screens,
      where the stamp drops below and the full column is available. */
-  --text-hero: clamp(2.75rem, 9.2vw, 8.25rem);
+  --text-hero: clamp(2.75rem, 6.7vw, 6rem);
   --text-hero-narrow: clamp(1.5rem, 10vw, 5rem);
 
   --tracking-tight: -0.02em;
@@ -147,14 +147,10 @@
   --nav-gap-inner: var(--space-xs);
   --tool-icon-size: 46px;
 
-  /* Hero bento. The stamp overlaps the information card and the card is cut away
-     around it, so the two interlock instead of sitting near each other. */
+  /* Hero bento */
   --bento-radius: var(--radius-lg);
   --badge-size: 15rem;
   --badge-spin: 22s;
-  --badge-inset: var(--space-sm);
-  --badge-overlap: 4.5rem;
-  --notch-gap: var(--space-sm);
   --tool-icon-glyph: 1.375rem;
 
   /* The quiet border for dense working UI, where a hard shadow would be too loud. */
