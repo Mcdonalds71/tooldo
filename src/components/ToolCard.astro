@@ -11,7 +11,12 @@ const isLive = status === 'live';
 const Wrapper = isLive ? 'a' : 'div';
 ---
 
-<Wrapper class="card" href={isLive ? `/${tool.slug}` : undefined} data-status={status}>
+<Wrapper
+  class="card"
+  id={`tool-${tool.slug}`}
+  href={isLive ? `/${tool.slug}` : undefined}
+  data-status={status}
+>
   <span class="card__icon">
     <Glyph size="var(--tool-icon-glyph)" weight="duotone" aria-hidden />
   </span>

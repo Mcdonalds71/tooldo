@@ -113,8 +113,22 @@
   --grid-card-min: 17rem;
   --gutter: var(--space-md);
 
+  /*
+   * Frosted glass, iOS-style: a translucent tint, a heavy blur that also lifts
+   * saturation so colour bleeds through warm rather than grey, and a light catching
+   * the top edge. It sits *under* the neo-brut border, never instead of it.
+   */
+  /* Opaque enough to read against: a menu floating over display type has to win. */
+  --glass-tint: color-mix(in srgb, var(--color-paper) 74%, transparent);
+  --glass-tint-strong: color-mix(in srgb, var(--color-card) 94%, transparent);
+  /* High enough that what shows through reads as diffuse light rather than legible
+     shapes — display type behind a menu must not be readable through it. */
+  --glass-blur: 40px;
+  --glass-saturate: 180%;
+  --glass-sheen: inset 0 1px 0 color-mix(in srgb, var(--color-white) 70%, transparent);
+
   /* Site chrome */
-  --nav-height: 70px;
+  --nav-float: var(--space-xs);
   --tool-icon-size: 46px;
 
   /* The hero deck. Each card steps sideways by --deck-shift and tilts by --deck-tilt,

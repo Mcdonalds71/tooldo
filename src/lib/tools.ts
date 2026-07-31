@@ -135,8 +135,27 @@ export interface ToolGroup {
   readonly tools: readonly Tool[];
 }
 
+/** The three the nav promotes. Order is the order they appear. */
+export const POPULAR_SLUGS = ['pdf', 'images', 'background'] as const;
+
 export function findTool(slug: string): Tool | undefined {
   return tools.find((tool) => tool.slug === slug);
+}
+
+export function popularTools(): readonly Tool[] {
+  return POPULAR_SLUGS.map((slug) => {
+    const tool = findTool(slug);
+    if (!tool) throw new Error(`POPULAR_SLUGS names ${slug}, which is not in the registry`);
+    return tool;
+  });
+}
+
+/**
+ * A tool that has no page yet still deserves somewhere to go, so it points at its own
+ * card in the landing grid rather than a route that would 404.
+ */
+export function toolHref(tool: Tool): string {
+  return tool.status === 'live' ? `/${tool.slug}` : `/#tool-${tool.slug}`;
 }
 
 export function groupToolsByCategory(): readonly ToolGroup[] {
