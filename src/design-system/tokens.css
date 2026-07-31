@@ -60,7 +60,7 @@
   /* Set in caps, so it carries further than the number suggests. Sized to keep the
      longer line unbroken beside the stamp; the hero overrides it on small screens,
      where the stamp drops below and the full column is available. */
-  --text-hero: clamp(2.75rem, 6.7vw, 6.25rem);
+  --text-hero: clamp(2.75rem, 6.7vw, 6rem);
   --text-hero-narrow: clamp(1.5rem, 10vw, 5rem);
 
   --tracking-tight: -0.02em;
@@ -149,7 +149,7 @@
 
   /* Hero bento */
   --bento-radius: var(--radius-lg);
-  --badge-size: 12rem;
+  --badge-size: 15rem;
   --badge-spin: 22s;
   --tool-icon-glyph: 1.375rem;
 

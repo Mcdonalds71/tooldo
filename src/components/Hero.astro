@@ -38,26 +38,26 @@ import HeroPromise from './HeroPromise.astro';
   .hero__headline {
     font-size: var(--text-hero);
     font-weight: var(--weight-bold);
-    line-height: 0.9;
+    line-height: 0.96;
     letter-spacing: -0.035em;
     text-transform: uppercase;
   }
 
-  /* The stamp floats in the top right with its own air, rather than sitting in a
-     column that happens to be next to the words. */
+  /* The stamp hangs at the foot of the headline rather than floating level with it,
+     so it drops into the paper left open above the information card. */
   .hero__top {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center;
+    align-items: end;
     gap: var(--space-3xl);
   }
 
-  /* The showcase leads and the information card sits beside it, narrower and shorter,
-     centred against the taller card rather than stretched to match it. */
+  /* Both cards land on one baseline. The information card is the shorter of the two,
+     so the space falls above it — which is where the stamp comes to rest. */
   .hero__bento {
     display: grid;
     grid-template-columns: 1.9fr 1fr;
-    align-items: center;
+    align-items: end;
     gap: var(--space-md);
     margin-top: var(--space-lg);
   }
@@ -69,10 +69,12 @@ import HeroPromise from './HeroPromise.astro';
       gap: var(--space-md);
     }
 
-    /* Full bleed across the column, so the caps set edge to edge. */
+    /* Full bleed across the column, so the caps set edge to edge. Caps stacked this
+       tight need a touch more leading on a phone than they do at display size. */
     .hero__headline {
       justify-self: stretch;
       font-size: var(--text-hero-narrow);
+      line-height: 1.04;
     }
   }
 

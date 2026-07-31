@@ -10,8 +10,11 @@ import { ArrowRightIcon } from '@phosphor-icons/react/dist/ssr';
     on your device, so your files stay private. No accounts. No cloud processing.
   </p>
 
-  <a class="promise__go" href="/privacy" aria-label="Read the privacy promise">
-    <ArrowRightIcon size="1.1rem" weight="bold" aria-hidden />
+  <a class="promise__go" href="/privacy">
+    <span class="promise__go-icon" aria-hidden>
+      <ArrowRightIcon size="1.1rem" weight="bold" />
+    </span>
+    Read the privacy promise
   </a>
 </article>
 
@@ -45,12 +48,25 @@ import { ArrowRightIcon } from '@phosphor-icons/react/dist/ssr';
     text-wrap: pretty;
   }
 
+  /* The arrow keeps its weight, but the words carry the destination — an arrow alone
+     tells a sighted reader nothing about where it goes. */
   .promise__go {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    margin-top: auto;
+    color: var(--color-ink);
+    font-family: var(--font-display);
+    font-weight: var(--weight-semibold);
+    font-size: var(--text-sm);
+    text-decoration: none;
+  }
+
+  .promise__go-icon {
     display: grid;
     place-items: center;
     width: var(--tap-target-min);
     height: var(--tap-target-min);
-    margin-top: auto;
     border: var(--brut-border);
     border-radius: var(--radius-full);
     background-color: var(--color-ink);
@@ -59,7 +75,7 @@ import { ArrowRightIcon } from '@phosphor-icons/react/dist/ssr';
     transition: translate var(--dur-base) var(--ease-out);
   }
 
-  .promise__go:hover {
+  .promise__go:hover .promise__go-icon {
     translate: 3px 0;
   }
 </style>
