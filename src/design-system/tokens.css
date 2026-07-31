@@ -146,7 +146,8 @@
   --nav-gap-outer: var(--space-sm);
   --nav-gap-inner: var(--space-xs);
   /* Its own step rather than a new rung on the spacing scale: the clear paper under a
-     floating capsule is a specific measurement, not a general one. */
+     floating capsule is a specific measurement, not a general one. Wider screens carry
+     more of it, the way a poster needs a deeper margin than a postcard. */
   --hero-top: 2.5rem;
   --tool-icon-size: 46px;
 
@@ -225,6 +226,12 @@
   --dur-slow: 450ms;
   /* Outside the UI easing family on purpose: a spinner reads as mechanical, not eased. */
   --dur-spin: 700ms;
+}
+
+@media (width >= 64rem) {
+  :root {
+    --hero-top: 4.375rem;
+  }
 }
 
 /*
