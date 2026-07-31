@@ -30,7 +30,7 @@ test('the hero bento shows the preview, the badge, and the promise', async ({ pa
   await page.goto('/');
 
   await expect(page.locator('.preview__saved')).toHaveText(/86%/);
-  await expect(page.getByRole('link', { name: 'Start here' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Explore tools' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Read the privacy promise' })).toBeVisible();
 });
 

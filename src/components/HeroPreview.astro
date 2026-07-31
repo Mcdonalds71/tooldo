@@ -102,9 +102,11 @@ const saved = Math.round((1 - after / before) * 100);
     font-size: var(--text-sm);
   }
 
+  /* Sized for the tool loop that will live here, which is what makes this card the
+     focus of the hero rather than a caption with a gap under it. */
   .preview__stage {
     flex: 1;
-    min-height: 7rem;
+    min-height: 13rem;
     border-radius: var(--radius-md);
     background-color: color-mix(in srgb, var(--color-paper-dim) 55%, transparent);
   }

@@ -16,7 +16,7 @@ import HeroPromise from './HeroPromise.astro';
   <div class="shell">
     <div class="hero__top">
       <h1 class="hero__headline">
-        Fix any file.<br />Without the cloud.
+        Fix any file.<br />Keep it private.
       </h1>
 
       <HeroBadge />
@@ -31,7 +31,7 @@ import HeroPromise from './HeroPromise.astro';
 
 <style>
   .hero {
-    padding-block: var(--space-lg) var(--space-3xl);
+    padding-block: var(--space-lg) var(--space-2xl);
   }
 
   /* 700 is the top of Clash Display's axis — there is no heavier cut to reach for. */
@@ -43,18 +43,22 @@ import HeroPromise from './HeroPromise.astro';
     text-transform: uppercase;
   }
 
-  /* The stamp takes the wedge of paper the ragged headline leaves on the right. */
+  /* The stamp floats in the top right with its own air, rather than sitting in a
+     column that happens to be next to the words. */
   .hero__top {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
-    align-items: end;
-    gap: var(--space-lg);
+    align-items: center;
+    gap: var(--space-3xl);
   }
 
+  /* The showcase leads and the information card sits beside it, narrower and shorter,
+     centred against the taller card rather than stretched to match it. */
   .hero__bento {
     display: grid;
-    grid-template-columns: 1.6fr 1fr;
-    gap: var(--space-sm);
+    grid-template-columns: 1.9fr 1fr;
+    align-items: center;
+    gap: var(--space-md);
     margin-top: var(--space-lg);
   }
 
