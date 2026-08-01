@@ -1,0 +1,18 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "tooldo",
+  "compatibility_date": "2026-08-01",
+
+  // No "main": the build is static HTML, so there is no Worker script to run in front
+  // of it. Cloudflare serves the files straight off its edge and a request never
+  // reaches compute — which is the whole point of a suite that does its work in the
+  // visitor's browser.
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page"
+  },
+
+  // A project whose pitch is that nothing is reported anywhere should not report its
+  // own build habits either.
+  "send_metrics": false
+}

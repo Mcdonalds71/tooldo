@@ -1,6 +1,7 @@
 node_modules/
 dist/
 .astro/
+.wrangler/
 
 # The Fontshare EULA permits using and self-hosting Clash Display but not
 # redistributing the files, and a public repo is redistribution. Fetch it per

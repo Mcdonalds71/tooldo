@@ -3,3 +3,6 @@
 allowBuilds:
   esbuild: true
   sharp: true
+  # Wrangler shells out to workerd, whose install script fetches the platform binary.
+  # Skip it and the deploy step fails on a runtime that never finished installing.
+  workerd: true
