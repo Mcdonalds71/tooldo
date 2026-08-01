@@ -1,4 +1,4 @@
-﻿name: CI
+name: CI
 
 on:
   pull_request:
@@ -7,10 +7,6 @@ on:
 
 permissions:
   contents: read
-
-# CLASH_DISPLAY_URL is a repository secret, so a pull request from a fork builds
-# without it and headings fall back to the system sans. That is the intended
-# outcome â€” see public/fonts/README.md â€” and never a failing check.
 
 jobs:
   verify:
@@ -28,8 +24,6 @@ jobs:
       - run: pnpm lint
       - run: pnpm test
       - run: pnpm build
-        env:
-          CLASH_DISPLAY_URL: ${{ secrets.CLASH_DISPLAY_URL }}
 
   smoke:
     name: Smoke tests
@@ -43,10 +37,7 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
-        # The suite builds the site before serving it, so it needs the font too.
       - run: pnpm test:e2e
-        env:
-          CLASH_DISPLAY_URL: ${{ secrets.CLASH_DISPLAY_URL }}
 
   audit:
     name: Dependency audit
