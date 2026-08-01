@@ -29,17 +29,20 @@ system sans. Headings still render; they just aren't wearing the brand face yet.
 
 ## Fetching it in a build
 
-`pnpm build` runs `scripts/fetch-fonts.mjs` first. Point `CLASH_DISPLAY_URL` at a
-private direct link to the `.woff2` and the build pulls its own copy; leave it unset and
-the build still succeeds on the fallback face.
+`pnpm build` runs `scripts/fetch-fonts.mjs` first, which downloads the file from the R2
+bucket named in that script. Nothing needs configuring — a fresh clone, a fork's pull
+request and the production deploy all end up on the real face.
 
-Set it wherever the production site is actually built. For this project that is
-Cloudflare Pages — see [`docs/deploy.md`](../../docs/deploy.md) for the bucket and the
-project settings. The GitHub Actions secret of the same name only dresses up CI's own
-build; it never reaches the deploy.
+The address is committed rather than held per-environment. A URL is not the file, so it
+carries no licence weight, and the font behind it is public either way: the deployed site
+serves that same woff2 to every visitor who loads a page.
 
-The link has to be reachable without a login, since the script fetches it
-unauthenticated — an object-storage URL works, a private repo path doesn't.
+`CLASH_DISPLAY_URL` overrides it if the file ever moves and a commit would be awkward.
+Either way the link has to be reachable without a login, since the fetch is
+unauthenticated.
+
+If the download fails the build still succeeds and headings fall back — a typeface should
+never take a deploy down with it.
 
 `src/design-system/fonts.css` declares the weight axis as `400 700`. Clash Display has
 no heavier weight, so map any 800 or 900 heading down to 700.

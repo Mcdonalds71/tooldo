@@ -26,35 +26,16 @@ the versions from the repo, so a change to either travels with the commit that n
 
 ## Environment variables
 
-One variable, and it is optional:
+None. The build needs nothing set to produce the real site.
 
-| Name | Value |
-|---|---|
-| `CLASH_DISPLAY_URL` | A direct link to `clash-display-variable.woff2` |
+Clash Display is fetched from the `tooldo-assets` R2 bucket at build time, and the address
+lives in `scripts/fetch-fonts.mjs` rather than in each environment's settings — see
+[`public/fonts/README.md`](../public/fonts/README.md) for why the file can't be committed
+but its URL can. `CLASH_DISPLAY_URL` overrides the default if the object ever moves.
 
-Set it for **both** Production and Preview. Each environment keeps its own set, and a
-preview that quietly renders headings in the system sans looks like a CSS regression
-rather than a missing variable.
-
-Without it the build still succeeds — see [`public/fonts/README.md`](../public/fonts/README.md)
-for why the font can't live in the repo and what the fallback costs.
-
-### Hosting the font on R2
-
-Since the deploy is already on Cloudflare, the font may as well be:
-
-1. Create an R2 bucket (`tooldo-assets` or similar).
-2. Upload `clash-display-variable.woff2` under a path that isn't worth guessing.
-3. Enable public access on the bucket, or attach a custom domain.
-4. Point `CLASH_DISPLAY_URL` at the object URL.
-
-Use a plain public URL, not a presigned one. R2's S3-compatible signatures expire after at
-most seven days, which would change the site's face mid-month with nothing in the commit
-log to explain it.
-
-A public bucket is not a licence problem. The deployed site already serves that exact file
-at a public URL — that is what a webfont *is*, and what the Fontshare licence grants. What
-it forbids is shipping the file as a repository asset, which is why the build fetches it.
+Use a plain public URL there, never a presigned one. R2's S3-compatible signatures expire
+after at most seven days, which would change the site's face mid-month with nothing in the
+commit log to explain it.
 
 ## Install scripts
 
