@@ -55,7 +55,7 @@ Keep a one-line "why this is different" on the landing page and in the case stud
 
 | Layer | Choice | Why |
 |---|---|---|
-| **Meta-framework** | **Astro 5** with **React islands** | Astro ships ~0 KB JS on static pages (landing, tool shells, SEO pages) and hydrates only the interactive tool as a React "island." You get Next-level DX where you need React, and a Lighthouse-100 marketing site everywhere else. This is the sharp choice for an SEO-driven, static, interactive-in-spots tool suite. |
+| **Meta-framework** | **Astro 7** with **React islands** | Astro ships ~0 KB JS on static pages (landing, tool shells, SEO pages) and hydrates only the interactive tool as a React "island." You get Next-level DX where you need React, and a Lighthouse-100 marketing site everywhere else. This is the sharp choice for an SEO-driven, static, interactive-in-spots tool suite. |
 | **Language** | **TypeScript** (strict) | Non-negotiable for a portfolio codebase recruiters will read. |
 | **UI runtime** | **React 19** (as islands only) | Each tool is one React island. The rest of the site is zero-JS HTML. |
 | **Styling** | **Tailwind CSS v4** + CSS variables for tokens | Fast, and the token layer (see §4) maps cleanly to Tailwind theme vars. |
