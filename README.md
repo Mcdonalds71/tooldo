@@ -15,6 +15,10 @@ pnpm install
 pnpm dev
 ```
 
+## Deploy
+
+Static build on Cloudflare Pages — [`docs/deploy.md`](docs/deploy.md).
+
 ## Licence
 
 MIT — see [`LICENSE`](LICENSE). Built by [Emmanuel Onugwu](https://www.emmanuelonugwu.com).

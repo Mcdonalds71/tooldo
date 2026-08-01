@@ -33,17 +33,13 @@ system sans. Headings still render; they just aren't wearing the brand face yet.
 private direct link to the `.woff2` and the build pulls its own copy; leave it unset and
 the build still succeeds on the fallback face.
 
-Set it wherever the production site is actually built:
+Set it wherever the production site is actually built. For this project that is
+Cloudflare Pages — see [`docs/deploy.md`](../../docs/deploy.md) for the bucket and the
+project settings. The GitHub Actions secret of the same name only dresses up CI's own
+build; it never reaches the deploy.
 
-- **A host that builds for you** (Vercel, Netlify, Cloudflare Pages) — add it to that
-  project's environment variables. This is the one that decides what visitors see.
-- **GitHub Actions** — `gh secret set CLASH_DISPLAY_URL`. Only needed if the deploy runs
-  from a workflow; the checks alone don't care which face they render.
-
-The link has to be reachable without a login, since the script fetches it unauthenticated
-— an object-storage URL works, a private repo path doesn't. Serving the font from the
-deployed site is ordinary self-hosting and squarely within the licence; the thing the
-EULA rules out is shipping the file itself in a public repo.
+The link has to be reachable without a login, since the script fetches it
+unauthenticated — an object-storage URL works, a private repo path doesn't.
 
 `src/design-system/fonts.css` declares the weight axis as `400 700`. Clash Display has
 no heavier weight, so map any 800 or 900 heading down to 700.
