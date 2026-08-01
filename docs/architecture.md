@@ -104,7 +104,7 @@ Full checklist in the `security-check` skill.
 
 | Concern | Choice |
 |---|---|
-| Meta-framework | Astro 5 (static + React islands) |
+| Meta-framework | Astro 7 (static + React islands) |
 | UI | React 19 (islands only), TypeScript strict |
 | Styling | Tailwind CSS v4 + CSS-variable tokens |
 | Primitives | Radix UI |

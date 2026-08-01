@@ -13,7 +13,7 @@ A suite of ten free, everyday utility tools (PDF, image, video, data, generators
 
 ## 2. Stack (do not swap without an ADR)
 
-- **Astro 5** with **React 19 islands** — static HTML everywhere; hydrate only the interactive tool.
+- **Astro 7** with **React 19 islands** — static HTML everywhere; hydrate only the interactive tool.
 - **TypeScript**, `strict` mode.
 - **Tailwind CSS v4** + CSS-variable design tokens.
 - **Radix UI** primitives (styled with our tokens) for menus, dialogs, sliders, tabs, tooltips.
