@@ -1,5 +1,7 @@
 # tooldo
 
+[![CI](https://github.com/Mcdonalds71/tooldo/actions/workflows/ci.yml/badge.svg)](https://github.com/Mcdonalds71/tooldo/actions/workflows/ci.yml)
+
 Free tools for everyday files — convert, compress, and clean up, all running right in your browser. No account, no uploads, no catch.
 
 > ⚠️ Early development. The showpiece README (live links, tool demos, screenshots) lands once the first tools ship. See [`docs/architecture.md`](docs/architecture.md) for how it's built and [`docs/build-spec.md`](docs/build-spec.md) for the full plan.
