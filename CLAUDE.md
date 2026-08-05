@@ -111,3 +111,34 @@ pnpm typecheck      # tsc --noEmit
 
 Invoke the matching skill for the job instead of improvising:
 `new-tool` · `design-system` · `empty-state` · `animation` · `ux-copy` · `pre-commit` · `security-check`.
+
+## 14. Where the project is
+
+Read [`docs/progress.md`](docs/progress.md) first in a new session. It carries what is
+built, what is next, and the decisions that aren't obvious from the code.
+
+- **Repo:** https://github.com/Mcdonalds71/tooldo (public, MIT)
+- **Live:** https://tooldo.emmanuelonugwu-c.workers.dev — Cloudflare Workers, builds from
+  `main` on push. `tooldo.online` is not connected yet.
+- **Deploy setup:** [`docs/deploy.md`](docs/deploy.md). Nothing needs configuring per
+  environment; the build is self-contained.
+
+### Glass, and where it is allowed
+
+The nav capsule is frosted glass, and the tokens for it already exist
+(`--glass-tint`, `--glass-blur`, `--glass-saturate`, `--glass-gradient`,
+`--glass-sheen`). Glass is also the intended look for **illustrations** — the folder in
+a dropzone, the artwork in an empty state.
+
+The line is chrome versus artwork. Anything the user operates — button, dropzone,
+card, panel — stays neo-brutalist: ink border, hard zero-blur shadow. Anything that is
+purely drawn can be soft, blurred and glassy, because it isn't a control and never
+needs a hit target or a focus ring. Glass artwork inside a neo-brut frame is the
+combination; a glass button is not.
+
+Warm it to the palette. Reference shots for this look are cool violet and grey; ours
+mixes from `--color-paper`, `--color-card` and `--color-signal`. Cool glass on warm
+paper reads as a component borrowed from another product.
+
+An element with `backdrop-filter` becomes its own backdrop root, so nested glass cannot
+blur the page behind it. Keep glass layers as siblings.

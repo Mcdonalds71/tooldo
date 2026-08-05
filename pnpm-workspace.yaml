@@ -1,5 +1,14 @@
 # Install scripts run only for the dependencies listed here. Anything else that asks
 # is a supply-chain decision to make deliberately, not a prompt to click through.
+# Both of these are patched upstream but reach us through a dependency that hasn't
+# picked the fix up yet. Neither ships to a visitor — undici arrives via wrangler's
+# local runtime, fast-uri via the YAML language server behind astro check — so the
+# override is about keeping the audit honest, not about closing a live hole.
+# Drop each one once its parent releases past it.
+overrides:
+  undici: '>=7.29.0'
+  fast-uri: '>=3.1.5'
+
 allowBuilds:
   esbuild: true
   sharp: true
