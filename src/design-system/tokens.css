@@ -39,6 +39,17 @@
    */
   --color-signal: #ff3b14;
   --color-signal-dark: #c92806;
+  /*
+   * Signal as a *fill with content on it*. White on the hot step is 3.6:1, under the
+   * 4.5:1 small text needs, so a filled button can't carry a white label at the hot
+   * value however much we want it to. This step is deep enough for white at 4.7:1 —
+   * and a touch warmer with it, hue 12° against the hot step's 10°.
+   *
+   * The hot step stays where it belongs: focus rings, borders, progress, the drag-over
+   * flood. Those are non-text and clear the 3:1 they need on their own.
+   */
+  --color-signal-fill: #de2e00;
+  --color-on-signal: var(--color-white);
 
   /* Status */
   --color-success: #1f8a4c;

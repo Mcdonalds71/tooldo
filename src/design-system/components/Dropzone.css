@@ -108,8 +108,8 @@
 .dropzone:hover .dropzone__glyph,
 .dropzone[data-dragging] .dropzone__glyph {
   transform: translateY(-8px) rotate(6deg) scale(1.06);
-  background-color: var(--color-signal);
-  color: var(--color-ink);
+  background-color: var(--color-signal-fill);
+  color: var(--color-on-signal);
 }
 
 /* No ink frame around the glyph down here: the compact zone is a quiet invitation
@@ -139,8 +139,8 @@
 .dropzone__tag[data-slot="1"] {
   right: var(--space-lg);
   bottom: var(--space-md);
-  background-color: var(--color-signal);
-  color: var(--color-ink);
+  background-color: var(--color-signal-fill);
+  color: var(--color-on-signal);
   rotate: 5deg;
 }
 

@@ -34,8 +34,8 @@
   }
 
   ::selection {
-    background-color: var(--color-signal);
-    color: var(--color-paper);
+    background-color: var(--color-signal-fill);
+    color: var(--color-on-signal);
   }
 
   :focus-visible {

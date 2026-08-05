@@ -125,7 +125,14 @@ export function Dropzone({
         illustration={
           illustration ?? (
             <span className="dropzone__glyph">
-              <UploadSimpleIcon size="45%" weight="duotone" aria-hidden />
+              {/* Duotone paints a filled shape behind the strokes, which at the compact
+                  size reads as a grey box rather than an accent. Regular is the right
+                  register down there anyway: expressive is for the opening moment. */}
+              <UploadSimpleIcon
+                size="45%"
+                weight={size === 'lg' ? 'duotone' : 'regular'}
+                aria-hidden
+              />
             </span>
           )
         }
