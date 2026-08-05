@@ -6,6 +6,21 @@ import '../tools/pdf/pdf.css';
 const description =
   'Merge, reorder, rotate, and trim PDF pages in your browser. Your files never leave your device.';
 
+const steps = [
+  {
+    title: 'Drop your PDFs',
+    body: 'Every page opens as a card, in the order the files arrived.',
+  },
+  {
+    title: 'Arrange them',
+    body: 'Drag a page somewhere else, turn it, or take it out. The arrows on each card do the same thing from the keyboard.',
+  },
+  {
+    title: 'Save',
+    body: 'The pages are copied into a fresh PDF and downloaded straight to you.',
+  },
+];
+
 const faq: readonly FaqEntry[] = [
   {
     question: 'Do my files get uploaded?',
@@ -51,22 +66,25 @@ const faq: readonly FaqEntry[] = [
   description={description}
   faq={faq}
 >
-  <PdfTool client:visible />
+  {
+    /* `client:load`, not `client:visible`: this island is the whole reason the route
+       exists and it opens above the fold, so there is nothing to defer for. Waiting on
+       an intersection here only buys a window where the dropzone is painted but dead. */
+  }
+  <PdfTool client:load />
 
   <Fragment slot="notes">
     <section class="steps">
       <h2 class="steps__heading">How it works</h2>
       <ol class="steps__list">
-        <li>
-          <b>Drop your PDFs.</b> Every page opens as a card, in the order the files arrived.
-        </li>
-        <li>
-          <b>Arrange them.</b> Drag a page somewhere else, turn it, or take it out. The arrows on
-          each card do the same thing from the keyboard.
-        </li>
-        <li>
-          <b>Save.</b> The pages are copied into a fresh PDF and downloaded straight to you.
-        </li>
+        {
+          steps.map((step) => (
+            <li class="step">
+              <b class="step__title">{step.title}</b>
+              <p class="step__body">{step.body}</p>
+            </li>
+          ))
+        }
       </ol>
     </section>
   </Fragment>
@@ -74,7 +92,6 @@ const faq: readonly FaqEntry[] = [
 
 <style>
   .steps {
-    max-width: var(--width-prose);
     margin-top: var(--space-2xl);
   }
 
@@ -82,18 +99,42 @@ const faq: readonly FaqEntry[] = [
     font-size: var(--text-xl);
   }
 
+  /* Three columns on a wide screen, one on a narrow one. Every line in the section —
+     the heading and each step — starts on the same left edge, which an indented list
+     with its markers stripped by the reset never managed. */
   .steps__list {
-    margin-top: var(--space-sm);
-    padding-inline-start: var(--space-md);
-    color: var(--color-ink-soft);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: var(--space-md);
+    margin-top: var(--space-md);
+    counter-reset: step;
+    list-style: none;
   }
 
-  .steps__list li {
-    margin-top: var(--space-2xs);
+  .step::before {
+    counter-increment: step;
+    content: counter(step);
+    display: grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    margin-bottom: var(--space-2xs);
+    border: var(--hairline);
+    border-radius: var(--radius-full);
+    background-color: var(--color-card);
+    color: var(--color-signal-dark);
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
   }
 
-  .steps__list b {
-    color: var(--color-ink);
+  .step__title {
+    font-family: var(--font-display);
     font-weight: var(--weight-semibold);
+  }
+
+  .step__body {
+    margin-top: var(--space-3xs);
+    color: var(--color-ink-soft);
   }
 </style>

@@ -5,9 +5,12 @@ import {
   type BoardPage,
   movePage,
   removePage,
+  reversePages,
   rotateAll,
   rotatePage,
+  type SortDirection,
   shiftPage,
+  sortByName,
   toPlan,
 } from './board';
 import { buildPdf, inspectFiles, loadSample } from './client';
@@ -16,7 +19,8 @@ import { usePageThumbnails } from './usePageThumbnails';
 
 export type Stage =
   | { readonly name: 'empty' }
-  | { readonly name: 'reading'; readonly progress: number }
+  /** `total` is the file count, so the overlay can name the one it is on. */
+  | { readonly name: 'reading'; readonly progress: number; readonly total: number }
   | { readonly name: 'ready' }
   | { readonly name: 'saving'; readonly progress: number }
   | {
@@ -83,11 +87,12 @@ export function usePdfWorkbench() {
 
       const signal = start();
       const keepBoard = board.pages.length > 0;
-      setStage({ name: 'reading', progress: 0 });
+      const total = incoming.length;
+      setStage({ name: 'reading', progress: 0, total });
 
       try {
         const inspected = await inspectFiles(incoming, signal, (progress) =>
-          setStage({ name: 'reading', progress }),
+          setStage({ name: 'reading', progress, total }),
         );
 
         setBoard((current) => ({
@@ -104,7 +109,7 @@ export function usePdfWorkbench() {
 
   const trySample = useCallback(async () => {
     const signal = start();
-    setStage({ name: 'reading', progress: 0 });
+    setStage({ name: 'reading', progress: 0, total: 1 });
 
     try {
       await addFiles([await loadSample(signal)]);
@@ -157,6 +162,18 @@ export function usePdfWorkbench() {
         setStage({ name: 'empty' });
       },
       keepEditing: () => setStage({ name: 'ready' }),
+      // Sorting is the one edit that needs the files as well as the pages, since it
+      // orders by their names.
+      sort: (direction: SortDirection) =>
+        setBoard((current) => ({
+          ...current,
+          pages: sortByName(
+            current.pages,
+            current.files.map((file) => file.name),
+            direction,
+          ),
+        })),
+      reverse: () => edit(reversePages),
       move: (id: string, to: number) => edit((pages) => movePage(pages, id, to)),
       shift: (id: string, step: number) => edit((pages) => shiftPage(pages, id, step)),
       rotate: (id: string) => edit((pages) => rotatePage(pages, id)),

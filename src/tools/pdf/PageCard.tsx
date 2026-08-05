@@ -7,6 +7,7 @@ import {
 import { motion } from 'motion/react';
 import type { CSSProperties, DragEventHandler } from 'react';
 import { IconButton } from '../../design-system/components/IconButton';
+import { dropIn, instant } from '../../design-system/motion';
 import { type BoardPage, displayRatio } from './board';
 
 export interface PageDragHandlers {
@@ -53,7 +54,14 @@ export function PageCard({
     // Motion claims `onDragStart` and `onDragEnd` for its own pan gesture, so the two
     // can't sit on the same element.
     <li className="page-slot" draggable {...drag}>
-      <motion.div className="page-card" layout={!reduced} data-dragging={dragging || undefined}>
+      {/* The entrance is inherited from the board, which staggers it, so no `animate`
+          here — only the variants this card resolves it against. */}
+      <motion.div
+        className="page-card"
+        layout={!reduced}
+        variants={reduced ? instant : dropIn}
+        data-dragging={dragging || undefined}
+      >
         {/* The ratio shapes the frame and tells a turned preview how wide to draw so it
             lands back inside it. */}
         <span

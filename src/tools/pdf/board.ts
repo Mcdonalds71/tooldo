@@ -75,6 +75,38 @@ export function removePage(pages: readonly BoardPage[], id: string): BoardPage[]
   return pages.filter((page) => page.id !== id);
 }
 
+export type SortDirection = 'asc' | 'desc';
+
+/**
+ * Files in name order, each one's pages back in the order they sit inside it. Reaching
+ * for A–Z means "put this back the way the filenames say", so a hand-shuffle inside a
+ * file is undone too — anything less is a half-sort.
+ *
+ * Compared with `numeric`, so part-2 lands before part-10 rather than after it.
+ */
+export function sortByName(
+  pages: readonly BoardPage[],
+  names: readonly string[],
+  direction: SortDirection,
+): BoardPage[] {
+  const order = [...new Set(pages.map((page) => page.source))].sort((a, b) => {
+    const compared = (names[a] ?? '').localeCompare(names[b] ?? '', undefined, {
+      numeric: true,
+      sensitivity: 'base',
+    });
+
+    return direction === 'asc' ? compared : -compared;
+  });
+
+  return order.flatMap((source) =>
+    pages.filter((page) => page.source === source).sort((a, b) => a.page - b.page),
+  );
+}
+
+export function reversePages(pages: readonly BoardPage[]): BoardPage[] {
+  return [...pages].reverse();
+}
+
 export function toPlan(pages: readonly BoardPage[]): PagePlan[] {
   return pages.map(({ source, page, rotation }) => ({ source, page, rotation }));
 }

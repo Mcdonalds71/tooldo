@@ -1,3 +1,5 @@
+import { copyFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { expect, type Page, test } from '@playwright/test';
 import { hydrated } from './support';
 
@@ -69,6 +71,39 @@ test('removing every page returns the tool to its opening state', async ({ page 
   }
 
   await expect(page.getByRole('heading', { name: /Drop a PDF/ })).toBeVisible();
+});
+
+/**
+ * Round trip: save the sample, then drop what came back in twice under two names. It
+ * covers merging and sorting at once, and it only passes if the PDF the tool wrote is
+ * one the tool can read again.
+ */
+test('two files merge onto one board and sort by name', async ({ page }, testInfo) => {
+  await openSample(page);
+  await page.getByRole('button', { name: 'Save PDF' }).click();
+
+  const download = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Download PDF' }).click();
+
+  const beta = join(testInfo.outputDir, 'beta.pdf');
+  const alpha = join(testInfo.outputDir, 'alpha.pdf');
+  await (await download).saveAs(beta);
+  copyFileSync(beta, alpha);
+
+  await page.getByRole('button', { name: 'Start over' }).click();
+  await page.locator('.dropzone__input').setInputFiles([beta, alpha]);
+
+  await expect(page.locator('.page-card')).toHaveCount(SAMPLE_PAGES * 2);
+  await expect(page.getByText('across 2 files')).toBeVisible();
+
+  const origins = page.locator('.page-card__origin');
+  await expect(origins.first()).toHaveText('beta.pdf');
+
+  await page.getByRole('button', { name: 'A–Z' }).click();
+  await expect(origins.first()).toHaveText('alpha.pdf');
+
+  await page.getByRole('button', { name: 'Z–A' }).click();
+  await expect(origins.first()).toHaveText('beta.pdf');
 });
 
 test('a file that claims to be a PDF but is not says so', async ({ page }) => {

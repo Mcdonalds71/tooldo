@@ -13,6 +13,12 @@ const baseURL = 'http://localhost:4322';
 export default defineConfig({
   testDir: 'e2e',
   fullyParallel: true,
+  /**
+   * Two, not one per core. A tool page runs a PDF engine in one worker, pdf.js in
+   * another and a canvas rasteriser on top; four browsers doing that at once put the
+   * renderer over its memory ceiling and the tab dies mid-assertion.
+   */
+  workers: 2,
   forbidOnly: isCI,
   retries: isCI ? 2 : 0,
   reporter: isCI ? 'github' : 'list',

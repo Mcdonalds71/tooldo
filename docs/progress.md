@@ -33,9 +33,21 @@ from pdf.js on the main thread (ADR 0006). "Try a sample" draws its own six-page
 rather than shipping a binary. 51 unit tests, 5 Playwright specs across desktop, mobile
 and reduced-motion.
 
+The pages land in a frosted tray with a warm glow behind it, because glass over flat
+paper is just a tinted box. The dropzone's folder works the same way: ruled sheets, and
+a smoked pane in front whose `backdrop-filter` blurs the half of them it covers. Both
+are siblings, never nested — that is the only arrangement where the blur has anything to
+work on. The counter reads pages drawn, not a percentage.
+
 `Dropzone` grew a `size` prop for this: the compact zone under a full board is how you
 merge a second file in, and it drops to a secondary action so the view keeps one
 vermilion.
+
+**The island is `client:load`, not `client:visible`.** On a route that exists only to
+run this tool there is nothing to defer for, and waiting on an intersection bought a
+window where the dropzone was painted but dead. Playwright is capped at two workers for
+the same reason the tool is worth having: it does real work, and four browsers running a
+PDF engine, pdf.js and a canvas at once take the renderer past its memory ceiling.
 
 ## Next
 

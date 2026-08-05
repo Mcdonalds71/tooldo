@@ -3,11 +3,11 @@
  *
  * Its measurements live in one block at the top — the same idea as the component tokens
  * in the design system, kept beside the tool because they are only this tool's. Nothing
- * below that block holds a literal.
+ * below that block holds a literal that isn't the geometry of a drawing.
  *
- * The board is dense working UI, so it follows the restraint rule: hairlines and soft
- * elevation, no hard shadows. The loud register belongs to the dropzone above it and the
- * save button, which is the only vermilion on the view.
+ * Two registers, per the restraint rule. The pages are dense working UI: hairlines, soft
+ * elevation, no hard shadows, and one vermilion on the view (Save PDF). The dropzone
+ * above them is the loud one.
  */
 
 .pdf-tool {
@@ -18,6 +18,13 @@
   --page-drift: 5s;
   /* A4 upright, until a card sets its own from the page it is showing. */
   --page-ratio: 0.707;
+  /* The site blur is tuned for a nav capsule floating over a whole page. Over a pane
+     this small it erases the sheets instead of softening them. */
+  --art-blur: 7px;
+  /* Smoked, not frosted: white sheets behind a cream pane are white sheets. Enough ink
+     in the tint and they come through as soft light, which is the whole effect. */
+  --art-glass: color-mix(in srgb, var(--color-ink) 24%, var(--glass-tint-strong));
+  --art-glass-live: color-mix(in srgb, var(--color-signal) 30%, var(--art-glass));
 
   position: relative;
 }
@@ -28,31 +35,22 @@
   gap: var(--space-md);
 }
 
-.pdf-tool__notice {
-  color: var(--color-ink-soft);
-  font-size: var(--text-sm);
-  text-align: center;
-}
-
 /* ---- the bar above the board ---- */
 
+/* No frame: the count and the controls sit on the paper, and the only enclosure on the
+   view is the tray holding the pages. */
 .board-bar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-2xs);
-  padding: var(--space-2xs);
-  border: var(--hairline);
-  border-radius: var(--radius-full);
-  background-color: var(--color-card);
+  gap: var(--space-2xs) var(--space-sm);
 }
 
 .board-bar__count {
   display: flex;
   align-items: baseline;
   gap: var(--space-3xs);
-  padding-inline-start: var(--space-xs);
+  margin-inline-end: auto;
   color: var(--color-ink-soft);
   font-size: var(--text-sm);
 }
@@ -68,17 +66,116 @@
   color: var(--color-ink-faint);
 }
 
+.board-bar__arrange,
 .board-bar__actions {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2xs);
 }
 
+/*
+ * On a phone the bar becomes three stacked rows: the count, the arranging controls, then
+ * the two secondary actions side by side with the primary spanning the full width under
+ * them. Everything reaches both margins, so nothing floats in the middle of the screen.
+ */
+@media (width < 48rem) {
+  .board-bar {
+    display: grid;
+    gap: var(--space-2xs);
+  }
+
+  .board-bar__count {
+    margin-inline-end: 0;
+  }
+
+  .board-bar__arrange {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  }
+
+  .board-bar__actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .board-bar__actions > :last-child {
+    grid-column: 1 / -1;
+  }
+
+  .board-bar .btn {
+    width: 100%;
+  }
+}
+
+/* ---- the tray the pages land in ---- */
+
+.page-stage {
+  position: relative;
+}
+
+/*
+ * Glass over flat paper is a tinted box. This is what the tray blurs — a warm wash held
+ * to the tray's own footprint, so it reads through the pane rather than as a band of
+ * colour leaking out around it.
+ */
+.page-stage__glow {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(
+      44% 58% at 16% 12%,
+      color-mix(in srgb, var(--color-signal) 26%, transparent),
+      transparent 72%
+    ),
+    radial-gradient(
+      48% 66% at 86% 82%,
+      color-mix(in srgb, var(--color-signal) 14%, transparent),
+      transparent 72%
+    ),
+    radial-gradient(72% 80% at 50% 50%, var(--color-paper-dim), transparent 80%);
+  pointer-events: none;
+}
+
+.page-tray {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  padding: var(--space-sm);
+  border: var(--hairline);
+  border-radius: var(--radius-lg);
+  background-color: var(--glass-tint);
+  background-image: var(--glass-gradient);
+  box-shadow: var(--glass-sheen);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+}
+
+/* The counter from the reference: a page number rather than a percentage, so progress
+   reads as something happening to your document and not to a generic bar. */
+.page-tray__status {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3xs);
+  color: var(--color-ink-soft);
+  font-size: var(--text-sm);
+}
+
+.page-tray__status[data-tone="quiet"] {
+  color: var(--color-ink-faint);
+}
+
+.page-tray__tick {
+  font-family: var(--font-mono);
+  color: var(--color-signal-dark);
+}
+
 /* ---- the pages ---- */
 
 .page-board {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(var(--page-card-width), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(var(--page-card-width), 100%), 1fr));
   gap: var(--space-sm);
   list-style: none;
 }
@@ -86,6 +183,7 @@
 /* The grid cell. It carries the native drag; the card inside carries the animation. */
 .page-slot {
   display: grid;
+  min-width: 0;
 }
 
 .page-card {
@@ -93,6 +191,7 @@
   flex-direction: column;
   align-items: center;
   gap: var(--space-2xs);
+  min-width: 0;
   padding: var(--space-2xs);
   border: var(--hairline);
   border-radius: var(--radius-md);
@@ -146,18 +245,23 @@
   gap: var(--space-3xs);
   width: 100%;
   min-width: 0;
+  overflow: hidden;
   padding-inline: var(--space-3xs);
   font-size: var(--text-xs);
   color: var(--color-ink-faint);
 }
 
 .page-card__number {
+  flex-shrink: 0;
   font-family: var(--font-mono);
   font-weight: var(--weight-medium);
   color: var(--color-ink);
 }
 
+/* A filename is arbitrary length and would otherwise push the whole grid sideways. */
 .page-card__origin {
+  flex: 1;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -178,8 +282,13 @@
 /* Below the card's own width a single page would fill the screen, so the grid is told
    to hold two regardless and the four controls fold into a square underneath. */
 @media (width < 30rem) {
+  .page-tray {
+    padding: var(--space-2xs);
+  }
+
   .page-board {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2xs);
   }
 
   .page-card__controls {
@@ -189,73 +298,130 @@
   }
 }
 
-/* ---- the empty state's artwork ---- */
+/* ---- the folder that takes the file ---- */
 
-/* Sized from the dropzone's own glyph token, so the compact zone shrinks it too. */
+/* Sized from the dropzone's own glyph token, so the compact zone shrinks it too.
+   Block, because a span won't take a width for its absolute children to sit in. */
 .pdf-art {
   position: relative;
-  display: grid;
-  place-items: center;
-  width: var(--drop-glyph-size);
+  display: block;
+  width: calc(var(--drop-glyph-size) * 1.4);
   height: var(--drop-glyph-size);
 }
 
+.pdf-art__tab,
+.pdf-art__back {
+  position: absolute;
+  left: 0;
+  background-color: var(--color-ink);
+}
+
+.pdf-art__tab {
+  top: 12%;
+  width: 42%;
+  height: 18%;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+}
+
+.pdf-art__back {
+  bottom: 0;
+  width: 100%;
+  height: 72%;
+  border-radius: var(--radius-sm) var(--radius-md) var(--radius-md) var(--radius-md);
+}
+
 /*
- * Warm glass, mixed from the paper palette rather than borrowed cool. These are drawn,
- * not operated, which is the line that lets them be soft next to a neo-brut mark.
- * The individual rotate and translate set the pose; the keyframes use `transform`, which
- * composes on top, so the drift doesn't fight the angle.
+ * Three ruled sheets standing in the folder. The static pose is set with the individual
+ * `rotate` and `translate` properties so the drift keyframes can use `transform` and
+ * compose on top instead of fighting it — and so the drag-over pose has something of its
+ * own to transition.
  */
 .pdf-art__sheet {
   position: absolute;
-  width: 66%;
-  height: 84%;
+  bottom: 26%;
+  width: 34%;
+  height: 62%;
   border: var(--hairline);
-  border-radius: var(--radius-sm);
-  background-color: var(--glass-tint-strong);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  background-color: var(--color-white);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--color-line) 0 1px,
+    transparent 1px 5px
+  );
+  background-position: 50% 24%;
+  background-size: 62% 46%;
+  background-repeat: no-repeat;
+  animation: pdf-art-drift var(--page-drift) var(--ease-in-out) infinite alternate;
+  transition:
+    rotate var(--dur-slow) var(--ease-out),
+    translate var(--dur-slow) var(--ease-out);
+}
+
+.pdf-art__sheet[data-slot="left"] {
+  left: 7%;
+  rotate: -11deg;
+}
+
+.pdf-art__sheet[data-slot="mid"] {
+  left: 33%;
+  animation-delay: -1.6s;
+}
+
+.pdf-art__sheet[data-slot="right"] {
+  left: 59%;
+  rotate: 11deg;
+  animation-delay: -3.2s;
+}
+
+/*
+ * The pane that makes it glass: it blurs what is painted behind it, which is the lower
+ * half of the sheets, so they go soft at the lip and stay crisp above it. Only works
+ * because it is their sibling — nested under them it would be its own backdrop root.
+ */
+.pdf-art__front {
+  position: absolute;
+  inset: auto 0 0;
+  height: 56%;
+  border-radius: var(--radius-sm) var(--radius-sm) var(--radius-md) var(--radius-md);
+  background-color: var(--art-glass);
   background-image: var(--glass-gradient);
   box-shadow: var(--glass-sheen);
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  animation: pdf-art-drift var(--page-drift) var(--ease-in-out) infinite alternate;
-}
-
-.pdf-art__sheet[data-slot="back"] {
-  rotate: -14deg;
-  translate: -32% 0;
-}
-
-.pdf-art__sheet[data-slot="front"] {
-  rotate: 12deg;
-  translate: 32% 0;
-  animation-delay: -2.5s;
-}
-
-.pdf-art__mark {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: 76%;
-  height: 76%;
-  border: var(--brut-border);
-  border-radius: var(--drop-glyph-radius);
-  background-color: var(--color-paper);
-  color: var(--color-ink);
+  backdrop-filter: blur(var(--art-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--art-blur)) saturate(var(--glass-saturate));
   transition:
-    transform var(--dur-slow) var(--ease-out),
+    translate var(--dur-slow) var(--ease-out),
     background-color var(--dur-base) var(--ease-out);
 }
 
-/* The same jump the stock dropzone glyph makes, so the signature reads the same here. */
-.dropzone:hover .pdf-art__mark,
-.dropzone[data-dragging] .pdf-art__mark {
-  transform: translateY(-8px) rotate(6deg) scale(1.06);
-  background-color: var(--color-signal);
+/* Drag a file over and the folder reaches for it: the sheets rise and fan, the front
+   tips forward. The same beat the stock dropzone glyph makes, in the folder's language. */
+.dropzone:hover .pdf-art__sheet,
+.dropzone[data-dragging] .pdf-art__sheet {
+  translate: 0 -14%;
+}
+
+.dropzone:hover .pdf-art__sheet[data-slot="left"],
+.dropzone[data-dragging] .pdf-art__sheet[data-slot="left"] {
+  rotate: -22deg;
+  translate: -10% -10%;
+}
+
+.dropzone:hover .pdf-art__sheet[data-slot="right"],
+.dropzone[data-dragging] .pdf-art__sheet[data-slot="right"] {
+  rotate: 22deg;
+  translate: 10% -10%;
+}
+
+.dropzone:hover .pdf-art__front,
+.dropzone[data-dragging] .pdf-art__front {
+  translate: 0 5%;
+  background-color: var(--art-glass-live);
 }
 
 @keyframes pdf-art-drift {
   to {
-    transform: translateY(-6px);
+    transform: translateY(-5%);
   }
 }
 

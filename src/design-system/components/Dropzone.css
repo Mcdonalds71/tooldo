@@ -112,6 +112,13 @@
   color: var(--color-ink);
 }
 
+/* No ink frame around the glyph down here: the compact zone is a quiet invitation
+   under work the user is already doing, not the moment the tool opens on. */
+.dropzone[data-size="sm"] .dropzone__glyph {
+  border: none;
+  background-color: transparent;
+}
+
 /* The file types this tool takes, peeking out of the corners like stickers. */
 .dropzone__tag {
   position: absolute;

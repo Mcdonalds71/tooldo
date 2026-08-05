@@ -1,5 +1,5 @@
 ---
-import { ArrowLeftIcon, LockIcon } from '@phosphor-icons/react/dist/ssr';
+import { ArrowLeftIcon, CaretDownIcon, LockIcon } from '@phosphor-icons/react/dist/ssr';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE } from '../lib/site';
 import { findTool } from '../lib/tools';
@@ -87,16 +87,25 @@ const structuredJson = JSON.stringify(structuredData).replaceAll('<', '\\u003c')
 
       <section class="tool__faq">
         <h2 class="tool__faq-heading">Questions</h2>
-        <dl>
-          {
-            faq.map((entry) => (
-              <>
-                <dt>{entry.question}</dt>
-                <dd>{entry.answer}</dd>
-              </>
-            ))
-          }
-        </dl>
+
+        {
+          /* Native <details>: the keyboard path, the announced state and the toggle all
+             come free, and search engines read a closed panel the same as an open one.
+             The first is open so the section never reads as a stack of shut doors. */
+        }
+        {
+          faq.map((entry, index) => (
+            <details class="faq" open={index === 0}>
+              <summary class="faq__question">
+                {entry.question}
+                <span class="faq__caret" aria-hidden>
+                  <CaretDownIcon size="1em" weight="bold" />
+                </span>
+              </summary>
+              <p class="faq__answer">{entry.answer}</p>
+            </details>
+          ))
+        }
       </section>
     </div>
   </article>
@@ -173,17 +182,46 @@ const structuredJson = JSON.stringify(structuredData).replaceAll('<', '\\u003c')
   }
 
   .tool__faq-heading {
+    margin-bottom: var(--space-2xs);
     font-size: var(--text-xl);
   }
 
-  .tool__faq dt {
-    margin-top: var(--space-md);
-    font-family: var(--font-display);
-    font-weight: var(--weight-semibold);
+  .faq {
+    border-bottom: var(--hairline);
   }
 
-  .tool__faq dd {
-    margin-top: var(--space-3xs);
+  .faq__question {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    /* The row is the hit area, and it clears the 44px target on its own. */
+    min-height: var(--tap-target-min);
+    padding-block: var(--space-2xs);
+    font-family: var(--font-display);
+    font-weight: var(--weight-semibold);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  /* Safari still draws the disclosure triangle without this. */
+  .faq__question::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq__caret {
+    display: inline-flex;
+    flex-shrink: 0;
+    color: var(--color-ink-faint);
+    transition: rotate var(--dur-base) var(--ease-out);
+  }
+
+  .faq[open] .faq__caret {
+    rotate: 180deg;
+  }
+
+  .faq__answer {
+    padding-bottom: var(--space-sm);
     color: var(--color-ink-soft);
   }
 </style>

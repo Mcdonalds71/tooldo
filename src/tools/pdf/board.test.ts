@@ -5,9 +5,11 @@ import {
   displayRatio,
   movePage,
   removePage,
+  reversePages,
   rotateAll,
   rotatePage,
   shiftPage,
+  sortByName,
   toPlan,
 } from './board';
 import type { InspectResult } from './types';
@@ -99,6 +101,46 @@ describe('rotating', () => {
 describe('removePage', () => {
   it('takes a page off the board and leaves the rest in order', () => {
     expect(order(removePage(board(3), '0:1'))).toEqual(['0:0', '0:2']);
+  });
+});
+
+describe('sortByName', () => {
+  const mixed = () => [...board(2, 1), ...board(1, 0), ...board(1, 2)];
+  const names = ['minutes.pdf', 'agenda.pdf', 'notes.pdf'];
+
+  it('puts the files in name order and their pages back in file order', () => {
+    const shuffled = movePage(mixed(), '1:0', 3);
+
+    expect(order(sortByName(shuffled, names, 'asc'))).toEqual(['1:0', '1:1', '0:0', '2:0']);
+  });
+
+  it('reverses the file order without reversing the pages inside a file', () => {
+    expect(order(sortByName(mixed(), names, 'desc'))).toEqual(['2:0', '0:0', '1:0', '1:1']);
+  });
+
+  it('reads a number in a name as a number, so part 2 comes before part 10', () => {
+    const pages = [...board(1, 0), ...board(1, 1)];
+
+    expect(order(sortByName(pages, ['part-10.pdf', 'part-2.pdf'], 'asc'))).toEqual(['1:0', '0:0']);
+  });
+
+  it('keeps the turn a page was given', () => {
+    const turned = rotatePage(mixed(), '0:0');
+
+    expect(sortByName(turned, names, 'asc').find((page) => page.id === '0:0')?.rotation).toBe(90);
+  });
+
+  it('leaves a file with no name where the comparison puts it, rather than dropping it', () => {
+    expect(sortByName(mixed(), [], 'asc')).toHaveLength(4);
+  });
+});
+
+describe('reversePages', () => {
+  it('flips the whole board and leaves the original alone', () => {
+    const pages = board(3);
+
+    expect(order(reversePages(pages))).toEqual(['0:2', '0:1', '0:0']);
+    expect(order(pages)).toEqual(['0:0', '0:1', '0:2']);
   });
 });
 

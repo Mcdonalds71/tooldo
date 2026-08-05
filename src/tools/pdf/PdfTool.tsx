@@ -19,6 +19,20 @@ function viewName(stage: Stage, pageCount: number): string {
   return pageCount === 0 ? 'idle' : 'board';
 }
 
+/**
+ * Reading names the file it is on, because `inspect` reports once per file and that
+ * number is exact. Saving doesn't pretend to: its progress spans loading and copying,
+ * so a page count there would be a guess dressed up as a fact.
+ */
+function describeWork(stage: Extract<Stage, { name: 'reading' | 'saving' }>): string {
+  if (stage.name === 'saving') return 'Copying them in the order you set.';
+  if (stage.total === 1) return 'Nothing is being uploaded.';
+
+  const current = Math.min(stage.total, Math.floor(stage.progress * stage.total) + 1);
+
+  return `File ${current} of ${stage.total}.`;
+}
+
 export function PdfTool() {
   return (
     <ToastProvider>
@@ -81,6 +95,8 @@ function Workbench() {
         <BoardToolbar
           pages={pages.length}
           files={origins.length}
+          onSort={actions.sort}
+          onReverse={actions.reverse}
           onRotateEvery={actions.rotateEvery}
           onReset={actions.reset}
           onSave={actions.save}
@@ -90,17 +106,12 @@ function Workbench() {
           pages={pages}
           thumbnails={thumbnails.urls}
           origins={origins}
+          previewsUnavailable={thumbnails.unavailable}
           onMove={actions.move}
           onShift={actions.shift}
           onRotate={actions.rotate}
           onRemove={actions.remove}
         />
-
-        {thumbnails.unavailable ? (
-          <p className="pdf-tool__notice">
-            Previews didn't load, so pages show as numbers. Everything else still works.
-          </p>
-        ) : null}
 
         <Dropzone
           size="sm"
@@ -130,8 +141,7 @@ function Workbench() {
       <ProcessingOverlay
         open={working !== undefined}
         title={working?.name === 'saving' ? 'Building your PDF' : 'Reading the pages'}
-        {...(working?.name === 'saving' ? { detail: 'Copying them in the order you set.' } : {})}
-        {...(working ? { progress: working.progress } : {})}
+        {...(working ? { detail: describeWork(working), progress: working.progress } : {})}
         onCancel={actions.cancel}
       />
     </div>
