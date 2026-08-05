@@ -213,6 +213,11 @@
   --drop-tilt: -0.6deg;
   --drop-glyph-size: 96px;
   --drop-glyph-radius: 24px;
+  --drop-padding: var(--space-2xl) var(--space-lg);
+  /* The compact register: a tool that already holds files still needs somewhere to
+     drop the next one, and a full-height zone under a full workbench is a wall. */
+  --drop-padding-sm: var(--space-md) var(--space-sm);
+  --drop-glyph-size-sm: 56px;
 
   --input-radius: var(--radius-full);
   --input-border: var(--brut-border);

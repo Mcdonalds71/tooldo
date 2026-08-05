@@ -8,7 +8,7 @@
  */
 .dropzone {
   position: relative;
-  padding: var(--space-2xl) var(--space-lg);
+  padding: var(--drop-padding);
   border: var(--drop-border);
   border-radius: var(--drop-radius);
   box-shadow: var(--drop-shadow);
@@ -19,6 +19,17 @@
     box-shadow var(--dur-base) var(--ease-out),
     border-color var(--dur-base) var(--ease-out),
     background-color var(--dur-base) var(--ease-out);
+}
+
+/* Same zone, quieter: it sits under a workbench that already has the user's attention. */
+.dropzone[data-size="sm"] {
+  --drop-glyph-size: var(--drop-glyph-size-sm);
+
+  padding: var(--drop-padding-sm);
+}
+
+.dropzone[data-size="sm"] .empty__headline {
+  font-size: var(--text-base);
 }
 
 .dropzone__input {

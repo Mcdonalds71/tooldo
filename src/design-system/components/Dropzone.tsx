@@ -4,6 +4,9 @@ import { describeRejection, partitionFiles } from '../../lib/files';
 import { buttonClass } from './Button';
 import { EmptyState } from './EmptyState';
 
+/** `lg` is the tool's opening moment; `sm` is the strip that takes the next file. */
+export type DropzoneSize = 'lg' | 'sm';
+
 export interface DropzoneProps {
   readonly headline: string;
   readonly hint: string;
@@ -17,6 +20,7 @@ export interface DropzoneProps {
   readonly sample?: { readonly label: string; readonly onTry: () => void } | undefined;
   readonly illustration?: ReactNode | undefined;
   readonly disabled?: boolean | undefined;
+  readonly size?: DropzoneSize | undefined;
 }
 
 export function Dropzone({
@@ -31,6 +35,7 @@ export function Dropzone({
   sample,
   illustration,
   disabled = false,
+  size = 'lg',
 }: DropzoneProps) {
   const inputId = useId();
   const [dragging, setDragging] = useState(false);
@@ -71,6 +76,7 @@ export function Dropzone({
     // biome-ignore lint/a11y/noStaticElementInteractions: the file input covering it owns the keyboard path.
     <div
       className="dropzone"
+      data-size={size}
       data-dragging={dragging || undefined}
       onDragEnter={(event) => {
         event.preventDefault();
@@ -107,11 +113,13 @@ export function Dropzone({
 
       <span className="dropzone__halo" aria-hidden />
 
-      {accept?.slice(0, 2).map((pattern, index) => (
-        <span key={pattern} className="dropzone__tag" data-slot={index} aria-hidden>
-          {pattern}
-        </span>
-      ))}
+      {size === 'lg'
+        ? accept?.slice(0, 2).map((pattern, index) => (
+            <span key={pattern} className="dropzone__tag" data-slot={index} aria-hidden>
+              {pattern}
+            </span>
+          ))
+        : null}
 
       <EmptyState
         illustration={
@@ -124,7 +132,12 @@ export function Dropzone({
         headline={headline}
         subtext={hint}
         primaryAction={
-          <label className={buttonClass({ variant: 'primary' })} htmlFor={inputId}>
+          // The compact zone never carries the vermilion: a view that already holds work
+          // has its own primary action, and two of them is one too many.
+          <label
+            className={buttonClass({ variant: size === 'lg' ? 'primary' : 'secondary' })}
+            htmlFor={inputId}
+          >
             Choose files
           </label>
         }
