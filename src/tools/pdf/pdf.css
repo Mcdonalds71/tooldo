@@ -1,0 +1,270 @@
+/*
+ * The PDF workbench.
+ *
+ * Its measurements live in one block at the top — the same idea as the component tokens
+ * in the design system, kept beside the tool because they are only this tool's. Nothing
+ * below that block holds a literal.
+ *
+ * The board is dense working UI, so it follows the restraint rule: hairlines and soft
+ * elevation, no hard shadows. The loud register belongs to the dropzone above it and the
+ * save button, which is the only vermilion on the view.
+ */
+
+.pdf-tool {
+  /* Wide enough for the four page controls to stay on one line. */
+  --page-card-width: 12rem;
+  --page-sheet-shadow: var(--shadow-sm);
+  /* Slower than any interaction easing: this one is ambient, not a response. */
+  --page-drift: 5s;
+  /* A4 upright, until a card sets its own from the page it is showing. */
+  --page-ratio: 0.707;
+
+  position: relative;
+}
+
+.pdf-tool__board {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.pdf-tool__notice {
+  color: var(--color-ink-soft);
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+/* ---- the bar above the board ---- */
+
+.board-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2xs);
+  padding: var(--space-2xs);
+  border: var(--hairline);
+  border-radius: var(--radius-full);
+  background-color: var(--color-card);
+}
+
+.board-bar__count {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3xs);
+  padding-inline-start: var(--space-xs);
+  color: var(--color-ink-soft);
+  font-size: var(--text-sm);
+}
+
+.board-bar__number {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  color: var(--color-ink);
+}
+
+.board-bar__from {
+  color: var(--color-ink-faint);
+}
+
+.board-bar__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs);
+}
+
+/* ---- the pages ---- */
+
+.page-board {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--page-card-width), 1fr));
+  gap: var(--space-sm);
+  list-style: none;
+}
+
+/* The grid cell. It carries the native drag; the card inside carries the animation. */
+.page-slot {
+  display: grid;
+}
+
+.page-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2xs);
+  padding: var(--space-2xs);
+  border: var(--hairline);
+  border-radius: var(--radius-md);
+  background-color: var(--color-card);
+  cursor: grab;
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    opacity var(--dur-fast) var(--ease-out);
+}
+
+.page-card:hover {
+  border-color: var(--color-line-strong);
+}
+
+/* The card being carried fades back so the gap it will land in stays readable. */
+.page-card[data-dragging] {
+  opacity: 0.4;
+  cursor: grabbing;
+}
+
+.page-card__paper {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: var(--page-ratio);
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-white);
+  box-shadow: var(--page-sheet-shadow);
+}
+
+.page-card__preview {
+  width: 100%;
+  transition: rotate var(--dur-base) var(--ease-out);
+}
+
+/* On its side, a page has to be drawn as wide as the frame is tall to land back inside it. */
+.page-card__preview[data-turned] {
+  width: calc(100% / var(--page-ratio));
+}
+
+.page-card__waiting {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-ink-faint);
+}
+
+.page-card__meta {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3xs);
+  width: 100%;
+  min-width: 0;
+  padding-inline: var(--space-3xs);
+  font-size: var(--text-xs);
+  color: var(--color-ink-faint);
+}
+
+.page-card__number {
+  font-family: var(--font-mono);
+  font-weight: var(--weight-medium);
+  color: var(--color-ink);
+}
+
+.page-card__origin {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Pushed to the foot of the card so a landscape page, whose paper is shorter, still
+   lines its controls up with the rest of the row. */
+.page-card__controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3xs);
+  margin-top: auto;
+  padding-top: var(--space-3xs);
+  cursor: default;
+}
+
+/* Below the card's own width a single page would fill the screen, so the grid is told
+   to hold two regardless and the four controls fold into a square underneath. */
+@media (width < 30rem) {
+  .page-board {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .page-card__controls {
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    justify-content: center;
+  }
+}
+
+/* ---- the empty state's artwork ---- */
+
+/* Sized from the dropzone's own glyph token, so the compact zone shrinks it too. */
+.pdf-art {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--drop-glyph-size);
+  height: var(--drop-glyph-size);
+}
+
+/*
+ * Warm glass, mixed from the paper palette rather than borrowed cool. These are drawn,
+ * not operated, which is the line that lets them be soft next to a neo-brut mark.
+ * The individual rotate and translate set the pose; the keyframes use `transform`, which
+ * composes on top, so the drift doesn't fight the angle.
+ */
+.pdf-art__sheet {
+  position: absolute;
+  width: 66%;
+  height: 84%;
+  border: var(--hairline);
+  border-radius: var(--radius-sm);
+  background-color: var(--glass-tint-strong);
+  background-image: var(--glass-gradient);
+  box-shadow: var(--glass-sheen);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  animation: pdf-art-drift var(--page-drift) var(--ease-in-out) infinite alternate;
+}
+
+.pdf-art__sheet[data-slot="back"] {
+  rotate: -14deg;
+  translate: -32% 0;
+}
+
+.pdf-art__sheet[data-slot="front"] {
+  rotate: 12deg;
+  translate: 32% 0;
+  animation-delay: -2.5s;
+}
+
+.pdf-art__mark {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 76%;
+  height: 76%;
+  border: var(--brut-border);
+  border-radius: var(--drop-glyph-radius);
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  transition:
+    transform var(--dur-slow) var(--ease-out),
+    background-color var(--dur-base) var(--ease-out);
+}
+
+/* The same jump the stock dropzone glyph makes, so the signature reads the same here. */
+.dropzone:hover .pdf-art__mark,
+.dropzone[data-dragging] .pdf-art__mark {
+  transform: translateY(-8px) rotate(6deg) scale(1.06);
+  background-color: var(--color-signal);
+}
+
+@keyframes pdf-art-drift {
+  to {
+    transform: translateY(-6px);
+  }
+}
+
+/* ---- the payoff ---- */
+
+.pdf-result__page {
+  display: block;
+  width: min(8.5rem, 100%);
+  margin-inline: auto;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+}

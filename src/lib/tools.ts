@@ -49,10 +49,10 @@ export const tools = [
   {
     slug: 'pdf',
     name: 'PDF Toolbox',
-    description: 'Merge, split, compress, and reorder pages.',
+    description: 'Merge, reorder, rotate, and trim pages.',
     category: 'Documents',
     icon: FilePdfIcon,
-    status: 'planned',
+    status: 'live',
   },
   {
     slug: 'images',

@@ -24,10 +24,27 @@ animation that isn't built yet.
 
 **Deployed.** Cloudflare Workers, static assets, no Worker script in front of them.
 
+**Tool 1, PDF Toolbox** (`/pdf`). Drop one PDF or several and every page opens as a card
+on one board: drag to reorder, turn, remove, then save a new document. Merging is what
+happens when you drop a second file, and trimming is what happens when you take pages
+off before saving — one flow covers all four verbs. `engine.ts` is pdf-lib behind
+`runInWorker`; `board.ts` holds the arrangement as plain functions; page previews come
+from pdf.js on the main thread (ADR 0006). "Try a sample" draws its own six-page PDF
+rather than shipping a binary. 51 unit tests, 5 Playwright specs across desktop, mobile
+and reduced-motion.
+
+`Dropzone` grew a `size` prop for this: the compact zone under a full board is how you
+merge a second file in, and it drops to a secondary action so the view keeps one
+vermilion.
+
 ## Next
 
-**Tool 1, PDF Toolbox.** Through the `new-tool` skill so the bar is identical across all
-ten. Then the upload animation, then tools 2 to 10.
+The upload animation, then tools 2 to 10 — each through the `new-tool` skill.
+
+**Not in the PDF tool, deliberately.** Compression, because pdf-lib copies page streams
+untouched and anything honest would mean re-encoding images and losing quality — the FAQ
+says so plainly rather than shipping a button that saves two percent. Splitting into many
+files in one pass, because that needs a zip dependency; today you save twice.
 
 The upload animation reference is a Dribbble shot by Artem Kucherov. What we take from
 it: one footprint holding both idle and working states so nothing jumps when work
@@ -50,6 +67,9 @@ Recorded properly in `docs/adr/`. The ones that catch people out:
 - **`pnpm-workspace.yaml` gates install scripts.** Only listed packages may run them.
   A new dependency that wants one is a supply-chain decision, so it gets added
   deliberately.
+- **Page previews are the one thing outside `runInWorker`** (ADR 0006). pdf.js ships its
+  own worker and the paint needs a canvas, so the parse is still off the main thread and
+  the board degrades to numbered placeholders if the chunk never lands.
 
 ## How we work
 
