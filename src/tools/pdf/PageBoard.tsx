@@ -1,5 +1,5 @@
-import { motion } from 'motion/react';
-import { useState } from 'react';
+import { motion, type PanInfo } from 'motion/react';
+import { useRef, useState } from 'react';
 import { instant, stagger, useReducedMotion } from '../../design-system/motion';
 import type { BoardPage } from './board';
 import { PageCard, type PageDragHandlers } from './PageCard';
@@ -22,8 +22,10 @@ export interface PageBoardProps {
  *
  * Pages reorder as the pointer crosses them rather than on drop, so the document
  * rearranges under the hand. Motion's layout animation carries each card to its new
- * place; the arrow buttons on every card are the same move from the keyboard, and the
- * only one a touchscreen has.
+ * place. Each card decides for itself how a press becomes a drag — see the constants at
+ * the top of PageCard — and this component only has to make sense of where it landed.
+ * The arrow buttons on every card are the same move from the keyboard, and stand in for
+ * drag anywhere it isn't available.
  */
 export function PageBoard({
   pages,
@@ -37,24 +39,34 @@ export function PageBoard({
 }: PageBoardProps) {
   const reduced = useReducedMotion() ?? false;
   const [held, setHeld] = useState<string | null>(null);
+  // Which card was last swapped into, so a still-hovering pointer doesn't reorder the
+  // same pair on every animation frame.
+  const lastTarget = useRef<string | null>(null);
 
-  const dragHandlers = (id: string, index: number): PageDragHandlers => ({
-    onDragStart: (event) => {
-      // Firefox refuses to start a drag until the transfer carries something.
-      event.dataTransfer.setData('text/plain', id);
-      event.dataTransfer.effectAllowed = 'move';
+  const dragHandlers = (id: string): PageDragHandlers => ({
+    onDragStart: () => {
+      lastTarget.current = id;
       setHeld(id);
     },
-    onDragOver: (event) => {
-      event.preventDefault();
-      event.dataTransfer.dropEffect = 'move';
+    onDrag: (event, info) => {
+      const point = clientPoint(event, info);
+      // The dragged card sits `pointer-events: none` while `[data-dragging]` (see
+      // pdf.css), so this always resolves to whichever card is genuinely underneath it.
+      const hovered = document.elementFromPoint(point.x, point.y)?.closest('[data-page-id]');
+      const targetId = hovered instanceof HTMLElement ? hovered.dataset.pageId : undefined;
+
+      // Own id: the dragged card's slot still occupies its layout position underneath
+      // the transform that's carrying it, so the pointer can cross back over it.
+      if (targetId === undefined || targetId === id || targetId === lastTarget.current) return;
+
+      const targetIndex = pages.findIndex((page) => page.id === targetId);
+      if (targetIndex === -1) return;
+
+      lastTarget.current = targetId;
+      onMove(id, targetIndex);
     },
-    onDragEnter: () => {
-      if (held !== null && held !== id) onMove(held, index);
-    },
-    onDragEnd: () => setHeld(null),
-    onDrop: (event) => {
-      event.preventDefault();
+    onDragEnd: () => {
+      lastTarget.current = null;
       setHeld(null);
     },
   });
@@ -87,7 +99,7 @@ export function PageBoard({
               {...(origins.length > 1 ? { origin: origins[page.source] } : {})}
               dragging={held === page.id}
               reduced={reduced}
-              drag={dragHandlers(page.id, index)}
+              drag={dragHandlers(page.id)}
               onShift={(step) => onShift(page.id, step)}
               onRotate={() => onRotate(page.id)}
               onRemove={() => onRemove(page.id)}
@@ -97,6 +109,20 @@ export function PageBoard({
       </div>
     </div>
   );
+}
+
+/**
+ * `elementFromPoint` needs viewport coordinates. Motion hands back a real `PointerEvent`
+ * in practice, which already carries those — `info.point` is the fallback, since it's
+ * relative to the page rather than the viewport and needs the scroll offset backed out.
+ */
+function clientPoint(
+  event: MouseEvent | TouchEvent | PointerEvent,
+  info: PanInfo,
+): { x: number; y: number } {
+  if ('clientX' in event) return { x: event.clientX, y: event.clientY };
+
+  return { x: info.point.x - window.scrollX, y: info.point.y - window.scrollY };
 }
 
 /**

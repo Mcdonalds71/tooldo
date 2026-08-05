@@ -186,6 +186,9 @@
 }
 
 .page-card {
+  /* Static would leave z-index (below) with nothing to act on, and the dragged card
+     needs to paint over its siblings rather than duck behind them. */
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -205,10 +208,18 @@
   border-color: var(--color-line-strong);
 }
 
-/* The card being carried fades back so the gap it will land in stays readable. */
+/*
+ * The card being carried rises above its siblings and fades back so the gap it will
+ * land in stays readable. `pointer-events: none` is load-bearing, not decorative: the
+ * board's own hit-test (PageBoard's onDrag) reads whatever `elementFromPoint` finds
+ * under the pointer, and without this it would always find the dragged card itself,
+ * since that's what's actually painted there.
+ */
 .page-card[data-dragging] {
+  z-index: 30;
   opacity: 0.4;
   cursor: grabbing;
+  pointer-events: none;
 }
 
 .page-card__paper {

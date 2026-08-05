@@ -4,19 +4,26 @@ import {
   ArrowRightIcon,
   TrashIcon,
 } from '@phosphor-icons/react/dist/ssr';
-import { motion } from 'motion/react';
-import type { CSSProperties, DragEventHandler } from 'react';
+import { type DragHandler, motion, useDragControls } from 'motion/react';
+import { type CSSProperties, type PointerEvent as ReactPointerEvent, useRef } from 'react';
 import { IconButton } from '../../design-system/components/IconButton';
 import { dropIn, instant } from '../../design-system/motion';
 import { type BoardPage, displayRatio } from './board';
 
 export interface PageDragHandlers {
-  readonly onDragStart: DragEventHandler<HTMLLIElement>;
-  readonly onDragEnter: DragEventHandler<HTMLLIElement>;
-  readonly onDragOver: DragEventHandler<HTMLLIElement>;
-  readonly onDragEnd: DragEventHandler<HTMLLIElement>;
-  readonly onDrop: DragEventHandler<HTMLLIElement>;
+  readonly onDragStart: DragHandler;
+  readonly onDrag: DragHandler;
+  readonly onDragEnd: DragHandler;
 }
+
+/**
+ * A mouse press starts dragging the moment it moves — there's no ambiguity, since a
+ * mouse has no separate "scroll the page" gesture to protect. A touch does, so a touch
+ * or pen press has to sit still through this hold before it commits to a drag; anything
+ * shorter, or any real movement first, reads as the start of a scroll instead.
+ */
+const TOUCH_HOLD_MS = 180;
+const TOUCH_HOLD_TOLERANCE = 6;
 
 export interface PageCardProps {
   readonly page: BoardPage;
@@ -48,19 +55,69 @@ export function PageCard({
   onRemove,
 }: PageCardProps) {
   const turned = page.rotation === 90 || page.rotation === 270;
+  const controls = useDragControls();
+  const holdTimer = useRef<number | undefined>(undefined);
+  const holdOrigin = useRef<{ x: number; y: number } | null>(null);
+
+  const cancelHold = () => {
+    window.clearTimeout(holdTimer.current);
+    holdTimer.current = undefined;
+    holdOrigin.current = null;
+  };
+
+  const armDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (event.pointerType === 'mouse') {
+      controls.start(event);
+      return;
+    }
+
+    holdOrigin.current = { x: event.clientX, y: event.clientY };
+    // The event is still valid to hand to Motion once the timer fires — React 17+
+    // doesn't recycle these, so holding a reference across the delay is safe.
+    holdTimer.current = window.setTimeout(() => {
+      holdTimer.current = undefined;
+      controls.start(event);
+    }, TOUCH_HOLD_MS);
+  };
+
+  const watchHold = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!holdOrigin.current) return;
+
+    const moved = Math.hypot(
+      event.clientX - holdOrigin.current.x,
+      event.clientY - holdOrigin.current.y,
+    );
+    if (moved > TOUCH_HOLD_TOLERANCE) cancelHold();
+  };
 
   return (
-    // The list item owns the native drag, the card inside owns the layout animation:
-    // Motion claims `onDragStart` and `onDragEnd` for its own pan gesture, so the two
-    // can't sit on the same element.
-    <li className="page-slot" draggable {...drag}>
+    // The board hit-tests drops against this id — see PageBoard's onDrag.
+    <li className="page-slot" data-page-id={page.id}>
       {/* The entrance is inherited from the board, which staggers it, so no `animate`
-          here — only the variants this card resolves it against. */}
+          here — only the variants this card resolves it against.
+          `dragListener` is off because `armDrag` decides when a press actually becomes
+          a drag rather than Motion starting one on every press — see the constants
+          above for why touch and mouse decide that differently. */}
       <motion.div
         className="page-card"
         layout={!reduced}
         variants={reduced ? instant : dropIn}
         data-dragging={dragging || undefined}
+        drag
+        dragListener={false}
+        dragControls={controls}
+        dragSnapToOrigin
+        dragMomentum={false}
+        onPointerDown={armDrag}
+        onPointerMove={watchHold}
+        onPointerUp={cancelHold}
+        onPointerCancel={cancelHold}
+        onDragStart={drag.onDragStart}
+        onDrag={drag.onDrag}
+        onDragEnd={(event, info) => {
+          cancelHold();
+          drag.onDragEnd(event, info);
+        }}
       >
         {/* The ratio shapes the frame and tells a turned preview how wide to draw so it
             lands back inside it. */}
@@ -69,11 +126,15 @@ export function PageCard({
           style={{ '--page-ratio': displayRatio(page) } as CSSProperties}
         >
           {thumbnail ? (
+            // A browser drags an image out of the page by default, on nothing more than
+            // it being an <img> — that native drag would win the gesture before Motion's
+            // own pointer tracking ever got it, so it's switched off here specifically.
             <img
               className="page-card__preview"
               src={thumbnail}
               alt={`Page ${position}`}
               data-turned={turned || undefined}
+              draggable={false}
               style={{ rotate: `${page.rotation}deg` }}
             />
           ) : (
@@ -86,7 +147,9 @@ export function PageCard({
           {origin ? <span className="page-card__origin">{origin}</span> : null}
         </p>
 
-        <div className="page-card__controls">
+        {/* Stops the press from bubbling to the card's own pointer-down handler above,
+            so tapping a control is always just a tap — never the start of a drag. */}
+        <div className="page-card__controls" onPointerDown={(event) => event.stopPropagation()}>
           <IconButton
             icon={ArrowLeftIcon}
             label={`Move page ${position} earlier`}

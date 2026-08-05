@@ -63,6 +63,28 @@ test('a page moves from the keyboard, not only by dragging', async ({ page }) =>
   expect(after[1]).toBe(before[0]);
 });
 
+test('a page moves by dragging it across the board', async ({ page }) => {
+  await openSample(page);
+  await expect(page.locator('.page-card__preview')).toHaveCount(SAMPLE_PAGES);
+
+  const cards = page.locator('.page-slot');
+  await cards.first().scrollIntoViewIfNeeded();
+  const from = await cards.nth(0).boundingBox();
+  const to = await cards.nth(3).boundingBox();
+  if (!from || !to) throw new Error('a page card has no box to drag from or to');
+
+  const before = await previewSources(page);
+
+  await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(to.x + to.width / 2, to.y + to.height / 2, { steps: 12 });
+  await page.mouse.up();
+
+  const after = await previewSources(page);
+  expect(after).not.toEqual(before);
+  expect(after[3]).toBe(before[0]);
+});
+
 test('removing every page returns the tool to its opening state', async ({ page }) => {
   await openSample(page);
 
