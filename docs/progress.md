@@ -58,9 +58,36 @@ start of a reorder. Reordering itself reads `elementFromPoint` under the pointer
 than native `dragenter`, which touch never fires either. The arrow buttons on every card
 are the same move from the keyboard, and stand in for drag anywhere it isn't available.
 
+**Tool 2, Image Converter** (`/images`). Drop PNG, JPEG, WebP, AVIF, or HEIC photos —
+batch, format, resize, and compress in one flow, then download each on its own or the
+whole batch as one zip. `engine.ts` decodes with the browser's own `createImageBitmap`
+for everything except HEIC, which nothing decodes natively; `heic-to`'s WASM build
+handles that one case. PNG encodes through native canvas (lossless, no quality curve to
+reason about); JPEG, WebP and AVIF go through `@jsquash/*`'s WASM encoders instead of
+relying on each browser's own — the point of "compress to a target size" is a
+predictable quality-to-size curve, and three different native encoders would each give a
+different answer for the same input. `imageMath.ts` holds the pure, fully-tested pieces
+— resize-to-fit math and the target-size binary search — separately from the
+browser-only decode/encode orchestration in `engine.ts`, which only Playwright can
+verify (no canvas or WebAssembly in Vitest's Node environment). 107 unit tests, 21
+Playwright specs across desktop, mobile and reduced-motion (63 runs).
+
+Three new design-system primitives came out of the option panel: `Slider`, `Segmented`
+and `Switch`, all Radix underneath. `Segmented` started on `@radix-ui/react-toggle-group`
+and moved to `@radix-ui/react-radio-group` mid-build — the toggle group exposes
+`role="radio"` in single-select mode but doesn't select on arrow key, only on Space/Enter
+after arrowing there, which native radio groups do automatically. Caught by actually
+driving it with a keyboard, not by reading the type signature.
+
+**Not in the Image Converter, deliberately.** PNG compression beyond resizing — a
+lossless format doesn't have a quality dial, so "shrink a PNG" honestly means resize or
+convert it to something lossy, and the FAQ says so. A resize mode besides "cap the
+longest side" — width/height fields would double the option panel for a case bulk
+conversion rarely needs.
+
 ## Next
 
-Tools 2 to 10, each through the `new-tool` skill. The landing page's upload animation
+Tools 3 to 10, each through the `new-tool` skill. The landing page's upload animation
 comes after the tools, not before — deliberately reordered from the original plan.
 
 **Not in the PDF tool, deliberately.** Compression, because pdf-lib copies page streams
@@ -113,6 +140,31 @@ Recorded properly in `docs/adr/`. The ones that catch people out:
   first case) needs `draggable={false}` on every image inside the draggable region — the
   browser's own drag-out-to-save gesture wins the pointer before app code ever sees it
   otherwise, silently breaking the drag on both mouse and touch.
+- **WebAssembly needed its own CSP keyword, and nothing before tool 2 had noticed**
+  (ADR 0007). `script-src` had neither `'unsafe-eval'` nor `'wasm-unsafe-eval'`, and
+  Chrome refuses `WebAssembly.instantiate()` without the latter — invisible until the
+  real header was actually enforced in a browser, since `astro preview` never sends
+  `public/_headers` at all. Every future WASM codec (video, background removal) already
+  has what it needs; this wasn't a per-tool fix.
+- **A download that waits on a worker first can silently fail.** Chrome only honours a
+  programmatic `<a download>` click while the triggering user gesture is still "fresh" —
+  `await` a Worker round trip before calling `download()` and the click can do nothing,
+  with no error and no console output. The per-item downloads in both tools call
+  `download()` synchronously inside their own click handler and are unaffected; the zip
+  button is two clicks for exactly this reason — prepare, then a second, genuinely fresh
+  click to save. Confirmed by reproducing the silent failure directly, not inferred from
+  a spec.
+- **A ZIP's mtime field only encodes 1980–2099.** Setting it to the Unix epoch for
+  privacy (stripping the exact conversion time from the download) throws inside `fflate`
+  — DOS timestamps predate 1970 having a representation. `1980-01-01` is the earliest
+  valid date and keeps the same intent.
+- **`workers: 2` in `playwright.config.ts` isn't a full fix for cross-project timing
+  flakiness, and dropping to 1 doesn't buy determinism either.** The PDF board's
+  mouse-drag test is intermittent specifically on the `mobile` project, specifically when
+  all three projects run together — reliable alone, reliable within any one project's
+  full run, occasional only under full-suite concurrency. That's Chromium's own input
+  classification on a touch-emulated device reacting to system load, not a resource knob
+  this repo controls, which is what `retries` on CI exists to absorb.
 
 ## How we work
 
