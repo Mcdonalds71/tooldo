@@ -60,7 +60,7 @@ export const tools = [
     description: 'Convert and shrink images in bulk.',
     category: 'Images & photo',
     icon: ImagesIcon,
-    status: 'planned',
+    status: 'live',
   },
   {
     slug: 'background',

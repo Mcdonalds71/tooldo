@@ -1,0 +1,70 @@
+---
+import ToolLayout, { type FaqEntry } from '../layouts/ToolLayout.astro';
+import { ImagesTool } from '../tools/images/ImagesTool';
+import '../tools/images/images.css';
+
+const description =
+  'Convert PNG, JPEG, WebP, AVIF, and HEIC photos, resize them, and shrink them to a target size — right in your browser. Your files never leave your device.';
+
+const steps = [
+  {
+    title: 'Drop your images',
+    body: 'HEIC, PNG, JPEG, WebP, or AVIF — drop as many as you like at once.',
+  },
+  {
+    title: 'Set the format',
+    body: 'Pick what to convert to, resize the longest side, and dial in a quality or a target file size.',
+  },
+  {
+    title: 'Convert',
+    body: 'Download each image on its own, or grab the whole batch as one zip.',
+  },
+];
+
+const faq: readonly FaqEntry[] = [
+  {
+    question: 'Do my photos get uploaded?',
+    answer:
+      'No. Every image is decoded, resized, and re-encoded by code running in this tab. Nothing is sent anywhere, and there is no server here to send it to.',
+  },
+  {
+    question: 'Can it open HEIC photos from an iPhone?',
+    answer:
+      'Yes. Drop a HEIC or HEIF file and convert it to PNG, JPEG, WebP, or AVIF like any other image.',
+  },
+  {
+    question: 'What does "target size" do?',
+    answer:
+      'Set a file size in KB and the tool searches for the highest quality that still fits it, so you get the best-looking image at the size you asked for. It only applies to JPEG, WebP, and AVIF — PNG has no quality to adjust.',
+  },
+  {
+    question: 'Will resizing distort my photos?',
+    answer:
+      'No. The longest side is capped at what you set and the other side follows automatically, so the picture keeps its shape. An image already smaller than that is left alone.',
+  },
+  {
+    question: 'How many images can I convert at once?',
+    answer:
+      'Up to 60 in a batch, each up to 100 MB. Past that a browser tab starts to struggle, so the tool says so rather than freezing.',
+  },
+  {
+    question: 'Which format should I pick?',
+    answer:
+      'WebP or AVIF for the smallest files the web actually supports well. JPEG if something you are sending it to still expects one. PNG only when you need transparency or a perfectly lossless copy.',
+  },
+];
+---
+
+<ToolLayout
+  slug="images"
+  title="Convert and compress images — tooldo"
+  description={description}
+  steps={steps}
+  faq={faq}
+>
+  {
+    /* client:load, not client:visible: matches the PDF tool — the island is the whole
+       reason the route exists and opens above the fold. */
+  }
+  <ImagesTool client:load />
+</ToolLayout>

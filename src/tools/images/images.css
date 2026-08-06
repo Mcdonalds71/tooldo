@@ -1,0 +1,113 @@
+/*
+ * The Image Converter workbench.
+ *
+ * Dense working UI throughout — the option panel and the queue both stay in the
+ * restraint rule's calm register (hairlines, no hard shadow); the dropzone above them
+ * carries the only loud surface, matching every other tool.
+ */
+
+.images-tool {
+  position: relative;
+}
+
+.images-tool__board {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.images-tool__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2xs);
+}
+
+.images-tool__stat {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2xs);
+  padding-inline: var(--space-2xs);
+  font-size: var(--text-sm);
+  color: var(--color-ink-soft);
+}
+
+.images-tool__stat strong {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  color: var(--color-signal-dark);
+}
+
+@media (width < 40rem) {
+  .images-tool__actions {
+    display: grid;
+  }
+}
+
+/* ---- the option panel ---- */
+
+.image-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-md);
+}
+
+.image-options__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.image-options__label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-ink);
+}
+
+/* ---- the empty-state artwork ---- */
+
+.image-art {
+  position: relative;
+  display: block;
+  width: var(--drop-glyph-size);
+  height: var(--drop-glyph-size);
+}
+
+.image-art__back {
+  position: absolute;
+  inset: 10% 18% 18% 10%;
+  border: var(--hairline);
+  border-radius: var(--drop-glyph-radius);
+  background-color: var(--color-paper-dim);
+  rotate: -6deg;
+  transition: rotate var(--dur-slow) var(--ease-out);
+}
+
+.image-art__front {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border: var(--brut-border);
+  border-radius: var(--drop-glyph-radius);
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  transition:
+    transform var(--dur-slow) var(--ease-out),
+    background-color var(--dur-base) var(--ease-out);
+}
+
+.dropzone:hover .image-art__front,
+.dropzone[data-dragging] .image-art__front {
+  transform: translateY(-8px) rotate(6deg) scale(1.06);
+  background-color: var(--color-signal-fill);
+  color: var(--color-on-signal);
+}
+
+.dropzone:hover .image-art__back,
+.dropzone[data-dragging] .image-art__back {
+  rotate: -14deg;
+}

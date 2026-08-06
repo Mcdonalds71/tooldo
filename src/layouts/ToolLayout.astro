@@ -9,15 +9,21 @@ export interface FaqEntry {
   answer: string;
 }
 
+export interface StepEntry {
+  title: string;
+  body: string;
+}
+
 interface Props {
   slug: string;
   /** Overrides the registry's one-liner where the page needs a longer search title. */
   title?: string;
   description: string;
+  steps: readonly StepEntry[];
   faq: readonly FaqEntry[];
 }
 
-const { slug, title, description, faq } = Astro.props;
+const { slug, title, description, steps, faq } = Astro.props;
 
 const tool = findTool(slug);
 if (!tool) throw new Error(`No tool called ${slug} in the registry`);
@@ -46,6 +52,15 @@ const structuredData = {
         '@type': 'Question',
         name: entry.question,
         acceptedAnswer: { '@type': 'Answer', text: entry.answer },
+      })),
+    },
+    {
+      '@type': 'HowTo',
+      name: `How to use ${tool.name}`,
+      step: steps.map((step) => ({
+        '@type': 'HowToStep',
+        name: step.title,
+        text: step.body,
       })),
     },
   ],
@@ -83,7 +98,19 @@ const structuredJson = JSON.stringify(structuredData).replaceAll('<', '\\u003c')
 
       <slot />
 
-      <slot name="notes" />
+      <section class="tool__steps">
+        <h2 class="tool__steps-heading">How it works</h2>
+        <ol class="tool__steps-list">
+          {
+            steps.map((step) => (
+              <li class="tool__step">
+                <b class="tool__step-title">{step.title}</b>
+                <p class="tool__step-body">{step.body}</p>
+              </li>
+            ))
+          }
+        </ol>
+      </section>
 
       <section class="tool__faq">
         <h2 class="tool__faq-heading">Questions</h2>
@@ -174,6 +201,52 @@ const structuredJson = JSON.stringify(structuredData).replaceAll('<', '\\u003c')
     background-color: var(--color-card);
     color: var(--color-ink-soft);
     font-size: var(--text-sm);
+  }
+
+  .tool__steps {
+    margin-top: var(--space-2xl);
+  }
+
+  .tool__steps-heading {
+    font-size: var(--text-xl);
+  }
+
+  /* Three columns on a wide screen, one on a narrow one — every line, the heading and
+     each step, starts on the same left edge. */
+  .tool__steps-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: var(--space-md);
+    margin-top: var(--space-md);
+    counter-reset: step;
+    list-style: none;
+  }
+
+  .tool__step::before {
+    counter-increment: step;
+    content: counter(step);
+    display: grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    margin-bottom: var(--space-2xs);
+    border: var(--hairline);
+    border-radius: var(--radius-full);
+    background-color: var(--color-card);
+    color: var(--color-signal-dark);
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+  }
+
+  .tool__step-title {
+    font-family: var(--font-display);
+    font-weight: var(--weight-semibold);
+  }
+
+  .tool__step-body {
+    margin-top: var(--space-3xs);
+    color: var(--color-ink-soft);
   }
 
   .tool__faq {

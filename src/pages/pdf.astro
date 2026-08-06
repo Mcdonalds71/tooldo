@@ -64,6 +64,7 @@ const faq: readonly FaqEntry[] = [
   slug="pdf"
   title="Merge and reorder PDF pages — tooldo"
   description={description}
+  steps={steps}
   faq={faq}
 >
   {
@@ -72,69 +73,4 @@ const faq: readonly FaqEntry[] = [
        an intersection here only buys a window where the dropzone is painted but dead. */
   }
   <PdfTool client:load />
-
-  <Fragment slot="notes">
-    <section class="steps">
-      <h2 class="steps__heading">How it works</h2>
-      <ol class="steps__list">
-        {
-          steps.map((step) => (
-            <li class="step">
-              <b class="step__title">{step.title}</b>
-              <p class="step__body">{step.body}</p>
-            </li>
-          ))
-        }
-      </ol>
-    </section>
-  </Fragment>
 </ToolLayout>
-
-<style>
-  .steps {
-    margin-top: var(--space-2xl);
-  }
-
-  .steps__heading {
-    font-size: var(--text-xl);
-  }
-
-  /* Three columns on a wide screen, one on a narrow one. Every line in the section —
-     the heading and each step — starts on the same left edge, which an indented list
-     with its markers stripped by the reset never managed. */
-  .steps__list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
-    gap: var(--space-md);
-    margin-top: var(--space-md);
-    counter-reset: step;
-    list-style: none;
-  }
-
-  .step::before {
-    counter-increment: step;
-    content: counter(step);
-    display: grid;
-    place-items: center;
-    width: 1.75rem;
-    height: 1.75rem;
-    margin-bottom: var(--space-2xs);
-    border: var(--hairline);
-    border-radius: var(--radius-full);
-    background-color: var(--color-card);
-    color: var(--color-signal-dark);
-    font-family: var(--font-display);
-    font-size: var(--text-sm);
-    font-weight: var(--weight-bold);
-  }
-
-  .step__title {
-    font-family: var(--font-display);
-    font-weight: var(--weight-semibold);
-  }
-
-  .step__body {
-    margin-top: var(--space-3xs);
-    color: var(--color-ink-soft);
-  }
-</style>
