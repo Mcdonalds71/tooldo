@@ -1,0 +1,73 @@
+.switch-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.switch-field__label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-ink);
+}
+
+.switch {
+  position: relative;
+  flex-shrink: 0;
+  width: var(--switch-width);
+  height: var(--switch-height);
+  border: none;
+  border-radius: var(--radius-full);
+  background-color: var(--switch-track-off);
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+.switch[data-state="checked"] {
+  background-color: var(--switch-track-on);
+}
+
+.switch:focus-visible {
+  outline: 2px solid var(--color-signal);
+  outline-offset: 2px;
+}
+
+.switch:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* The padded, invisible touch target — same trick as Button and Segmented. */
+.switch::after {
+  content: "";
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: max(100%, var(--tap-target-min));
+  height: max(100%, var(--tap-target-min));
+  translate: -50% -50%;
+}
+
+.switch__thumb {
+  display: block;
+  width: var(--switch-thumb-size);
+  height: var(--switch-thumb-size);
+  /* Centers the thumb in the track vertically, and gives it the same clearance on the
+     left at rest — derived so it can't drift out of sync with the size tokens above. */
+  margin: calc((var(--switch-height) - var(--switch-thumb-size)) / 2);
+  border-radius: var(--radius-full);
+  background-color: var(--color-white);
+  box-shadow: var(--shadow-sm);
+  transition: translate var(--dur-fast) var(--ease-out);
+  translate: 0 0;
+}
+
+.switch[data-state="checked"] .switch__thumb {
+  /* The full track width, minus the thumb and its clearance on both sides. */
+  translate: calc(
+      var(--switch-width) -
+      var(--switch-thumb-size) -
+      2 *
+      ((var(--switch-height) - var(--switch-thumb-size)) / 2)
+    )
+    0;
+}

@@ -209,6 +209,27 @@
   --progress-track: var(--color-paper);
   --progress-fill: var(--color-signal);
 
+  /* Calm register: option-panel controls stay quiet next to the loud hero surfaces. */
+  --slider-track-height: 4px;
+  --slider-track: var(--color-line);
+  --slider-range: var(--color-ink);
+  --slider-thumb-size: 20px;
+  --slider-thumb-border: 2px solid var(--color-ink);
+
+  --segmented-height: var(--btn-height-sm);
+  --segmented-radius: var(--radius-full);
+  --segmented-active-bg: var(--color-ink);
+  --segmented-active-color: var(--color-paper);
+  /* Tighter than the spacing scale's smallest step — just enough for each pill to read
+     as its own shape against the group's background. */
+  --segmented-gap: 2px;
+
+  --switch-width: 40px;
+  --switch-height: 24px;
+  --switch-thumb-size: 18px;
+  --switch-track-off: var(--color-line-strong);
+  --switch-track-on: var(--color-ink);
+
   --card-radius: var(--radius-md);
   --card-border: var(--brut-border);
   --card-shadow: 3px 3px 0 var(--color-ink);

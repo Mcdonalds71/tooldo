@@ -1,0 +1,83 @@
+.slider-field {
+  width: 100%;
+}
+
+.slider-field__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2xs);
+  margin-bottom: var(--space-2xs);
+}
+
+.slider-field__label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-ink);
+}
+
+.slider-field__value {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-ink-soft);
+}
+
+/* The touch-target padding lives on the root, not the thumb, so the thumb can stay
+   visually small while the hit area still clears 44px. */
+.slider {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: var(--tap-target-min);
+  touch-action: none;
+  user-select: none;
+}
+
+.slider__track {
+  position: relative;
+  flex: 1;
+  height: var(--slider-track-height);
+  border-radius: var(--radius-full);
+  background-color: var(--slider-track);
+}
+
+.slider__range {
+  position: absolute;
+  height: 100%;
+  border-radius: var(--radius-full);
+  background-color: var(--slider-range);
+}
+
+.slider__thumb {
+  display: block;
+  width: var(--slider-thumb-size);
+  height: var(--slider-thumb-size);
+  border: var(--slider-thumb-border);
+  border-radius: var(--radius-full);
+  background-color: var(--color-card);
+  box-shadow: var(--shadow-sm);
+  cursor: grab;
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+.slider__thumb:hover {
+  transform: scale(1.08);
+}
+
+.slider__thumb:active {
+  cursor: grabbing;
+}
+
+.slider__thumb:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-signal) 45%, transparent);
+}
+
+.slider[data-disabled] .slider__thumb {
+  cursor: not-allowed;
+}
+
+.slider[data-disabled] {
+  opacity: 0.55;
+}

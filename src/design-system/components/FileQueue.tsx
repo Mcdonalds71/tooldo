@@ -1,5 +1,6 @@
 import {
   CheckCircleIcon,
+  DownloadSimpleIcon,
   FileIcon,
   WarningCircleIcon,
   XIcon,
@@ -25,11 +26,14 @@ export interface QueueItem {
 
 export interface FileQueueProps {
   readonly items: readonly QueueItem[];
+  /** The row's action while it's still queued — take it out before running the tool. */
   readonly onRemove?: ((id: string) => void) | undefined;
+  /** The row's action once it's done — save that one file on its own. */
+  readonly onDownload?: ((id: string) => void) | undefined;
   readonly label?: string | undefined;
 }
 
-export function FileQueue({ items, onRemove, label = 'Files' }: FileQueueProps) {
+export function FileQueue({ items, onRemove, onDownload, label = 'Files' }: FileQueueProps) {
   const reduced = useReducedMotion();
 
   return (
@@ -73,6 +77,16 @@ export function FileQueue({ items, onRemove, label = 'Files' }: FileQueueProps) 
               <span className="queue__failed">
                 <WarningCircleIcon size="1rem" weight="fill" aria-hidden /> Failed
               </span>
+            ) : null}
+
+            {onDownload && item.status === 'done' ? (
+              <IconButton
+                icon={DownloadSimpleIcon}
+                label={`Download ${item.name}`}
+                variant="ghost"
+                size="sm"
+                onClick={() => onDownload(item.id)}
+              />
             ) : null}
 
             {onRemove ? (

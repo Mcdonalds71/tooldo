@@ -1,0 +1,59 @@
+.segmented {
+  display: inline-flex;
+  gap: var(--segmented-gap);
+  padding: var(--segmented-gap);
+  border: var(--hairline);
+  border-radius: var(--segmented-radius);
+  background-color: var(--color-paper-dim);
+}
+
+.segmented__item {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--segmented-height);
+  padding-inline: var(--space-sm);
+  border: none;
+  border-radius: var(--segmented-radius);
+  background-color: transparent;
+  color: var(--color-ink-soft);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+/* Pads the hit area out to the minimum touch target without changing the drawn height,
+   the same trick Button uses for its own `sm` size. */
+.segmented__item::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: 50%;
+  height: max(100%, var(--tap-target-min));
+  translate: 0 -50%;
+}
+
+.segmented__item:hover {
+  color: var(--color-ink);
+}
+
+.segmented__item[data-state="checked"] {
+  background-color: var(--segmented-active-bg);
+  color: var(--segmented-active-color);
+}
+
+.segmented__item:focus-visible {
+  outline: 2px solid var(--color-signal);
+  outline-offset: 2px;
+}
+
+.segmented__item:disabled {
+  color: var(--color-ink-faint);
+  cursor: not-allowed;
+}
