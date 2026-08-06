@@ -60,7 +60,8 @@ are the same move from the keyboard, and stand in for drag anywhere it isn't ava
 
 ## Next
 
-The upload animation, then tools 2 to 10 — each through the `new-tool` skill.
+Tools 2 to 10, each through the `new-tool` skill. The landing page's upload animation
+comes after the tools, not before — deliberately reordered from the original plan.
 
 **Not in the PDF tool, deliberately.** Compression, because pdf-lib copies page streams
 untouched and anything honest would mean re-encoding images and losing quality — the FAQ
