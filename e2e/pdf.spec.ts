@@ -77,7 +77,14 @@ test('a page moves by dragging it across the board', async ({ page }) => {
 
   await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
   await page.mouse.down();
-  await page.mouse.move(to.x + to.width / 2, to.y + to.height / 2, { steps: 12 });
+  // The `mobile` project emulates a touch-capable device, and Chromium can dispatch
+  // `page.mouse` input as `pointerType: 'touch'` there rather than `'mouse'` — which
+  // routes through PageCard's touch path (a still hold before the drag arms, so a swipe
+  // isn't mistaken for a reorder; see the constants at the top of PageCard.tsx). Holding
+  // here past that threshold makes the gesture land correctly under either
+  // interpretation, rather than assuming which one a given browser will pick.
+  await page.waitForTimeout(250);
+  await page.mouse.move(to.x + to.width / 2, to.y + to.height / 2, { steps: 20 });
   await page.mouse.up();
 
   const after = await previewSources(page);
