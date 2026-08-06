@@ -12,5 +12,11 @@ export default defineConfig({
   build: { inlineStylesheets: 'never' },
   vite: {
     plugins: [tailwindcss()],
+    // jSquash's own glue code resolves each codec's .wasm file relative to itself at
+    // request time; Vite's dependency pre-bundler rewrites that path before the codec
+    // ever runs, which is what jSquash's own README calls out as the fix.
+    optimizeDeps: {
+      exclude: ['@jsquash/avif', '@jsquash/jpeg', '@jsquash/webp', '@jsquash/resize'],
+    },
   },
 });
