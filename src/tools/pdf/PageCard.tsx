@@ -5,7 +5,13 @@ import {
   TrashIcon,
 } from '@phosphor-icons/react/dist/ssr';
 import { type DragHandler, motion, useDragControls } from 'motion/react';
-import { type CSSProperties, type PointerEvent as ReactPointerEvent, useRef } from 'react';
+import {
+  type CSSProperties,
+  type PointerEvent as ReactPointerEvent,
+  useCallback,
+  useEffect,
+  useRef,
+} from 'react';
 import { IconButton } from '../../design-system/components/IconButton';
 import { dropIn, instant } from '../../design-system/motion';
 import { type BoardPage, displayRatio } from './board';
@@ -59,11 +65,15 @@ export function PageCard({
   const holdTimer = useRef<number | undefined>(undefined);
   const holdOrigin = useRef<{ x: number; y: number } | null>(null);
 
-  const cancelHold = () => {
+  const cancelHold = useCallback(() => {
     window.clearTimeout(holdTimer.current);
     holdTimer.current = undefined;
     holdOrigin.current = null;
-  };
+  }, []);
+
+  // A page can be removed by another finger while this one is still holding — the timer
+  // would otherwise fire on a card that's no longer there.
+  useEffect(() => cancelHold, [cancelHold]);
 
   const armDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (event.pointerType === 'mouse') {

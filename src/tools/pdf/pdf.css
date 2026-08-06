@@ -375,13 +375,15 @@
 
 .pdf-art__sheet[data-slot="mid"] {
   left: 33%;
-  animation-delay: -1.6s;
+  /* A third and two-thirds of the drift out of phase, derived rather than restated so
+     the three sheets stay evenly staggered if --page-drift's own pace ever changes. */
+  animation-delay: calc(var(--page-drift) / -3);
 }
 
 .pdf-art__sheet[data-slot="right"] {
   left: 59%;
   rotate: 11deg;
-  animation-delay: -3.2s;
+  animation-delay: calc(var(--page-drift) / -3 * 2);
 }
 
 /*

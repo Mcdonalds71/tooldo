@@ -30,8 +30,8 @@ happens when you drop a second file, and trimming is what happens when you take 
 off before saving — one flow covers all four verbs. `engine.ts` is pdf-lib behind
 `runInWorker`; `board.ts` holds the arrangement as plain functions; page previews come
 from pdf.js on the main thread (ADR 0006). "Try a sample" draws its own six-page PDF
-rather than shipping a binary. 51 unit tests, 5 Playwright specs across desktop, mobile
-and reduced-motion.
+rather than shipping a binary. 95 unit tests, 15 Playwright specs across desktop,
+mobile and reduced-motion (45 runs).
 
 The pages land in a frosted tray with a warm glow behind it, because glass over flat
 paper is just a tinted box. The dropzone's folder works the same way: ruled sheets, and
@@ -48,6 +48,15 @@ run this tool there is nothing to defer for, and waiting on an intersection boug
 window where the dropzone was painted but dead. Playwright is capped at two workers for
 the same reason the tool is worth having: it does real work, and four browsers running a
 PDF engine, pdf.js and a canvas at once take the renderer past its memory ceiling.
+
+**The board drags by touch, not just mouse.** Native HTML5 drag-and-drop never fires
+from a touch, so the board uses Motion's `useDragControls` instead, armed manually per
+card rather than through Motion's own listener: a mouse press starts dragging the moment
+it moves, a touch or pen press has to hold still for 180ms first (see the constants at
+the top of `PageCard.tsx`), so a swipe to scroll the page never gets mistaken for the
+start of a reorder. Reordering itself reads `elementFromPoint` under the pointer rather
+than native `dragenter`, which touch never fires either. The arrow buttons on every card
+are the same move from the keyboard, and stand in for drag anywhere it isn't available.
 
 ## Next
 
@@ -82,6 +91,27 @@ Recorded properly in `docs/adr/`. The ones that catch people out:
 - **Page previews are the one thing outside `runInWorker`** (ADR 0006). pdf.js ships its
   own worker and the paint needs a canvas, so the parse is still off the main thread and
   the board degrades to numbered placeholders if the chunk never lands.
+- **The glass was never actually glass, sitewide, until tool 1's second pass.** Every
+  frosted pane — the nav capsule, the nav flyout, both new to tool 1 — hand-wrote
+  `-webkit-backdrop-filter` beside the standard `backdrop-filter` property. Lightning CSS
+  collapses that pair down to the prefixed one alone on build, which Blink doesn't
+  implement, so computed `backdrop-filter` was `none` everywhere and every pane was a
+  flat tint you could see straight through. Fix: don't hand-write the prefix — the
+  bundler adds whatever prefixes the build targets need on its own. If a future glass
+  surface looks flat instead of blurred, check for a hand-written `-webkit-` prefix
+  first.
+- **Signal picked up a second surface step, `--color-signal-fill` / `--color-on-signal`.**
+  White text on the hot `--color-signal` is 3.6:1, under the 4.5:1 small text needs, so a
+  filled button can never carry a white label at the hot value. `--color-signal-fill`
+  (`#de2e00`) is deep enough for white at 4.7:1. The hot step still owns what it was
+  always right for — focus rings, borders, progress, the drag-over flood — anywhere
+  content sits ON a signal fill, reach for the fill token and `--color-on-signal`, not
+  `--color-signal` with `--color-ink`.
+- **An `<img>` is natively draggable whether or not anything asks for it.** Any card or
+  tile built with a custom pointer-based drag (the page board's touch reordering is the
+  first case) needs `draggable={false}` on every image inside the draggable region — the
+  browser's own drag-out-to-save gesture wins the pointer before app code ever sees it
+  otherwise, silently breaking the drag on both mouse and touch.
 
 ## How we work
 
