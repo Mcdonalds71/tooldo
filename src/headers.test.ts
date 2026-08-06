@@ -25,8 +25,19 @@ describe('the shipped security headers', () => {
     expect(csp).toContain(directive);
   });
 
-  it('never allows eval, which nothing here needs', () => {
-    expect(csp).not.toContain('unsafe-eval');
+  it('never allows full eval — only the narrower wasm-unsafe-eval the image codecs need', () => {
+    // A plain substring check would false-positive on 'wasm-unsafe-eval' itself, which
+    // contains 'unsafe-eval' as text but grants a much narrower permission: compiling a
+    // WebAssembly module, not evaluating a JS string. Tokenising checks the real claim.
+    const tokens = csp.split(/[\s;]+/);
+
+    expect(tokens).not.toContain("'unsafe-eval'");
+  });
+
+  it('scopes wasm-unsafe-eval to script-src, where the image codecs actually run', () => {
+    const scriptSrc = csp.split(';').find((directive) => directive.trim().startsWith('script-src'));
+
+    expect(scriptSrc).toContain("'wasm-unsafe-eval'");
   });
 
   it('allows inline only where Astro, Radix and Motion force it, and nowhere else', () => {
