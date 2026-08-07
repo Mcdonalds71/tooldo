@@ -1,5 +1,5 @@
 import type { pipeline as PipelineFn } from '@huggingface/transformers';
-import type { RemoveProgress, RemoveResult } from './types';
+import { MODEL_UNAVAILABLE, type RemoveProgress, type RemoveResult } from './types';
 
 const MODEL_ID = 'onnx-community/ormbg-ONNX';
 
@@ -15,7 +15,18 @@ let segmenterPromise: Promise<Segmenter> | undefined;
  * rest of that story.
  */
 function getSegmenter(onProgress: (progress: RemoveProgress) => void): Promise<Segmenter> {
-  segmenterPromise ??= loadSegmenter(onProgress);
+  segmenterPromise ??= loadSegmenter(onProgress).catch((cause: unknown) => {
+    // A *rejected* promise must not be the thing we cache. Memoizing the failure would
+    // outlive whatever caused it — a dropped connection is temporary, but the cached
+    // rejection is not, and "Try again" would replay the original error forever on a
+    // network that has long since come back.
+    segmenterPromise = undefined;
+
+    const failure = new Error('The background remover could not be downloaded', { cause });
+    failure.name = MODEL_UNAVAILABLE;
+    throw failure;
+  });
+
   return segmenterPromise;
 }
 

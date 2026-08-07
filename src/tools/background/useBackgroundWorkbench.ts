@@ -2,7 +2,7 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { useToast } from '../../design-system/components/Toast';
 import { outputName } from './imageUtils';
 import { removeBackground } from './segmenterClient';
-import type { RemoveOutcome, RemovePhase } from './types';
+import { MODEL_UNAVAILABLE, type RemoveOutcome, type RemovePhase } from './types';
 import { loadSample } from './utilityClient';
 
 export interface QueuedFile {
@@ -24,6 +24,9 @@ export type Stage =
   | { readonly name: 'error'; readonly message: string };
 
 const GENERIC_FAILURE = 'Nothing came through — try again, or a different photo';
+/** Names the network, because the model download is the only part of this tool that
+ *  touches it, and it's the only failure the reader can actually do something about. */
+const MODEL_FAILURE = "Couldn't download the background remover — check your connection";
 
 export function useBackgroundWorkbench() {
   const { notify } = useToast();
@@ -87,7 +90,15 @@ export function useBackgroundWorkbench() {
           width: result.width,
           height: result.height,
         });
-      } catch {
+      } catch (cause) {
+        // The model failing to load isn't this photo's fault and won't be the next one's
+        // either — every remaining photo would fail identically, so the batch stops here
+        // rather than marching through the queue collecting the same failure.
+        if (cause instanceof Error && cause.name === MODEL_UNAVAILABLE) {
+          setStage({ name: 'error', message: MODEL_FAILURE });
+          return;
+        }
+
         outcomes.push({ ok: false, name: entry.file.name });
       }
     }

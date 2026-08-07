@@ -129,21 +129,25 @@ pipeline lives in its module scope across every call. The unrelated stateless ha
 sample image, zipping — still goes through the ordinary ephemeral worker. Full reasoning
 in ADR 0008.
 
-Typecheck, lint, and all 112 unit tests pass. Confirmed working end to end by hand —
-sample in, model downloads and runs, a real 163 KB transparent PNG comes back — in a
-real browser on a real machine, repeatedly. The Playwright spec covering that same flow
-fails in this specific build environment, but the cause turned out to be outside the
-app entirely: `page.on('requestfailed')` traced it to
-`net::ERR_NAME_NOT_RESOLVED` resolving `huggingface.co`, and Node's own `dns.resolve4`
-against the same host independently failed with `ESERVFAIL` moments later — this
-sandbox's DNS resolver is intermittently unreliable for outbound lookups, which every
-other tool in the suite never exercises because they make zero network requests. Not a
-resource, timing, or contention problem — raising the timeout and forcing the file's
-specs to run serially both left the failure unchanged, which is what pointed at the
-network layer instead. The two specs that don't touch the network (rejecting a
-non-photo, removing a queued file) pass cleanly and repeatedly. Re-run this spec in an
-environment with normal DNS before trusting the automated suite's green here — CI should
-be fine; this sandbox specifically was not.
+Typecheck, lint, all 112 unit tests, and the Playwright specs pass, including the one
+that downloads the real model and asserts a real transparent PNG comes back.
+
+**The model download is a hard dependency, and the failure it produces is the one worth
+designing for.** Every other tool in the suite makes zero network requests, so this is
+the first place a dropped connection can break a run — and it did, repeatedly, while
+this tool was being built: `net::ERR_NAME_NOT_RESOLVED` on `huggingface.co`, with Node's
+own `dns.resolve4` failing `ESERVFAIL` against the same host minutes apart. That cost
+real time to diagnose, mostly because the tool said the wrong thing about it. A model
+that won't download now stops the batch immediately and says
+"Couldn't download the background remover — check your connection", instead of marching
+through the queue marking every photo failed and suggesting a different photo — which
+pointed at the one thing that was never the problem. `e2e/background.spec.ts` covers it
+by aborting the Hugging Face route, so that path is tested without needing a network at
+all: it's the fastest spec in the file precisely because it never leaves the machine.
+
+The related trap, fixed at the same time: the loaded model was memoized as a promise,
+so a *rejected* load got cached too and "Try again" would replay the original failure
+forever on a connection that had since recovered. A failed load now clears itself.
 
 ## Next
 

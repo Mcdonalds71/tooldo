@@ -54,6 +54,17 @@ export interface ZipEntry {
  * dedicated worker is to keep it resident across every image in a session rather than
  * reloading it per file. See `worker.ts` and `segmenterClient.ts`.
  */
+/**
+ * Marks the model itself failing to load, as opposed to a photo failing to process.
+ * The two need different words: the model is the one part of this tool that needs the
+ * network, so its failure is almost always a connection problem, and telling someone to
+ * "try a different photo" when their wifi dropped sends them chasing the wrong thing.
+ *
+ * Carried as an error *name* because that, and the message, is all `WorkerTaskError`
+ * preserves across the worker boundary — structured clone drops everything else.
+ */
+export const MODEL_UNAVAILABLE = 'ModelUnavailableError';
+
 export type RemovePhase = 'loading-model' | 'removing';
 
 export interface RemoveProgress {
