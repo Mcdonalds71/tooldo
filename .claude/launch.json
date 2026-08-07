@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "tooldo-preview",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["exec", "astro", "preview", "--port", "4327"],
+      "port": 4327
+    }
+  ]
+}

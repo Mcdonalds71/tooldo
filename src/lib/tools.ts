@@ -68,7 +68,7 @@ export const tools = [
     description: 'Erase any background in one drop.',
     category: 'Images & photo',
     icon: EraserIcon,
-    status: 'planned',
+    status: 'live',
   },
   {
     slug: 'video',

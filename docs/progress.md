@@ -85,9 +85,69 @@ convert it to something lossy, and the FAQ says so. A resize mode besides "cap t
 longest side" — width/height fields would double the option panel for a case bulk
 conversion rarely needs.
 
+**Tool 3, Background Remover** (`/background`). Drop a photo, get back a transparent
+PNG — an on-device AI model (ormbg, Apache-2.0) finds the subject and cuts around it,
+general-purpose rather than portrait-only. This is the first tool with any network
+dependency at all: the model (`onnx-community/ormbg-ONNX`, ~40 MB quantized) is a
+public, cacheable file fetched once from Hugging Face, never anything of the visitor's.
+The photo itself still never leaves the tab. `connect-src` widened to `huggingface.co`
+and `*.hf.co` for exactly that fetch — see ADR 0008 and the CSP comment in
+`public/_headers`.
+
+**The model that shipped isn't the model that was first chosen, and the reason why is
+the most important thing this tool taught.** BiRefNet (MIT, strong quality, general-
+purpose) looked right on every axis that typecheck and unit tests can see — correct
+license, correct pipeline API, loads fine, starts running. It only failed where none of
+that checks: the forward pass itself, `std::bad_alloc` out of onnxruntime-web,
+reproduced consistently on real hardware and immune to every configuration knob tried
+against it (fp32 instead of fp16, the memory arena on and off). The actual cause is
+architectural — BiRefNet's transformer encoder has activation memory that scales with
+image resolution in a way WASM's 32-bit contiguous-memory model can't reliably serve,
+independently confirmed by another developer's public account of hitting the identical
+crash with the identical model. `onnx-community/ormbg-ONNX` is IS-Net — a plain
+convolutional architecture with none of that scaling — and the identical test that
+reliably crashed BiRefNet completed cleanly against it, repeatedly, verified with a real
+downloaded-and-compared output file, not just a state transition in the UI. Full story
+in ADR 0008. The lesson stated there plainly: a model needing WASM inference has to be
+verified by actually running the forward pass on ordinary hardware before the
+integration counts as done — nothing short of that would have caught this one.
+
+Along the way, two smaller real bugs surfaced the same way — by running the tool in a
+browser, not by reading the API. WebGPU throws on BiRefNet's shader (17 storage buffers
+against a 16 default limit); the pipeline asks for `device: 'wasm'` only, and that
+choice carried over to ormbg since WASM was already proven reliable. Separately,
+onnxruntime-web fetches its own WASM runtime from jsDelivr's CDN by default — a second
+third-party host with nothing to do with the model — so `scripts/copy-onnx-runtime.mjs`
+copies the six files it actually needs from the already-resolved dependency into
+`public/ort/` at install time instead.
+
+**A second worker shape.** Every other tool's compute is a `runInWorker` call: spin up
+a worker, run one task, terminate it. Wrong here — the model is a load worth keeping
+resident, not something to repeat per photo in a batch. `worker.ts` is a persistent
+worker instead, created once and kept alive for the whole session; `engine.ts`'s loaded
+pipeline lives in its module scope across every call. The unrelated stateless half — the
+sample image, zipping — still goes through the ordinary ephemeral worker. Full reasoning
+in ADR 0008.
+
+Typecheck, lint, and all 112 unit tests pass. Confirmed working end to end by hand —
+sample in, model downloads and runs, a real 163 KB transparent PNG comes back — in a
+real browser on a real machine, repeatedly. The Playwright spec covering that same flow
+fails in this specific build environment, but the cause turned out to be outside the
+app entirely: `page.on('requestfailed')` traced it to
+`net::ERR_NAME_NOT_RESOLVED` resolving `huggingface.co`, and Node's own `dns.resolve4`
+against the same host independently failed with `ESERVFAIL` moments later — this
+sandbox's DNS resolver is intermittently unreliable for outbound lookups, which every
+other tool in the suite never exercises because they make zero network requests. Not a
+resource, timing, or contention problem — raising the timeout and forcing the file's
+specs to run serially both left the failure unchanged, which is what pointed at the
+network layer instead. The two specs that don't touch the network (rejecting a
+non-photo, removing a queued file) pass cleanly and repeatedly. Re-run this spec in an
+environment with normal DNS before trusting the automated suite's green here — CI should
+be fine; this sandbox specifically was not.
+
 ## Next
 
-Tools 3 to 10, each through the `new-tool` skill. The landing page's upload animation
+Tools 4 to 10, each through the `new-tool` skill. The landing page's upload animation
 comes after the tools, not before — deliberately reordered from the original plan.
 
 **Not in the PDF tool, deliberately.** Compression, because pdf-lib copies page streams
@@ -165,6 +225,24 @@ Recorded properly in `docs/adr/`. The ones that catch people out:
   full run, occasional only under full-suite concurrency. That's Chromium's own input
   classification on a touch-emulated device reacting to system load, not a resource knob
   this repo controls, which is what `retries` on CI exists to absorb.
+- **A hard, non-optional dependency isn't the same as a dependency you actually need**
+  (ADR 0008). `@huggingface/transformers` declares `onnxruntime-node` — a multi-platform
+  native binary bundle for its Node.js code path — as a regular dependency, not an
+  optional one, so `pnpm install` tries to fetch it regardless of whether a browser
+  bundle will ever import that path. It repeatedly timed out fetching in this
+  environment and would have bought nothing even on success.
+  `pnpm-workspace.yaml`'s `overrides` redirects it to a local stub
+  (`scripts/stubs/onnxruntime-node`) that throws if anything ever actually imports it.
+- **pnpm 11 stopped reading the `"pnpm"` field in `package.json`.** An `overrides` block
+  placed there is silently ignored — a warning names the field, but nothing fails loudly.
+  Config that used to live in `package.json` now belongs in `pnpm-workspace.yaml`, which
+  this repo already had one for; the override joined it there instead of a second file.
+- **A model's own choice of accelerator can be wrong even when the API accepted it
+  without complaint.** BiRefNet's WebGPU path compiles and runs — it just throws
+  `Too many storage buffers in shader` on ordinary hardware the moment it executes,
+  because the shader needs 17 storage buffers against the platform's default limit of
+  16. Nothing about the pipeline API surfaces that until you actually run it. WASM has
+  no such ceiling, so that's the only device this pipeline asks for. See ADR 0008.
 
 ## How we work
 
