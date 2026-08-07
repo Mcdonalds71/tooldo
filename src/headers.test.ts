@@ -20,9 +20,26 @@ describe('the shipped security headers', () => {
     ["frame-ancestors 'none'", 'clickjacking'],
     ["base-uri 'self'", 'a rewritten base tag redirects every relative URL'],
     ["form-action 'self'", 'posting user input off-site'],
-    ["connect-src 'self'", 'the privacy promise depends on nothing being sent anywhere'],
   ])('keeps %s — %s', (directive) => {
     expect(csp).toContain(directive);
+  });
+
+  it('scopes connect-src to self plus exactly the Hugging Face hosts the Background Remover needs', () => {
+    // The privacy promise is about files, not every network request: the model itself
+    // is a public, cacheable download with nothing of the visitor's in it, fetched once
+    // from huggingface.co and the CDN its redirect resolves to. Everything else in the
+    // suite still makes zero outbound requests, which is what this pins down — a third
+    // host showing up here later should fail this test, not slip in unnoticed.
+    const connectSrc = csp
+      .split(';')
+      .find((directive) => directive.trim().startsWith('connect-src'));
+
+    expect(connectSrc?.trim().split(/\s+/)).toEqual([
+      'connect-src',
+      "'self'",
+      'https://huggingface.co',
+      'https://*.hf.co',
+    ]);
   });
 
   it('never allows full eval — only the narrower wasm-unsafe-eval the image codecs need', () => {

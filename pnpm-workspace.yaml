@@ -5,12 +5,23 @@
 # local runtime, fast-uri via the YAML language server behind astro check — so the
 # override is about keeping the audit honest, not about closing a live hole.
 # Drop each one once its parent releases past it.
+#
+# onnxruntime-node is different: transformers.js declares it as a hard dependency for
+# its Node.js code path, but tooldo never runs that path — the whole suite is browser
+# and Worker only. The real package is a multi-platform native binary bundle that timed
+# out fetching in this environment and buys nothing even when it succeeds, so it's
+# redirected to a local stub that throws if anything ever actually imports it.
 overrides:
   undici: '>=7.29.0'
   fast-uri: '>=3.1.5'
+  onnxruntime-node: 'link:./scripts/stubs/onnxruntime-node'
 
 allowBuilds:
   esbuild: true
+  # Brought in by onnxruntime-web to parse .onnx files (protobuf-encoded). Its install
+  # step generates JS from the .proto schemas bundled in the package itself — local
+  # codegen, no network fetch or native binary.
+  protobufjs: true
   sharp: true
   # Wrangler shells out to workerd, whose install script fetches the platform binary.
   # Skip it and the deploy step fails on a runtime that never finished installing.
