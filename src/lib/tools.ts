@@ -1,5 +1,4 @@
 import {
-  EraserIcon,
   FilePdfIcon,
   FilmStripIcon,
   FrameCornersIcon,
@@ -60,14 +59,6 @@ export const tools = [
     description: 'Convert and shrink images in bulk.',
     category: 'Images & photo',
     icon: ImagesIcon,
-    status: 'live',
-  },
-  {
-    slug: 'background',
-    name: 'Background Remover',
-    description: 'Erase any background in one drop.',
-    category: 'Images & photo',
-    icon: EraserIcon,
     status: 'live',
   },
   {
@@ -136,7 +127,7 @@ export interface ToolGroup {
 }
 
 /** The three the nav promotes. Order is the order they appear. */
-export const POPULAR_SLUGS = ['pdf', 'images', 'background'] as const;
+export const POPULAR_SLUGS = ['pdf', 'images', 'invoice'] as const;
 
 export function findTool(slug: string): Tool | undefined {
   return tools.find((tool) => tool.slug === slug);

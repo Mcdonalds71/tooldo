@@ -9,7 +9,7 @@ If a request conflicts with these rules, stop and flag it rather than breaking t
 
 ## 1. What this is
 
-A suite of ten free, everyday utility tools (PDF, image, video, data, generators) under one brand and one design system. Everything runs **client-side in the browser** — no backend, no database, no accounts, no file uploads. Privacy is the product: *"Your files never leave your device."*
+A suite of nine free, everyday utility tools (PDF, image, video, data, generators) under one brand and one design system. Everything runs **client-side in the browser** — no backend, no database, no accounts, no file uploads. Privacy is the product: *"Your files never leave your device."* That's also why every tool in the suite is pure client-side compute: a tool that depends on a third-party service at runtime is a tool that can fail for reasons this project can't fix — see [ADR 0009](docs/adr/0009-remove-background-remover.md).
 
 ## 2. Stack (do not swap without an ADR)
 
@@ -20,7 +20,7 @@ A suite of ten free, everyday utility tools (PDF, image, video, data, generators
 - **Motion** (`motion/react`) for UI micro-interactions; **GSAP** (+ScrollTrigger) for landing-page showpieces only.
 - **Phosphor Icons** (`@phosphor-icons/react`), duotone for large/expressive, regular for inline. **Never Lucide. Never emoji in shipped UI.**
 - **Zustand** only when a tool truly needs cross-component state; otherwise `useState`/`useReducer`.
-- Compute libs per tool: `pdf-lib`/`pdfjs-dist`, `@jsquash/*`+`libheif`, `@huggingface/transformers`, `@ffmpeg/ffmpeg`, `SheetJS`, `qr-code-styling`, `luxon`.
+- Compute libs per tool: `pdf-lib`/`pdfjs-dist`, `@jsquash/*`+`libheif`, `@ffmpeg/ffmpeg`, `SheetJS`, `qr-code-styling`, `luxon`.
 - Tooling: **pnpm**, **Biome** (lint+format), **Vitest** (unit), **Playwright** (smoke).
 - Palette: **"paper, ink & signal"** — cream paper base (`--color-paper #f4f0e7`), near-black ink text (`--color-ink #16130d`), one hot vermilion accent (`--color-signal #ff3b14`) used sparingly (primary CTA, focus, key emphasis only). Warm lines, light-first. Full tokens in `docs/build-spec.md` §4.1.
 - Fonts: self-hosted, `Clash Display` (headers, Fontshare — max weight 700) + `Inter` (UI/body) + `JetBrains Mono` (code/data). Free/OFL/Fontshare licences only.
@@ -93,7 +93,7 @@ A suite of ten free, everyday utility tools (PDF, image, video, data, generators
 
 ## 11. Definition of done for a tool
 
-A tool is done only when it has: a pure tested `engine.ts`; a thin island built from design-system components; an `.astro` page with SEO metadata (title/meta/OG/JSON-LD); a registry entry in `lib/tools.ts`; an interactive empty state with a sample file; full keyboard + reduced-motion support; passing unit + smoke tests; and no lint errors, dead code, or hardcoded tokens. **Use the `new-tool` skill for every tool so the bar is identical across all ten.**
+A tool is done only when it has: a pure tested `engine.ts`; a thin island built from design-system components; an `.astro` page with SEO metadata (title/meta/OG/JSON-LD); a registry entry in `lib/tools.ts`; an interactive empty state with a sample file; full keyboard + reduced-motion support; passing unit + smoke tests; and no lint errors, dead code, or hardcoded tokens. **Use the `new-tool` skill for every tool so the bar is identical across all nine.**
 
 ## 12. Commands
 
