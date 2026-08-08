@@ -75,7 +75,7 @@ export const tools = [
     description: 'Fill a form, get a clean PDF.',
     category: 'Documents',
     icon: ReceiptIcon,
-    status: 'planned',
+    status: 'live',
   },
   {
     slug: 'screenshot',

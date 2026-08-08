@@ -1,0 +1,70 @@
+---
+import ToolLayout, { type FaqEntry } from '../layouts/ToolLayout.astro';
+import { InvoiceTool } from '../tools/invoice/InvoiceTool';
+import '../tools/invoice/invoice.css';
+
+const description =
+  'Fill in a form and watch a clean, ready-to-send invoice build in real time — right in your browser. Download it as a PDF. Your details never leave your device.';
+
+const steps = [
+  {
+    title: 'Fill in the details',
+    body: 'Your business, the client, and as many line items as the job needs.',
+  },
+  {
+    title: 'Watch it build',
+    body: 'The invoice on the right updates as you type — no separate preview step.',
+  },
+  {
+    title: 'Download the PDF',
+    body: 'One clean invoice, ready to send.',
+  },
+];
+
+const faq: readonly FaqEntry[] = [
+  {
+    question: 'Does my invoice data get uploaded?',
+    answer:
+      'No. The whole invoice — every field, the live preview, the PDF itself — is built by code running in this tab. Nothing is sent anywhere.',
+  },
+  {
+    question: 'Is my business information remembered next time?',
+    answer:
+      "Your name, address, contact details, and logo are saved on this device only, so you don't retype them on the next invoice. Clear them any time with the link above that section. Client details and line items are never saved — every invoice starts fresh there.",
+  },
+  {
+    question: 'Can I add a logo?',
+    answer:
+      'Yes. Drop in a PNG, JPEG, or WebP under 2 MB and it appears at the top of the invoice.',
+  },
+  {
+    question: 'How does tax and discount work?',
+    answer:
+      'Both are percentages. The discount comes off the subtotal first, then tax is calculated on what remains — the order a real invoice uses, not tax on the pre-discount total.',
+  },
+  {
+    question: 'Can I change how the invoice looks?',
+    answer:
+      "Not yet — there's one clean layout rather than a template picker. It covers the fields a standard invoice needs: business and client details, line items, tax, discount, and notes.",
+  },
+  {
+    question: 'What currency does it use?',
+    answer:
+      'Amounts show with a $ sign. A currency picker may come later, but nothing today changes what symbol appears.',
+  },
+];
+---
+
+<ToolLayout
+  slug="invoice"
+  title="Free invoice generator — tooldo"
+  description={description}
+  steps={steps}
+  faq={faq}
+>
+  {
+    /* client:load, not client:visible: matches every other tool — the island is the
+       whole reason the route exists and opens above the fold. */
+  }
+  <InvoiceTool client:load />
+</ToolLayout>

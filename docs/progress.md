@@ -98,15 +98,36 @@ controls. Removed rather than escalated into hosting the model file on infrastru
 tooldo would have to operate itself. Full history — the model architecture debugging
 that's still a good read for any future tool considering WASM inference, and the CDN
 investigation that diagnosed the production failure precisely rather than guessing at
-it — in ADR 0008. The removal decision itself is ADR 0009. Invoice Generator, already
-registered as `planned` and dependency-free by nature, takes its place next.
+it — in ADR 0008. The removal decision itself is ADR 0009.
+
+**Tool 4, Invoice Generator** (`/invoice`). Fill in business and client details and a
+table of line items, watch a real invoice build in the pane beside the form as you
+type, download it as a PDF. The suite's first input-in tool — no Dropzone, nothing to
+drop — and the first with a live preview that updates on every keystroke rather than a
+result revealed after a separate run step. `engine.ts` splits cleanly: `calculateTotals`
+is pure and cheap enough to call directly on the main thread for the live preview, and
+the exact same function is what the worker-side `pdf-lib` routine (`pdfLayout.ts`) calls
+for the real PDF — one source of truth, so the preview and the download can never
+disagree about a number. 12 unit tests, 4 Playwright specs including one that types into
+a field and asserts the preview updates immediately.
+
+Business details (name, address, contact info, logo) are remembered in `localStorage`
+between visits — the suite's first tool to persist anything, deliberately narrow in
+scope and not a precedent for the other nine. Client details and line items are never
+saved. Full reasoning, including why the state machine and the responsive layout both
+depart from the file-tool template on purpose, in ADR 0010.
+
+Two new design-system components came out of the form: `TextField` and `TextAreaField`,
+reading a new calm-register `--field-*` token set rather than the existing (unused)
+hero-register `--input-*` tokens — the same `brut`/`calm` split `Card` already draws for
+dense working UI. The live preview itself is `Card tone="brut"`, on purpose: it's this
+tool's delight moment, not part of the dense form around it.
 
 ## Next
 
-Invoice Generator (`/invoice`) is up next, through the `new-tool` skill — fill a form,
-get a clean PDF, no external dependency of any kind. Then the rest of the `planned`
-roster in `lib/tools.ts`. The landing page's upload animation comes after the tools, not
-before — deliberately reordered from the original plan.
+The rest of the `planned` roster in `lib/tools.ts`, each through the `new-tool` skill.
+The landing page's upload animation comes after the tools, not before — deliberately
+reordered from the original plan.
 
 **Not in the PDF tool, deliberately.** Compression, because pdf-lib copies page streams
 untouched and anything honest would mean re-encoding images and losing quality — the FAQ
@@ -192,6 +213,11 @@ Recorded properly in `docs/adr/`. The ones that catch people out:
   only tool with a runtime dependency on a service it doesn't operate. If `connect-src`
   in `public/_headers` or a Hugging Face reference turns up somewhere, it's a leftover to
   clean up, not something to build around.
+- **Not every tool fits the file-in template, and Invoice Generator is where that first
+  mattered** (ADR 0010). A form with a live preview needs its own state shape, its own
+  empty-state answer, and — deliberately, narrowly — the suite's first `localStorage`
+  use. Read it before assuming the next input-in tool should copy the file-tool pattern,
+  or that `localStorage` is now fair game elsewhere without the same reasoning.
 
 ## How we work
 

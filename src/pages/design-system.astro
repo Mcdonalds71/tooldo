@@ -2,6 +2,8 @@
 import { DownloadSimpleIcon, TrashIcon } from '@phosphor-icons/react/dist/ssr';
 import { Button } from '../design-system/components/Button';
 import { IconButton } from '../design-system/components/IconButton';
+import { TextAreaField } from '../design-system/components/TextAreaField';
+import { TextField } from '../design-system/components/TextField';
 import { EmptyStateShowcase } from '../design-system/examples/EmptyStateShowcase';
 import { InteractiveShowcase } from '../design-system/examples/InteractiveShowcase';
 import { SurfaceShowcase } from '../design-system/examples/SurfaceShowcase';
@@ -90,6 +92,35 @@ const sizes = ['sm', 'md', 'lg'] as const;
         </figure>
       </div>
 
+      <h2>Fields — the calm register</h2>
+      <p class="guide__note">
+        Long forms don't get the hard shadow. A thin line, a vermilion border on focus —
+        quiet enough to fill in a dozen of these without the page shouting back.
+      </p>
+      <div class="row row--fields">
+        <TextField label="Business name" value="" onChange={() => {}} placeholder="Acme Studio" />
+        <TextField
+          label="Contact email"
+          value="hello@acmestudio.com"
+          onChange={() => {}}
+          type="email"
+          hint="Shown on the invoice, not used for anything else."
+        />
+        <TextField
+          label="Tax rate"
+          value="8.5"
+          onChange={() => {}}
+          type="number"
+          error="Enter a number between 0 and 100"
+        />
+        <TextAreaField
+          label="Notes"
+          value=""
+          onChange={() => {}}
+          placeholder="Payment due within 14 days."
+        />
+      </div>
+
       <h2>Surfaces, progress, and the payoff</h2>
       <SurfaceShowcase />
 
@@ -145,6 +176,15 @@ const sizes = ['sm', 'md', 'lg'] as const;
     align-items: center;
     gap: var(--space-md);
     margin-top: var(--space-md);
+  }
+
+  .row--fields {
+    align-items: flex-start;
+  }
+
+  .row--fields > :global(.field) {
+    width: 16rem;
+    max-width: 100%;
   }
 
   figure {
