@@ -88,8 +88,8 @@ staying resident.
 **Runtime, not just model.** onnxruntime-web fetches its own WASM binaries from
 jsDelivr's CDN by default — a second third-party host beyond huggingface.co, and one
 that has nothing to do with the model itself. `scripts/copy-onnx-runtime.mjs` copies the
-six `ort-wasm-simd-threaded*` files it actually needs (plain and asyncify for the WASM
-path, jsep for a possible future WebGPU path) from the already-resolved
+four `ort-wasm-simd-threaded*` files it actually needs — plain and asyncify, the split
+onnxruntime-web makes between Safari and everyone else — from the already-resolved
 `onnxruntime-web` dependency into `public/ort/` at install time, and
 `env.backends.onnx.wasm.wasmPaths` points there. `connect-src` only has to trust
 `huggingface.co` and `*.hf.co` — the model weights, the one thing that can't be
@@ -110,6 +110,11 @@ self-hosted without committing a binary to a public repo.
   transformer-family model for in-browser WASM inference should budget time to verify
   the forward pass completes on ordinary hardware before treating the integration as
   done, not just verify that the pipeline constructs successfully.
+- **Shipping the WebGPU runtime "just in case" was a deploy risk, not free insurance.**
+  The jsep build is 24.9 MiB — 99.6% of Cloudflare's 25 MiB per-file ceiling for static
+  assets — and with `device: 'wasm'` pinned, nothing ever fetched it. A routine
+  onnxruntime-web bump could have failed a deploy over a file no visitor loads. It comes
+  back in the same commit that turns WebGPU on, not before.
 - `onnxruntime-node` — a hard (non-optional) dependency of `@huggingface/transformers`
   for its Node.js code path, never exercised by a browser-only build — is redirected to
   a local stub via `pnpm-workspace.yaml`'s `overrides` (`scripts/stubs/onnxruntime-node`)

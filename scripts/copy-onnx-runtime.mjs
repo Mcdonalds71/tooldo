@@ -12,10 +12,17 @@ import { fileURLToPath } from 'node:url';
  * dependency into public/ort/ instead. One more host to fetch a public model from is
  * honest; one more host the CSP has to trust just to run the engine itself is not.
  *
- * Only the six wasm-simd-threaded variants are needed: plain and asyncify cover the WASM
- * fallback (Safari and everyone else — the same split onnxruntime-web's own default path
- * logic makes), jsep is the WebGPU-capable build. Everything else in the package's dist
- * folder is a JS bundle Vite already resolves through the normal import graph.
+ * Only the four wasm-simd-threaded variants are needed, and only those: plain and
+ * asyncify are the split onnxruntime-web's own path logic makes between Safari and
+ * everyone else. Everything else in the package's dist folder is a JS bundle Vite
+ * already resolves through the normal import graph.
+ *
+ * The jsep pair is deliberately not here. It is the WebGPU build, and `engine.ts` pins
+ * `device: 'wasm'` (ADR 0008 — WebGPU threw on the model this tool used to use), so it
+ * would never be fetched. That matters beyond tidiness: at 24.9 MiB it sat at 99.6% of
+ * Cloudflare's 25 MiB per-file ceiling for static assets, close enough that a routine
+ * upstream bump to onnxruntime-web could fail a deploy for a file nothing loads. Add it
+ * back in the same commit that turns WebGPU on, not before.
  */
 
 const FILES = [
@@ -23,8 +30,6 @@ const FILES = [
   'ort-wasm-simd-threaded.wasm',
   'ort-wasm-simd-threaded.asyncify.mjs',
   'ort-wasm-simd-threaded.asyncify.wasm',
-  'ort-wasm-simd-threaded.jsep.mjs',
-  'ort-wasm-simd-threaded.jsep.wasm',
 ];
 
 const TARGET_DIR = 'public/ort';
