@@ -30,6 +30,38 @@ function getSegmenter(onProgress: (progress: RemoveProgress) => void): Promise<S
   return segmenterPromise;
 }
 
+/**
+ * Hugging Face's edge cache is sharded per node; a node that cached a transient 5xx for
+ * this file keeps serving it to whoever it routes to, independent of the visitor's own
+ * network — confirmed live by the identical request succeeding from one vantage point
+ * and failing from another at the same moment (ADR 0008). A few backed-off retries ride
+ * out exactly that without masking a real failure: a 4xx (wrong id, private repo) still
+ * returns on the first attempt.
+ */
+async function fetchWithRetry(input: string | URL, init?: RequestInit): Promise<Response> {
+  const maxAttempts = 4;
+  let lastError: unknown;
+
+  for (let i = 0; i < maxAttempts; i++) {
+    if (i > 0) await sleep(400 * 2 ** i);
+
+    try {
+      const response = await fetch(input, init);
+      if (response.status < 500) return response;
+      await response.body?.cancel();
+      lastError = new Error(`${response.status} ${response.statusText}`);
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  throw lastError;
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 async function loadSegmenter(onProgress: (progress: RemoveProgress) => void): Promise<Segmenter> {
   const { pipeline, env } = await import('@huggingface/transformers');
 
@@ -40,6 +72,8 @@ async function loadSegmenter(onProgress: (progress: RemoveProgress) => void): Pr
   if (env.backends.onnx.wasm) {
     env.backends.onnx.wasm.wasmPaths = '/ort/';
   }
+
+  env.fetch = fetchWithRetry;
 
   const segmenter = await pipeline('background-removal', MODEL_ID, {
     // ormbg is IS-Net — a fully convolutional segmentation architecture, not a
