@@ -11,10 +11,24 @@
 # and Worker only. The real package is a multi-platform native binary bundle that timed
 # out fetching in this environment and buys nothing even when it succeeds, so it's
 # redirected to a local stub that throws if anything ever actually imports it.
+#
+# The last three are the same shape as the first two — patched upstream, reaching us
+# through a parent that hasn't bumped yet, none of them on a path a visitor executes.
+# sharp arrives via transformers.js's Node image path (which this suite never takes,
+# and the repo already asks for a fixed sharp of its own for the brand-asset script);
+# js-yaml and nanoid arrive under Astro's build tooling. `pnpm audit --audit-level high`
+# gates CI, so leaving them unpinned blocks every pull request over code nobody ships.
 overrides:
   undici: '>=7.29.0'
   fast-uri: '>=3.1.5'
   onnxruntime-node: 'link:./scripts/stubs/onnxruntime-node'
+  # Upper bounds are not decoration. Left open, these resolve to the newest major —
+  # js-yaml 5 drops the default export Astro imports, and nanoid 6 is ESM-only where
+  # postcss still requires it — so an override meant to silence an advisory breaks the
+  # build instead. Pin to the patch inside the major each parent already expects.
+  sharp: '>=0.35.0 <0.36.0'
+  js-yaml: '>=4.3.1 <5'
+  nanoid: '>=3.3.17 <4'
 
 allowBuilds:
   esbuild: true
