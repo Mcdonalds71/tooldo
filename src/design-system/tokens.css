@@ -272,6 +272,18 @@
   --input-shadow-focus: var(--shadow-brut-focus);
   --input-height: 48px;
 
+  /* Calm register: text fields for dense, long forms — same "stay quiet" family as
+     Slider/Segmented/Switch and Card's `calm` tone, not the hero-surface tokens above. */
+  --field-height: 44px;
+  --field-radius: var(--radius-md);
+  --field-border: 1.5px solid var(--color-line-strong);
+  --field-border-focus: 1.5px solid var(--color-signal);
+  --field-bg: var(--color-card);
+  --field-padding-x: var(--space-sm);
+  --field-gap: var(--space-3xs);
+  --field-textarea-min-height: 6rem;
+  --field-error: var(--color-danger);
+
   --dur-press: 120ms;
   --dur-fast: 150ms;
   --dur-base: 250ms;

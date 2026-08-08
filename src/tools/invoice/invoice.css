@@ -1,0 +1,316 @@
+/*
+ * The Invoice Generator workbench. Restraint rule in practice: the form stays in the
+ * calm register (Card `calm`, thin `--field-*` borders) because it's dense working UI,
+ * while the live preview gets the full neo-brut hero treatment (Card `brut`) because
+ * watching your invoice build is the whole point of this tool — loud where it delights.
+ */
+
+.invoice-tool {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.invoice-tool__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.invoice-tool__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  margin-left: auto;
+}
+
+.invoice-tool__panels {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-lg);
+  align-items: start;
+}
+
+/* Mobile: one pane at a time, driven by the Segmented toggle above. */
+@media (width < 64rem) {
+  .invoice-tool__panels[data-view="edit"] .invoice-tool__preview-pane {
+    display: none;
+  }
+
+  .invoice-tool__panels[data-view="preview"] .invoice-tool__form-pane {
+    display: none;
+  }
+}
+
+/* Desktop: both panes side by side, live, all the time — the toggle has nothing to do. */
+@media (width >= 64rem) {
+  .invoice-tool__toggle {
+    display: none;
+  }
+
+  .invoice-tool__panels {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .invoice-tool__preview-sticky {
+    position: sticky;
+    top: var(--space-lg);
+  }
+}
+
+/* ---------- Form ---------- */
+
+.invoice-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.invoice-form__section {
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.invoice-form__section h3 {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+}
+
+.invoice-form__section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.invoice-form__clear {
+  font-size: var(--text-xs);
+  color: var(--color-ink-faint);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.invoice-form__clear:hover {
+  color: var(--color-ink-soft);
+}
+
+.invoice-form__logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.invoice-form__logo-preview {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+  border: var(--hairline);
+  background-color: var(--color-white);
+}
+
+.invoice-form__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: var(--space-sm);
+}
+
+.invoice-form__hint {
+  font-size: var(--text-xs);
+  color: var(--color-ink-faint);
+}
+
+/* ---------- Line items ---------- */
+
+.line-items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.line-items__head {
+  display: none;
+  font-size: var(--text-xs);
+  color: var(--color-ink-faint);
+  padding-inline: var(--field-padding-x);
+}
+
+.line-items__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs);
+  align-items: center;
+}
+
+.line-items__description {
+  flex: 1 1 100%;
+  min-width: 0;
+}
+
+.line-items__qty,
+.line-items__price {
+  flex: 1 1 6rem;
+  min-width: 0;
+}
+
+.line-items__amount {
+  flex: 1 1 6rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink-soft);
+  font-size: var(--text-sm);
+}
+
+/* Wide enough for a real table: header row appears, everything lines up in columns
+   instead of wrapping. This block owns every layout property for the width — nothing
+   above it may repeat `display`/`flex` for these selectors, or source order would
+   decide the winner instead of the breakpoint. */
+@media (width >= 40rem) {
+  .line-items__head,
+  .line-items__row {
+    display: grid;
+    grid-template-columns: 1fr 4rem 6rem 6rem auto;
+    gap: var(--space-2xs);
+    align-items: center;
+  }
+
+  .line-items__description,
+  .line-items__qty,
+  .line-items__price,
+  .line-items__amount {
+    flex: initial;
+    text-align: left;
+  }
+
+  .line-items__amount {
+    text-align: right;
+  }
+}
+
+/* ---------- Live preview ---------- */
+
+.invoice-preview {
+  padding: var(--space-lg);
+  background-color: var(--color-white);
+  color: var(--color-ink);
+  font-size: var(--text-sm);
+}
+
+.invoice-preview__header {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.invoice-preview__from {
+  min-width: 0;
+}
+
+.invoice-preview__logo {
+  max-width: 4rem;
+  max-height: 4rem;
+  object-fit: contain;
+  margin-bottom: var(--space-2xs);
+}
+
+.invoice-preview__business-name {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+}
+
+.invoice-preview__muted {
+  color: var(--color-ink-faint);
+  font-size: var(--text-xs);
+  line-height: var(--leading-body);
+}
+
+.invoice-preview__meta {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.invoice-preview__title {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  color: var(--color-signal-dark);
+}
+
+.invoice-preview__label {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--color-ink-faint);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-eyebrow);
+}
+
+.invoice-preview__bill-to {
+  margin-top: var(--space-lg);
+}
+
+.invoice-preview__client-name {
+  font-weight: var(--weight-medium);
+}
+
+.invoice-preview__table {
+  width: 100%;
+  margin-top: var(--space-lg);
+  border-collapse: collapse;
+}
+
+.invoice-preview__table th {
+  text-align: left;
+  font-size: var(--text-xs);
+  color: var(--color-ink-faint);
+  font-weight: var(--weight-semibold);
+  padding-bottom: var(--space-2xs);
+  border-bottom: var(--hairline);
+}
+
+.invoice-preview__table th:last-child,
+.invoice-preview__table td:last-child {
+  text-align: right;
+}
+
+.invoice-preview__table td {
+  padding-block: var(--space-2xs);
+  border-bottom: 1px solid var(--color-line);
+  font-variant-numeric: tabular-nums;
+}
+
+.invoice-preview__totals {
+  margin-top: var(--space-md);
+  margin-left: auto;
+  width: min(16rem, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+}
+
+.invoice-preview__totals-row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink-soft);
+}
+
+.invoice-preview__totals-row--total {
+  margin-top: var(--space-2xs);
+  padding-top: var(--space-2xs);
+  border-top: var(--hairline);
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  color: var(--color-signal-dark);
+}
+
+.invoice-preview__notes {
+  margin-top: var(--space-lg);
+}
