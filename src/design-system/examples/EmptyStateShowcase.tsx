@@ -17,7 +17,7 @@ export function EmptyStateShowcase() {
         variant="no-results"
         illustration={<MagnifyingGlassIcon size="2.5rem" weight="duotone" />}
         headline="Nothing matches that filter"
-        subtext="Clear it and all ten tools come back."
+        subtext="Clear it and every tool comes back."
         primaryAction={
           <Button size="sm" variant="secondary">
             Clear filters
