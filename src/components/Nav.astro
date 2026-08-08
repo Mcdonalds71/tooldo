@@ -92,7 +92,6 @@ const popular = popularTools();
     background-color: var(--glass-tint);
     background-image: var(--glass-gradient);
     backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   }
 
   /* The capsule's own padding is the clear space here, so the lockup drops its own.
@@ -211,7 +210,6 @@ const popular = popularTools();
     background-color: var(--glass-tint-strong);
     background-image: var(--glass-gradient);
     backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
     opacity: 0;
     visibility: hidden;
     translate: -50% -0.5rem;
@@ -288,8 +286,8 @@ const popular = popularTools();
   }
 
   .nav__tool:hover .nav__tool-icon {
-    background-color: var(--color-signal);
-    color: var(--color-ink);
+    background-color: var(--color-signal-fill);
+    color: var(--color-on-signal);
   }
 
   .nav__tool-name {

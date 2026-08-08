@@ -17,12 +17,29 @@
 # actually matters here: React escapes everything, nothing uses dangerouslySetInnerHTML,
 # and file input is validated before it is touched.
 #
+# 'wasm-unsafe-eval' is not the same permission as 'unsafe-eval', despite the name: it
+# only allows compiling a WebAssembly module, not evaluating a JS string, and Chrome
+# refuses WebAssembly.instantiate() without it — confirmed by actually enforcing this
+# policy in a browser, not assumed. The Image Converter's codecs (@jsquash/*, heic-to)
+# are the first thing in the suite that touches WebAssembly at all; nothing before it
+# needed the keyword, which is why it wasn't here already.
+#
+# connect-src carries two Hugging Face hosts for the Background Remover: huggingface.co
+# itself, where the model file's metadata and redirect are served from, and *.hf.co,
+# the CDN the redirect actually resolves to (traced with a real request rather than
+# assumed — the exact subdomain is signed and rotates, so the wildcard is the only
+# stable target). The model file is the one thing in the suite that isn't self-hosted:
+# it's a public, cacheable download that never carries anything about the visitor or
+# their photo, which stays on-device like every other tool. The WASM engine that runs
+# it is still self-hosted (public/ort/, copied from onnxruntime-web at install time)
+# rather than pulled from jsDelivr, so this is the only third-party host the CSP trusts.
+#
 # Everything else stays locked down. blob: is allowed for images, media and workers
 # because tools preview and download their own output through object URLs — never a
 # remote fetch.
 
 /*
-  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; frame-src 'none'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; worker-src 'self' blob:; media-src 'self' blob:; manifest-src 'self'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; frame-src 'none'; form-action 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://huggingface.co https://*.hf.co; worker-src 'self' blob:; media-src 'self' blob:; manifest-src 'self'; upgrade-insecure-requests
   Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY

@@ -49,10 +49,10 @@ export const tools = [
   {
     slug: 'pdf',
     name: 'PDF Toolbox',
-    description: 'Merge, split, compress, and reorder pages.',
+    description: 'Merge, reorder, rotate, and trim pages.',
     category: 'Documents',
     icon: FilePdfIcon,
-    status: 'planned',
+    status: 'live',
   },
   {
     slug: 'images',
@@ -60,7 +60,7 @@ export const tools = [
     description: 'Convert and shrink images in bulk.',
     category: 'Images & photo',
     icon: ImagesIcon,
-    status: 'planned',
+    status: 'live',
   },
   {
     slug: 'background',
@@ -68,7 +68,7 @@ export const tools = [
     description: 'Erase any background in one drop.',
     category: 'Images & photo',
     icon: EraserIcon,
-    status: 'planned',
+    status: 'live',
   },
   {
     slug: 'video',

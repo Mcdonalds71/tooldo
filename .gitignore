@@ -8,6 +8,11 @@ dist/
 # checkout — see public/fonts/README.md.
 public/fonts/clash-display-variable.woff2
 
+# onnxruntime-web's WASM binaries, copied from node_modules by
+# scripts/copy-onnx-runtime.mjs (postinstall) so the Background Remover never fetches
+# them from a third-party CDN. Derived from an already-licensed dependency, not source.
+public/ort/
+
 # test output
 test-results/
 playwright-report/

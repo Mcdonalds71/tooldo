@@ -1,0 +1,310 @@
+/*
+ * The PDF workbench.
+ *
+ * Its measurements live in one block at the top — the same idea as the component tokens
+ * in the design system, kept beside the tool because they are only this tool's. Nothing
+ * below that block holds a literal that isn't the geometry of a drawing.
+ *
+ * Two registers, per the restraint rule. The pages are dense working UI: hairlines, soft
+ * elevation, no hard shadows, and one vermilion on the view (Save PDF). The dropzone
+ * above them is the loud one.
+ */
+
+.pdf-tool {
+  /* Wide enough for the four page controls to stay on one line. */
+  --page-card-width: 12rem;
+  --page-sheet-shadow: var(--shadow-sm);
+  /* A4 upright, until a card sets its own from the page it is showing. */
+  --page-ratio: 0.707;
+
+  position: relative;
+}
+
+.pdf-tool__board {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* ---- the bar above the board ---- */
+
+/* No frame: the count and the controls sit on the paper, and the only enclosure on the
+   view is the tray holding the pages. */
+.board-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2xs) var(--space-sm);
+}
+
+.board-bar__count {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3xs);
+  margin-inline-end: auto;
+  color: var(--color-ink-soft);
+  font-size: var(--text-sm);
+}
+
+.board-bar__number {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  color: var(--color-ink);
+}
+
+.board-bar__from {
+  color: var(--color-ink-faint);
+}
+
+.board-bar__arrange,
+.board-bar__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs);
+}
+
+/*
+ * On a phone the bar becomes three stacked rows: the count, the arranging controls, then
+ * the two secondary actions side by side with the primary spanning the full width under
+ * them. Everything reaches both margins, so nothing floats in the middle of the screen.
+ */
+@media (width < 48rem) {
+  .board-bar {
+    display: grid;
+    gap: var(--space-2xs);
+  }
+
+  .board-bar__count {
+    margin-inline-end: 0;
+  }
+
+  .board-bar__arrange {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  }
+
+  .board-bar__actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .board-bar__actions > :last-child {
+    grid-column: 1 / -1;
+  }
+
+  .board-bar .btn {
+    width: 100%;
+  }
+}
+
+/* ---- the tray the pages land in ---- */
+
+.page-stage {
+  position: relative;
+}
+
+/*
+ * Glass over flat paper is a tinted box. This is what the tray blurs — a warm wash held
+ * to the tray's own footprint, so it reads through the pane rather than as a band of
+ * colour leaking out around it.
+ */
+.page-stage__glow {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(
+      44% 58% at 16% 12%,
+      color-mix(in srgb, var(--color-signal) 26%, transparent),
+      transparent 72%
+    ),
+    radial-gradient(
+      48% 66% at 86% 82%,
+      color-mix(in srgb, var(--color-signal) 14%, transparent),
+      transparent 72%
+    ),
+    radial-gradient(72% 80% at 50% 50%, var(--color-paper-dim), transparent 80%);
+  pointer-events: none;
+}
+
+.page-tray {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  padding: var(--space-sm);
+  border: var(--hairline);
+  border-radius: var(--radius-lg);
+  background-color: var(--glass-tint);
+  background-image: var(--glass-gradient);
+  box-shadow: var(--glass-sheen);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+}
+
+/* The counter from the reference: a page number rather than a percentage, so progress
+   reads as something happening to your document and not to a generic bar. */
+.page-tray__status {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3xs);
+  color: var(--color-ink-soft);
+  font-size: var(--text-sm);
+}
+
+.page-tray__status[data-tone="quiet"] {
+  color: var(--color-ink-faint);
+}
+
+.page-tray__tick {
+  font-family: var(--font-mono);
+  color: var(--color-signal-dark);
+}
+
+/* ---- the pages ---- */
+
+.page-board {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(var(--page-card-width), 100%), 1fr));
+  gap: var(--space-sm);
+  list-style: none;
+}
+
+/* The grid cell. It carries the native drag; the card inside carries the animation. */
+.page-slot {
+  display: grid;
+  min-width: 0;
+}
+
+.page-card {
+  /* Static would leave z-index (below) with nothing to act on, and the dragged card
+     needs to paint over its siblings rather than duck behind them. */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2xs);
+  min-width: 0;
+  padding: var(--space-2xs);
+  border: var(--hairline);
+  border-radius: var(--radius-md);
+  background-color: var(--color-card);
+  cursor: grab;
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    opacity var(--dur-fast) var(--ease-out);
+}
+
+.page-card:hover {
+  border-color: var(--color-line-strong);
+}
+
+/*
+ * The card being carried rises above its siblings and fades back so the gap it will
+ * land in stays readable. `pointer-events: none` is load-bearing, not decorative: the
+ * board's own hit-test (PageBoard's onDrag) reads whatever `elementFromPoint` finds
+ * under the pointer, and without this it would always find the dragged card itself,
+ * since that's what's actually painted there.
+ */
+.page-card[data-dragging] {
+  z-index: 30;
+  opacity: 0.4;
+  cursor: grabbing;
+  pointer-events: none;
+}
+
+.page-card__paper {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: var(--page-ratio);
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-white);
+  box-shadow: var(--page-sheet-shadow);
+}
+
+.page-card__preview {
+  width: 100%;
+  transition: rotate var(--dur-base) var(--ease-out);
+}
+
+/* On its side, a page has to be drawn as wide as the frame is tall to land back inside it. */
+.page-card__preview[data-turned] {
+  width: calc(100% / var(--page-ratio));
+}
+
+.page-card__waiting {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-ink-faint);
+}
+
+.page-card__meta {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3xs);
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  padding-inline: var(--space-3xs);
+  font-size: var(--text-xs);
+  color: var(--color-ink-faint);
+}
+
+.page-card__number {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-weight: var(--weight-medium);
+  color: var(--color-ink);
+}
+
+/* A filename is arbitrary length and would otherwise push the whole grid sideways. */
+.page-card__origin {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Pushed to the foot of the card so a landscape page, whose paper is shorter, still
+   lines its controls up with the rest of the row. */
+.page-card__controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3xs);
+  margin-top: auto;
+  padding-top: var(--space-3xs);
+  cursor: default;
+}
+
+/* Below the card's own width a single page would fill the screen, so the grid is told
+   to hold two regardless and the four controls fold into a square underneath. */
+@media (width < 30rem) {
+  .page-tray {
+    padding: var(--space-2xs);
+  }
+
+  .page-board {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2xs);
+  }
+
+  .page-card__controls {
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    justify-content: center;
+  }
+}
+
+/* ---- the payoff ---- */
+
+.pdf-result__page {
+  display: block;
+  width: min(8.5rem, 100%);
+  margin-inline: auto;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+}

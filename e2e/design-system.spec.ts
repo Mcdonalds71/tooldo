@@ -1,13 +1,5 @@
-import { expect, type Page, test } from '@playwright/test';
-
-/**
- * Astro drops the `ssr` attribute once an island has hydrated. Waiting on that beats
- * waiting on a timeout: a click that lands before React attaches its handlers does
- * nothing at all, which is what made these tests flaky under parallel load.
- */
-async function hydrated(page: Page) {
-  await expect(page.locator('astro-island[ssr]')).toHaveCount(0);
-}
+import { expect, test } from '@playwright/test';
+import { hydrated } from './support';
 
 /**
  * The style guide is the only page that hydrates, so it is where a broken island shows

@@ -1,0 +1,76 @@
+---
+import ToolLayout, { type FaqEntry } from '../layouts/ToolLayout.astro';
+import { PdfTool } from '../tools/pdf/PdfTool';
+import '../tools/pdf/pdf.css';
+
+const description =
+  'Merge, reorder, rotate, and trim PDF pages in your browser. Your files never leave your device.';
+
+const steps = [
+  {
+    title: 'Drop your PDFs',
+    body: 'Every page opens as a card, in the order the files arrived.',
+  },
+  {
+    title: 'Arrange them',
+    body: 'Drag a page somewhere else, turn it, or take it out. The arrows on each card do the same thing from the keyboard.',
+  },
+  {
+    title: 'Save',
+    body: 'The pages are copied into a fresh PDF and downloaded straight to you.',
+  },
+];
+
+const faq: readonly FaqEntry[] = [
+  {
+    question: 'Do my files get uploaded?',
+    answer:
+      'No. The pages are read and rebuilt by code running in this tab. Nothing is sent anywhere, and there is no server here to send it to.',
+  },
+  {
+    question: 'Can I merge more than two PDFs?',
+    answer:
+      'Yes. Drop as many as you like — their pages join the end of the board, and any page can move anywhere from there.',
+  },
+  {
+    question: 'How do I split a PDF?',
+    answer:
+      'Take out the pages you do not want and save. Then start over, keep the other half, and save again. That gives you the two files.',
+  },
+  {
+    question: 'Will it make my PDF smaller?',
+    answer:
+      'Only a little. Pages are copied across exactly as they are, so text and images keep their quality. This tool rearranges pages rather than re-encoding what is inside them.',
+  },
+  {
+    question: 'What happens to the document details?',
+    answer:
+      'The file you save is built new, so the author, title, and other details from the original are not carried over.',
+  },
+  {
+    question: 'Does it open a password-protected PDF?',
+    answer:
+      'Not yet. Unlock it in the app that made it, then drop it here and everything else works as normal.',
+  },
+  {
+    question: 'Is there a limit?',
+    answer:
+      'Files up to 100 MB, and 500 pages across everything you drop. Past that a browser tab starts to struggle, so the tool says so rather than freezing.',
+  },
+];
+---
+
+<ToolLayout
+  slug="pdf"
+  title="Merge and reorder PDF pages — tooldo"
+  description={description}
+  steps={steps}
+  faq={faq}
+>
+  {
+    /* `client:load`, not `client:visible`: this island is the whole reason the route
+       exists and it opens above the fold, so there is nothing to defer for. Waiting on
+       an intersection here only buys a window where the dropzone is painted but dead. */
+  }
+  <PdfTool client:load />
+</ToolLayout>

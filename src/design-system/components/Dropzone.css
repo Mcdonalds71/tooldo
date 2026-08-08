@@ -8,7 +8,7 @@
  */
 .dropzone {
   position: relative;
-  padding: var(--space-2xl) var(--space-lg);
+  padding: var(--drop-padding);
   border: var(--drop-border);
   border-radius: var(--drop-radius);
   box-shadow: var(--drop-shadow);
@@ -19,6 +19,17 @@
     box-shadow var(--dur-base) var(--ease-out),
     border-color var(--dur-base) var(--ease-out),
     background-color var(--dur-base) var(--ease-out);
+}
+
+/* Same zone, quieter: it sits under a workbench that already has the user's attention. */
+.dropzone[data-size="sm"] {
+  --drop-glyph-size: var(--drop-glyph-size-sm);
+
+  padding: var(--drop-padding-sm);
+}
+
+.dropzone[data-size="sm"] .empty__headline {
+  font-size: var(--text-base);
 }
 
 .dropzone__input {
@@ -97,8 +108,15 @@
 .dropzone:hover .dropzone__glyph,
 .dropzone[data-dragging] .dropzone__glyph {
   transform: translateY(-8px) rotate(6deg) scale(1.06);
-  background-color: var(--color-signal);
-  color: var(--color-ink);
+  background-color: var(--color-signal-fill);
+  color: var(--color-on-signal);
+}
+
+/* No ink frame around the glyph down here: the compact zone is a quiet invitation
+   under work the user is already doing, not the moment the tool opens on. */
+.dropzone[data-size="sm"] .dropzone__glyph {
+  border: none;
+  background-color: transparent;
 }
 
 /* The file types this tool takes, peeking out of the corners like stickers. */
@@ -121,8 +139,8 @@
 .dropzone__tag[data-slot="1"] {
   right: var(--space-lg);
   bottom: var(--space-md);
-  background-color: var(--color-signal);
-  color: var(--color-ink);
+  background-color: var(--color-signal-fill);
+  color: var(--color-on-signal);
   rotate: 5deg;
 }
 

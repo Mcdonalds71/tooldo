@@ -1,0 +1,129 @@
+/*
+ * The folder that takes the file. Sized from the dropzone's own glyph token, so the
+ * compact zone shrinks it too. Block, because a span won't take a width for its
+ * absolute children to sit in.
+ */
+
+.drop-art {
+  position: relative;
+  display: block;
+  width: calc(var(--drop-glyph-size) * 1.4);
+  height: var(--drop-glyph-size);
+}
+
+.drop-art__tab,
+.drop-art__back {
+  position: absolute;
+  left: 0;
+  background-color: var(--color-ink);
+}
+
+.drop-art__tab {
+  top: 12%;
+  width: 42%;
+  height: 18%;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+}
+
+.drop-art__back {
+  bottom: 0;
+  width: 100%;
+  height: 72%;
+  border-radius: var(--radius-sm) var(--radius-md) var(--radius-md) var(--radius-md);
+}
+
+/*
+ * Three ruled sheets standing in the folder. The static pose is set with the individual
+ * `rotate` and `translate` properties so the drift keyframes can use `transform` and
+ * compose on top instead of fighting it — and so the drag-over pose has something of its
+ * own to transition.
+ */
+.drop-art__sheet {
+  position: absolute;
+  bottom: 26%;
+  width: 34%;
+  height: 62%;
+  border: var(--hairline);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  background-color: var(--color-white);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--color-line) 0 1px,
+    transparent 1px 5px
+  );
+  background-position: 50% 24%;
+  background-size: 62% 46%;
+  background-repeat: no-repeat;
+  animation: drop-art-drift var(--art-drift) var(--ease-in-out) infinite alternate;
+  transition:
+    rotate var(--dur-slow) var(--ease-out),
+    translate var(--dur-slow) var(--ease-out);
+}
+
+.drop-art__sheet[data-slot="left"] {
+  left: 7%;
+  rotate: -11deg;
+}
+
+.drop-art__sheet[data-slot="mid"] {
+  left: 33%;
+  /* A third and two-thirds of the drift out of phase, derived rather than restated so
+     the three sheets stay evenly staggered if --art-drift's own pace ever changes. */
+  animation-delay: calc(var(--art-drift) / -3);
+}
+
+.drop-art__sheet[data-slot="right"] {
+  left: 59%;
+  rotate: 11deg;
+  animation-delay: calc(var(--art-drift) / -3 * 2);
+}
+
+/*
+ * The pane that makes it glass: it blurs what is painted behind it, which is the lower
+ * half of the sheets, so they go soft at the lip and stay crisp above it. Only works
+ * because it is their sibling — nested under them it would be its own backdrop root.
+ */
+.drop-art__front {
+  position: absolute;
+  inset: auto 0 0;
+  height: 56%;
+  border-radius: var(--radius-sm) var(--radius-sm) var(--radius-md) var(--radius-md);
+  background-color: var(--art-glass);
+  background-image: var(--glass-gradient);
+  box-shadow: var(--glass-sheen);
+  backdrop-filter: blur(var(--art-blur)) saturate(var(--glass-saturate));
+  transition:
+    translate var(--dur-slow) var(--ease-out),
+    background-color var(--dur-base) var(--ease-out);
+}
+
+/* Drag a file over and the folder reaches for it: the sheets rise and fan, the front
+   tips forward. The same beat the stock dropzone glyph makes, in the folder's language. */
+.dropzone:hover .drop-art__sheet,
+.dropzone[data-dragging] .drop-art__sheet {
+  translate: 0 -14%;
+}
+
+.dropzone:hover .drop-art__sheet[data-slot="left"],
+.dropzone[data-dragging] .drop-art__sheet[data-slot="left"] {
+  rotate: -22deg;
+  translate: -10% -10%;
+}
+
+.dropzone:hover .drop-art__sheet[data-slot="right"],
+.dropzone[data-dragging] .drop-art__sheet[data-slot="right"] {
+  rotate: 22deg;
+  translate: 10% -10%;
+}
+
+.dropzone:hover .drop-art__front,
+.dropzone[data-dragging] .drop-art__front {
+  translate: 0 5%;
+  background-color: var(--art-glass-live);
+}
+
+@keyframes drop-art-drift {
+  to {
+    transform: translateY(-5%);
+  }
+}

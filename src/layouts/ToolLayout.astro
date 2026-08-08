@@ -1,0 +1,300 @@
+---
+import { ArrowLeftIcon, CaretDownIcon, LockIcon } from '@phosphor-icons/react/dist/ssr';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../lib/site';
+import { findTool } from '../lib/tools';
+
+export interface FaqEntry {
+  question: string;
+  answer: string;
+}
+
+export interface StepEntry {
+  title: string;
+  body: string;
+}
+
+interface Props {
+  slug: string;
+  /** Overrides the registry's one-liner where the page needs a longer search title. */
+  title?: string;
+  description: string;
+  steps: readonly StepEntry[];
+  faq: readonly FaqEntry[];
+}
+
+const { slug, title, description, steps, faq } = Astro.props;
+
+const tool = findTool(slug);
+if (!tool) throw new Error(`No tool called ${slug} in the registry`);
+
+const { icon: Glyph } = tool;
+const url = new URL(`/${tool.slug}`, Astro.site).href;
+
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'SoftwareApplication',
+      name: `${tool.name} — ${SITE.name}`,
+      url,
+      description,
+      applicationCategory: 'UtilitiesApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      creator: { '@type': 'Person', name: SITE.author.name, url: SITE.author.url },
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: faq.map((entry) => ({
+        '@type': 'Question',
+        name: entry.question,
+        acceptedAnswer: { '@type': 'Answer', text: entry.answer },
+      })),
+    },
+    {
+      '@type': 'HowTo',
+      name: `How to use ${tool.name}`,
+      step: steps.map((step) => ({
+        '@type': 'HowToStep',
+        name: step.title,
+        text: step.body,
+      })),
+    },
+  ],
+};
+
+// A closing tag inside the JSON would end the script element early; escaping the angle
+// bracket keeps that impossible whatever a future tool description says.
+const structuredJson = JSON.stringify(structuredData).replaceAll('<', '\\u003c');
+---
+
+<BaseLayout title={title ?? `${tool.name} — ${SITE.name}`} description={description}>
+  <script type="application/ld+json" is:inline set:html={structuredJson} />
+
+  <article class="tool">
+    <div class="shell">
+      <header class="tool__head">
+        <a class="tool__back" href="/#tools">
+          <ArrowLeftIcon size="1em" weight="bold" aria-hidden />
+          All tools
+        </a>
+
+        <span class="tool__icon" aria-hidden>
+          <Glyph size="var(--tool-icon-glyph)" weight="duotone" />
+        </span>
+
+        <p class="eyebrow">{tool.category}</p>
+        <h1 class="tool__name">{tool.name}</h1>
+        <p class="tool__lead">{description}</p>
+
+        <p class="tool__promise">
+          <LockIcon size="1em" weight="duotone" aria-hidden />
+          Runs in your browser · nothing uploaded
+        </p>
+      </header>
+
+      <slot />
+
+      <section class="tool__steps">
+        <h2 class="tool__steps-heading">How it works</h2>
+        <ol class="tool__steps-list">
+          {
+            steps.map((step) => (
+              <li class="tool__step">
+                <b class="tool__step-title">{step.title}</b>
+                <p class="tool__step-body">{step.body}</p>
+              </li>
+            ))
+          }
+        </ol>
+      </section>
+
+      <section class="tool__faq">
+        <h2 class="tool__faq-heading">Questions</h2>
+
+        {
+          /* Native <details>: the keyboard path, the announced state and the toggle all
+             come free, and search engines read a closed panel the same as an open one.
+             The first is open so the section never reads as a stack of shut doors. */
+        }
+        {
+          faq.map((entry, index) => (
+            <details class="faq" open={index === 0}>
+              <summary class="faq__question">
+                {entry.question}
+                <span class="faq__caret" aria-hidden>
+                  <CaretDownIcon size="1em" weight="bold" />
+                </span>
+              </summary>
+              <p class="faq__answer">{entry.answer}</p>
+            </details>
+          ))
+        }
+      </section>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .tool {
+    padding-block: var(--space-xl) var(--space-3xl);
+  }
+
+  .tool__head {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3xs);
+    margin-bottom: var(--space-lg);
+  }
+
+  .tool__back {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3xs);
+    margin-bottom: var(--space-sm);
+    color: var(--color-ink-soft);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    text-decoration: none;
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+
+  .tool__back:hover {
+    color: var(--color-ink);
+  }
+
+  .tool__icon {
+    display: grid;
+    place-items: center;
+    width: var(--tool-icon-size);
+    height: var(--tool-icon-size);
+    margin-bottom: var(--space-2xs);
+    border: var(--brut-border);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-brut);
+    background-color: var(--color-signal-fill);
+    color: var(--color-on-signal);
+  }
+
+  .tool__name {
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-bold);
+  }
+
+  .tool__lead {
+    max-width: var(--width-prose);
+    color: var(--color-ink-soft);
+  }
+
+  .tool__promise {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3xs);
+    margin-top: var(--space-2xs);
+    padding: var(--space-3xs) var(--space-xs);
+    border: var(--hairline);
+    border-radius: var(--radius-full);
+    background-color: var(--color-card);
+    color: var(--color-ink-soft);
+    font-size: var(--text-sm);
+  }
+
+  .tool__steps {
+    margin-top: var(--space-2xl);
+  }
+
+  .tool__steps-heading {
+    font-size: var(--text-xl);
+  }
+
+  /* Three columns on a wide screen, one on a narrow one — every line, the heading and
+     each step, starts on the same left edge. */
+  .tool__steps-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: var(--space-md);
+    margin-top: var(--space-md);
+    counter-reset: step;
+    list-style: none;
+  }
+
+  .tool__step::before {
+    counter-increment: step;
+    content: counter(step);
+    display: grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    margin-bottom: var(--space-2xs);
+    border: var(--hairline);
+    border-radius: var(--radius-full);
+    background-color: var(--color-card);
+    color: var(--color-signal-dark);
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+  }
+
+  .tool__step-title {
+    font-family: var(--font-display);
+    font-weight: var(--weight-semibold);
+  }
+
+  .tool__step-body {
+    margin-top: var(--space-3xs);
+    color: var(--color-ink-soft);
+  }
+
+  .tool__faq {
+    max-width: var(--width-prose);
+    margin-top: var(--space-2xl);
+  }
+
+  .tool__faq-heading {
+    margin-bottom: var(--space-2xs);
+    font-size: var(--text-xl);
+  }
+
+  .faq {
+    border-bottom: var(--hairline);
+  }
+
+  .faq__question {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    /* The row is the hit area, and it clears the 44px target on its own. */
+    min-height: var(--tap-target-min);
+    padding-block: var(--space-2xs);
+    font-family: var(--font-display);
+    font-weight: var(--weight-semibold);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  /* Safari still draws the disclosure triangle without this. */
+  .faq__question::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq__caret {
+    display: inline-flex;
+    flex-shrink: 0;
+    color: var(--color-ink-faint);
+    transition: rotate var(--dur-base) var(--ease-out);
+  }
+
+  .faq[open] .faq__caret {
+    rotate: 180deg;
+  }
+
+  .faq__answer {
+    padding-bottom: var(--space-sm);
+    color: var(--color-ink-soft);
+  }
+</style>

@@ -5,7 +5,11 @@
 @import "./Button.css";
 @import "./EmptyState.css";
 @import "./Dropzone.css";
+@import "./DropArt.css";
 @import "./FileQueue.css";
 @import "./Toast.css";
 @import "./ProcessingOverlay.css";
 @import "./ResultPanel.css";
+@import "./Slider.css";
+@import "./Segmented.css";
+@import "./Switch.css";

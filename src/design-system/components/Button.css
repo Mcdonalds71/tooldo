@@ -81,8 +81,8 @@
  * which also keeps the label's contrast constant across every state.
  */
 .btn--primary {
-  background-color: var(--color-signal);
-  color: var(--color-ink);
+  background-color: var(--color-signal-fill);
+  color: var(--color-on-signal);
 }
 
 .btn--secondary {
