@@ -2,16 +2,23 @@ import { PlusIcon, TrashIcon } from '@phosphor-icons/react/dist/ssr';
 import { Button } from '../../design-system/components/Button';
 import { IconButton } from '../../design-system/components/IconButton';
 import { formatMoney, lineItemAmount } from './money';
-import type { LineItem } from './types';
+import type { CurrencyCode, LineItem } from './types';
 
 export interface LineItemsEditorProps {
   readonly lineItems: readonly LineItem[];
+  readonly currency: CurrencyCode;
   readonly onAdd: () => void;
   readonly onUpdate: (id: string, patch: Partial<LineItem>) => void;
   readonly onRemove: (id: string) => void;
 }
 
-export function LineItemsEditor({ lineItems, onAdd, onUpdate, onRemove }: LineItemsEditorProps) {
+export function LineItemsEditor({
+  lineItems,
+  currency,
+  onAdd,
+  onUpdate,
+  onRemove,
+}: LineItemsEditorProps) {
   return (
     <div className="line-items">
       <div className="line-items__head" aria-hidden>
@@ -63,7 +70,9 @@ export function LineItemsEditor({ lineItems, onAdd, onUpdate, onRemove }: LineIt
               placeholder="0.00"
             />
 
-            <span className="line-items__amount">{formatMoney(lineItemAmount(item))}</span>
+            <span className="line-items__amount">
+              {formatMoney(lineItemAmount(item), currency)}
+            </span>
 
             <IconButton
               icon={TrashIcon}

@@ -108,6 +108,18 @@ describe('generateInvoicePdf', () => {
     expect(doc.getPageCount()).toBe(1);
   });
 
+  it('generates for a currency whose symbol the PDF font cannot encode', async () => {
+    // ₦ falls outside WinAnsi, which is exactly why formatMoney renders the code
+    // ("NGN") instead of the symbol — this only stays true if nothing upstream ever
+    // tries to draw the symbol directly.
+    const result = await generateInvoicePdf(
+      invoice({ details: { ...EMPTY_DETAILS, currency: 'NGN' } }),
+    );
+
+    const doc = await PDFDocument.load(result.bytes);
+    expect(doc.getPageCount()).toBe(1);
+  });
+
   it('embeds an optional logo without failing', async () => {
     const withLogo = invoice({
       business: { ...EMPTY_BUSINESS_PROFILE, name: 'Acme Studio', logoDataUrl: TINY_PNG },

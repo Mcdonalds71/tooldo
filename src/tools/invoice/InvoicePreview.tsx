@@ -68,8 +68,8 @@ export function InvoicePreview({
             <tr key={item.id}>
               <td>{item.description || 'Untitled item'}</td>
               <td>{item.quantity || '0'}</td>
-              <td>{formatMoney(toSafeNumber(item.unitPrice))}</td>
-              <td>{formatMoney(lineItemAmount(item))}</td>
+              <td>{formatMoney(toSafeNumber(item.unitPrice), details.currency)}</td>
+              <td>{formatMoney(lineItemAmount(item), details.currency)}</td>
             </tr>
           ))}
         </tbody>
@@ -78,23 +78,23 @@ export function InvoicePreview({
       <section className="invoice-preview__totals">
         <div className="invoice-preview__totals-row">
           <span>Subtotal</span>
-          <span>{formatMoney(totals.subtotal)}</span>
+          <span>{formatMoney(totals.subtotal, details.currency)}</span>
         </div>
         {totals.discountAmount > 0 ? (
           <div className="invoice-preview__totals-row">
             <span>Discount ({details.discountRate}%)</span>
-            <span>-{formatMoney(totals.discountAmount)}</span>
+            <span>{formatMoney(-totals.discountAmount, details.currency)}</span>
           </div>
         ) : null}
         {totals.taxAmount > 0 ? (
           <div className="invoice-preview__totals-row">
             <span>Tax ({details.taxRate}%)</span>
-            <span>{formatMoney(totals.taxAmount)}</span>
+            <span>{formatMoney(totals.taxAmount, details.currency)}</span>
           </div>
         ) : null}
         <div className="invoice-preview__totals-row invoice-preview__totals-row--total">
           <span>Total</span>
-          <span>{formatMoney(totals.total)}</span>
+          <span>{formatMoney(totals.total, details.currency)}</span>
         </div>
       </section>
 
