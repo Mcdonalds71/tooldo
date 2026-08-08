@@ -26,7 +26,7 @@ export interface RunInWorkerOptions<TIn> {
 /**
  * The one way a tool runs heavy work. Every engine goes through here so the main
  * thread stays free for 60fps motion, and so cancellation and progress behave the
- * same in all ten tools.
+ * same in every tool.
  */
 export function runInWorker<TIn, TOut>(
   createWorker: () => Worker,

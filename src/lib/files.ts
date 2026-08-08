@@ -60,7 +60,7 @@ export function partitionFiles(files: readonly File[], rule: FileRule = {}): Fil
   return { accepted, rejected };
 }
 
-/** One sentence: what happened, then what to do. Written once so all ten tools agree. */
+/** One sentence: what happened, then what to do. Written once so every tool agrees. */
 export function describeRejection(rejection: RejectedFile, rule: FileRule = {}): string {
   const { file, reason } = rejection;
 
