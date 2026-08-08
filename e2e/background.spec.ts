@@ -38,7 +38,7 @@ test('a queued photo can be taken back out before running', async ({ page }) => 
   await expect(page.locator('[aria-label="Photos to process"] li')).toHaveCount(0);
 });
 
-test('a model that will not download blames the connection, not the photo', async ({ page }) => {
+test('a model that will not download says to retry, not the photo', async ({ page }) => {
   // Routed on the context, not the page: the model is fetched from inside a Worker, and
   // page-level interception doesn't reach it. Blocking the host is also what makes this
   // the one spec here that needs no network at all — the failure is the assertion.
@@ -53,7 +53,7 @@ test('a model that will not download blames the connection, not the photo', asyn
   await page.getByRole('button', { name: /Remove \d+ background/ }).click();
 
   const failure = page.getByRole('alert');
-  await expect(failure).toContainText('check your connection', { timeout: 60_000 });
+  await expect(failure).toContainText('try again', { timeout: 60_000 });
   // The photo is not the thing to change, so the copy must not send anyone chasing it.
   await expect(failure).not.toContainText('a different photo');
 });

@@ -85,6 +85,36 @@ The unrelated stateless half of the tool — generating the sample image, zippin
 (`utilityWorker.ts`), because it has nothing to do with the model and gains nothing from
 staying resident.
 
+**Resilience: retrying the model fetch.** After this shipped, the live site
+reproducibly failed to download the model for a real visitor — on their home
+connection and, separately, on a phone hotspot, which ruled out anything specific to
+one network. Direct testing against the live model URL from several vantage points at
+once found the real shape of it: the identical request to the identical file returned a
+clean `200` from one vantage point and a reproducible `503` from another, minutes apart,
+for both the small `config.json` and the actual 42 MiB `model_quantized.onnx` alike,
+always at Hugging Face's own `resolve/main` endpoint rather than the further redirect to
+LFS/Xet storage. That rules out a CSP problem, a DNS problem, and a problem with this
+tool's own request — the same request succeeds cleanly from elsewhere at the same
+moment. The likeliest shape of it: Hugging Face's CDN edge nodes cache independently,
+and a node that has cached an error response for this model's files keeps serving that
+error to whoever it routes to, regardless of that visitor's own network — which also
+explains why it reproduced on two unrelated networks for the same visitor, something a
+purely local problem couldn't do.
+
+`env.fetch` — a documented `transformers.js` extension point, not a private API — is now
+a small wrapper that retries up to 4 times with backoff, treating a `5xx` or a
+network-level failure as retryable and a `4xx` as not: a `4xx` means a real problem
+(wrong model id, private repo) that retrying can't fix and shouldn't hide. This does
+not close the gap completely. Tested directly against a vantage point that was
+reproducing the failure, all 4 attempts — spanning several seconds of backoff — failed
+identically, meaning whatever was wrong at that specific edge outlasted the retry
+budget. It still earns its place: it's correct, standard practice for an idempotent GET
+against a `5xx`, and it will paper over the shorter-lived version of this same failure
+class even though it didn't clear the one instance it was tested against directly. The
+error copy was corrected in the same change to stop telling the visitor to check their
+own connection — the investigation disproved that specifically, and shipping a retry
+without fixing the message would have kept blaming the one thing that was never true.
+
 **Runtime, not just model.** onnxruntime-web fetches its own WASM binaries from
 jsDelivr's CDN by default — a second third-party host beyond huggingface.co, and one
 that has nothing to do with the model itself. `scripts/copy-onnx-runtime.mjs` copies the
@@ -126,3 +156,18 @@ self-hosted without committing a binary to a public repo.
   for now, not just `runInWorker` — but it's still the exception. Reach for the ordinary
   ephemeral worker first; this shape earns its complexity only when reloading per call
   is the actually-measured problem.
+- **The suite's one outbound dependency turned out to be less reliable than assumed,
+  and the fix that's actually in place is a mitigation, not a guarantee.** The failure
+  isn't in tooldo's code — CSP, worker, and pipeline wiring are all correct, verified by
+  the same request succeeding cleanly from other vantage points at the same moment — but
+  Hugging Face's CDN can and does return inconsistent results for the identical request
+  depending on which edge it lands on, for however long that edge's cache stays wrong.
+  The retry added against this helps but doesn't guarantee a fix if a visitor's network
+  path happens to route to an unhealthy edge for longer than the retry budget. The
+  robust version of this fix is to stop depending on Hugging Face's CDN at request time
+  at all — self-host the model weights the same way `public/ort/` already self-hosts the
+  inference runtime — but the quantized file this tool actually uses is 42 MiB, over
+  Cloudflare's 25 MiB static-asset ceiling (the same ceiling that ruled out shipping the
+  jsep pair above), so that would need object storage (Cloudflare R2) rather than a
+  static asset: real infrastructure work, not a build-script tweak. Flagged, not yet
+  built.

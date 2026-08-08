@@ -118,8 +118,9 @@ against a 16 default limit); the pipeline asks for `device: 'wasm'` only, and th
 choice carried over to ormbg since WASM was already proven reliable. Separately,
 onnxruntime-web fetches its own WASM runtime from jsDelivr's CDN by default — a second
 third-party host with nothing to do with the model — so `scripts/copy-onnx-runtime.mjs`
-copies the six files it actually needs from the already-resolved dependency into
-`public/ort/` at install time instead.
+copies the four files it actually needs from the already-resolved dependency into
+`public/ort/` at install time instead (the WebGPU pair is deliberately excluded — see
+below).
 
 **A second worker shape.** Every other tool's compute is a `runInWorker` call: spin up
 a worker, run one task, terminate it. Wrong here — the model is a load worth keeping
@@ -138,16 +139,38 @@ the first place a dropped connection can break a run — and it did, repeatedly,
 this tool was being built: `net::ERR_NAME_NOT_RESOLVED` on `huggingface.co`, with Node's
 own `dns.resolve4` failing `ESERVFAIL` against the same host minutes apart. That cost
 real time to diagnose, mostly because the tool said the wrong thing about it. A model
-that won't download now stops the batch immediately and says
-"Couldn't download the background remover — check your connection", instead of marching
-through the queue marking every photo failed and suggesting a different photo — which
-pointed at the one thing that was never the problem. `e2e/background.spec.ts` covers it
-by aborting the Hugging Face route, so that path is tested without needing a network at
-all: it's the fastest spec in the file precisely because it never leaves the machine.
+that won't download now stops the batch immediately with one clear message instead of
+marching through the queue marking every photo failed and suggesting a different photo —
+which pointed at the one thing that was never the problem. `e2e/background.spec.ts`
+covers it by aborting the Hugging Face route, so that path is tested without needing a
+network at all: it's the fastest spec in the file precisely because it never leaves the
+machine.
 
 The related trap, fixed at the same time: the loaded model was memoized as a promise,
 so a *rejected* load got cached too and "Try again" would replay the original failure
 forever on a connection that had since recovered. A failed load now clears itself.
+
+**The first version of that error message was itself wrong, and only live production
+traffic proved it.** After merge, the real, live site reproducibly failed to download
+the model for a real visitor — on their home connection and, separately, on a phone
+hotspot, ruling out anything local to one network. The first theory (broken IPv6 routing
+on their home connection) didn't survive the second data point and was retracted.
+Direct testing against the live model URL — the same request, sent moments apart from
+different vantage points — found the real shape of it: a clean `200` from one vantage
+point and a reproducible `503` from another, for both the small `config.json` and the
+actual 42 MiB model weights alike, always at Hugging Face's own `resolve/main` endpoint.
+That means the failure was never the visitor's connection at all — it's Hugging Face's
+CDN edge nodes caching independently, and a node that has cached an error for this
+model's files keeps serving that error to whoever it routes to, regardless of that
+visitor's own network. `env.fetch` (a documented `transformers.js` extension point) now
+retries up to 4 times with backoff, treating a `5xx` or a network-level failure as
+retryable and a `4xx` as not, since the latter means a real problem retrying can't fix.
+Tested directly against a vantage point that was reproducing the failure, all 4 attempts
+still failed identically — the retry is real resilience against the shorter-lived version
+of this failure, not a guarantee against a long-lived one. The error copy was corrected
+to match what's now known: it no longer tells anyone to check their connection, since
+the investigation proved that was never the problem. Full writeup, including what's
+still open, in ADR 0008.
 
 ## Next
 

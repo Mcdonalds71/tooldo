@@ -24,9 +24,10 @@ export type Stage =
   | { readonly name: 'error'; readonly message: string };
 
 const GENERIC_FAILURE = 'Nothing came through — try again, or a different photo';
-/** Names the network, because the model download is the only part of this tool that
- *  touches it, and it's the only failure the reader can actually do something about. */
-const MODEL_FAILURE = "Couldn't download the background remover — check your connection";
+/** Doesn't blame the visitor's connection — a live investigation (ADR 0008) found this
+ *  failure sitting upstream at the model host, reproducible from a healthy connection,
+ *  so the honest advice is to retry, not to check anything local. */
+const MODEL_FAILURE = "Couldn't download the background remover — try again in a few minutes";
 
 export function useBackgroundWorkbench() {
   const { notify } = useToast();
