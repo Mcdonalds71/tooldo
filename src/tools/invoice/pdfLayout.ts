@@ -1,7 +1,7 @@
 import type { PDFDocument, PDFFont, PDFPage, RGB } from 'pdf-lib';
 import { InvoiceError } from './errors';
 import { formatMoney, lineItemAmount, toSafeNumber } from './money';
-import type { InvoiceData, InvoiceTotals, LineItem } from './types';
+import type { CurrencyCode, InvoiceData, InvoiceTotals, LineItem } from './types';
 
 const PAGE_WIDTH = 595.28;
 const PAGE_HEIGHT = 841.89;
@@ -56,7 +56,7 @@ export async function drawInvoicePage(
   let y = PAGE_HEIGHT - MARGIN;
   y = await drawHeader(page, fonts, palette, doc, data, y);
   y = drawBillTo(page, fonts, palette, data, y - 28);
-  y = drawLineItems(page, fonts, palette, data.lineItems, y - 28);
+  y = drawLineItems(page, fonts, palette, data.lineItems, data.details.currency, y - 28);
   y = drawTotals(page, fonts, palette, totals, data.details, y - 14);
 
   if (data.details.notes.trim()) {
@@ -134,6 +134,7 @@ function drawLineItems(
   fonts: Fonts,
   palette: Palette,
   lineItems: readonly LineItem[],
+  currency: CurrencyCode,
   top: number,
 ): number {
   let y = top;
@@ -167,12 +168,12 @@ function drawLineItems(
       page,
       fonts.regular,
       10,
-      formatMoney(toSafeNumber(item.unitPrice)),
+      formatMoney(toSafeNumber(item.unitPrice), currency),
       COLUMN.unitPrice,
       y,
       palette.ink,
     );
-    drawRight(page, fonts.regular, 10, formatMoney(lineItemAmount(item)), y, palette.ink);
+    drawRight(page, fonts.regular, 10, formatMoney(lineItemAmount(item), currency), y, palette.ink);
     y -= ROW_HEIGHT;
   }
 
@@ -203,7 +204,14 @@ function drawTotals(
     const font = emphasize ? fonts.bold : fonts.regular;
     const color = emphasize ? palette.signal : palette.inkSoft;
     drawLeft(page, font, size, label, labelX, y, color);
-    drawRight(page, font, size, formatMoney(amount), y, emphasize ? palette.signal : palette.ink);
+    drawRight(
+      page,
+      font,
+      size,
+      formatMoney(amount, details.currency),
+      y,
+      emphasize ? palette.signal : palette.ink,
+    );
     y -= emphasize ? 22 : 16;
   };
 

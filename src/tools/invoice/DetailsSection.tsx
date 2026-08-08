@@ -1,6 +1,12 @@
 import { Card } from '../../design-system/components/Card';
+import { SelectField } from '../../design-system/components/SelectField';
 import { TextField } from '../../design-system/components/TextField';
-import type { InvoiceDetails } from './types';
+import { CURRENCIES, type CurrencyCode, type InvoiceDetails } from './types';
+
+const CURRENCY_OPTIONS = CURRENCIES.map((currency) => ({
+  value: currency.code,
+  label: `${currency.code} — ${currency.name}`,
+}));
 
 export interface DetailsSectionProps {
   readonly details: InvoiceDetails;
@@ -29,6 +35,12 @@ export function DetailsSection({ details, onChange }: DetailsSectionProps) {
           value={details.dueDate}
           onChange={(dueDate) => onChange({ dueDate })}
           type="date"
+        />
+        <SelectField<CurrencyCode>
+          label="Currency"
+          value={details.currency}
+          onChange={(currency) => onChange({ currency })}
+          options={CURRENCY_OPTIONS}
         />
         <TextField
           label="Tax %"

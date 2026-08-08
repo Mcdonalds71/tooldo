@@ -62,7 +62,19 @@ test('the totals in the preview reflect tax and discount', async ({ page }) => {
   await showPreview(page);
   const preview = page.getByRole('region', { name: 'Invoice preview' });
   // 100 - 20% discount = 80, +10% tax on 80 = 8 → 88 total.
-  await expect(preview).toContainText('$88.00');
+  await expect(preview).toContainText('USD 88.00');
+});
+
+test('switching currency changes how every amount in the preview reads', async ({ page }) => {
+  await openInvoice(page);
+
+  await page.locator('.line-items__price').first().fill('100');
+  await page.getByLabel('Currency').selectOption('NGN');
+
+  await showPreview(page);
+  const preview = page.getByRole('region', { name: 'Invoice preview' });
+  await expect(preview).toContainText('NGN 100.00');
+  await expect(preview).not.toContainText('USD');
 });
 
 test('the last line item cannot be removed', async ({ page }) => {

@@ -24,6 +24,40 @@ export interface ClientInfo {
   readonly email: string;
 }
 
+/**
+ * A working set of major and regional currencies, not the full ISO-4217 list — wide
+ * enough that most visitors find their own without a search box, small enough to stay
+ * one screen in a plain `<select>`. `formatMoney` (`money.ts`) renders amounts with the
+ * code rather than a symbol, since a symbol alone (`$`, `£`) doesn't say which of
+ * several currencies that share it is meant, and some symbols this list needs (₦, ₹)
+ * aren't in the WinAnsi encoding the PDF's font supports — the code works everywhere,
+ * identically, in both the live preview and the download.
+ */
+export const CURRENCIES = [
+  { code: 'USD', name: 'US Dollar' },
+  { code: 'EUR', name: 'Euro' },
+  { code: 'GBP', name: 'British Pound' },
+  { code: 'NGN', name: 'Nigerian Naira' },
+  { code: 'CAD', name: 'Canadian Dollar' },
+  { code: 'AUD', name: 'Australian Dollar' },
+  { code: 'JPY', name: 'Japanese Yen' },
+  { code: 'CNY', name: 'Chinese Yuan' },
+  { code: 'INR', name: 'Indian Rupee' },
+  { code: 'ZAR', name: 'South African Rand' },
+  { code: 'GHS', name: 'Ghanaian Cedi' },
+  { code: 'KES', name: 'Kenyan Shilling' },
+  { code: 'EGP', name: 'Egyptian Pound' },
+  { code: 'AED', name: 'UAE Dirham' },
+  { code: 'BRL', name: 'Brazilian Real' },
+  { code: 'MXN', name: 'Mexican Peso' },
+  { code: 'CHF', name: 'Swiss Franc' },
+  { code: 'SEK', name: 'Swedish Krona' },
+  { code: 'SGD', name: 'Singapore Dollar' },
+  { code: 'NZD', name: 'New Zealand Dollar' },
+] as const;
+
+export type CurrencyCode = (typeof CURRENCIES)[number]['code'];
+
 export interface InvoiceDetails {
   readonly invoiceNumber: string;
   readonly issueDate: string;
@@ -31,6 +65,7 @@ export interface InvoiceDetails {
   /** Percent, 0–100, same shape as discount so the two fields read as a pair. */
   readonly taxRate: string;
   readonly discountRate: string;
+  readonly currency: CurrencyCode;
   readonly notes: string;
 }
 
@@ -69,6 +104,7 @@ export const EMPTY_DETAILS: InvoiceDetails = {
   dueDate: '',
   taxRate: '',
   discountRate: '',
+  currency: 'USD',
   notes: '',
 };
 

@@ -108,7 +108,7 @@ result revealed after a separate run step. `engine.ts` splits cleanly: `calculat
 is pure and cheap enough to call directly on the main thread for the live preview, and
 the exact same function is what the worker-side `pdf-lib` routine (`pdfLayout.ts`) calls
 for the real PDF — one source of truth, so the preview and the download can never
-disagree about a number. 12 unit tests, 4 Playwright specs including one that types into
+disagree about a number. 13 unit tests, 5 Playwright specs including one that types into
 a field and asserts the preview updates immediately.
 
 Business details (name, address, contact info, logo) are remembered in `localStorage`
@@ -122,6 +122,31 @@ reading a new calm-register `--field-*` token set rather than the existing (unus
 hero-register `--input-*` tokens — the same `brut`/`calm` split `Card` already draws for
 dense working UI. The live preview itself is `Card tone="brut"`, on purpose: it's this
 tool's delight moment, not part of the dense form around it.
+
+**A currency picker followed almost immediately, and it's why `formatMoney` renders a
+code, not a symbol.** `$` and `£` are each shared by several currencies in the twenty-
+option list, which makes a bare symbol genuinely ambiguous on an invoice meant for
+someone else to read — and separately, a few symbols the list needs (₦, ₹) fall outside
+the WinAnsi encoding `pdfLayout.ts`'s Helvetica font supports, so drawing them directly
+would have thrown inside the worker. `Intl.NumberFormat` with `currencyDisplay: 'code'`
+solves both at once and gets each currency's own decimal convention right for free —
+confirmed live: JPY shows no cents, USD shows two, without either being special-cased.
+A third new design-system component, `SelectField`, is a native `<select>` in the same
+calm register as the text fields — full keyboard and screen-reader behaviour without
+hand-building a listbox.
+
+**Two real bugs shipped in the first pass and were caught from real use, not review.**
+Line items had no gap between rows (`.line-items` set `gap` on the wrong element — the
+outer wrapper, not the `<ul>` the rows actually live in) and the live preview overflowed
+a real phone's width. The second one was a textbook flex/grid trap: `1fr` tracks and
+flex children don't shrink below their content's natural width unless told to, so a
+long address or a fixed-content table pushed the whole card wider than the screen. The
+fix is `min-width: 0` on the panes and the row that needed to shrink, `minmax(0, 1fr)`
+instead of a bare `1fr` on the desktop grid, and a phone-specific breakpoint (28rem,
+narrower than the tool's own edit/preview breakpoint) that stacks the header and backs
+off the padding. Confirmed after the fix with real numbers, not just a visual check: a
+375px viewport now measures zero horizontal overflow, and consecutive line-item rows
+sit exactly one `--space-sm` apart.
 
 ## Next
 

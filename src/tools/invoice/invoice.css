@@ -33,6 +33,15 @@
   align-items: start;
 }
 
+/* Both panes get `min-width: 0`, and the desktop grid below sizes its tracks with
+   `minmax(0, 1fr)` rather than a bare `1fr` — a bare `1fr` track won't shrink below its
+   content's natural width, so anything wider than the pane (a long address, a
+   fixed-layout table) would push the whole grid past the viewport instead of wrapping. */
+.invoice-tool__form-pane,
+.invoice-tool__preview-pane {
+  min-width: 0;
+}
+
 /* Mobile: one pane at a time, driven by the Segmented toggle above. */
 @media (width < 64rem) {
   .invoice-tool__panels[data-view="edit"] .invoice-tool__preview-pane {
@@ -51,7 +60,7 @@
   }
 
   .invoice-tool__panels {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
 
   .invoice-tool__preview-sticky {
@@ -140,6 +149,12 @@
   padding-inline: var(--field-padding-x);
 }
 
+.line-items__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
 .line-items__row {
   display: flex;
   flex-wrap: wrap;
@@ -196,6 +211,7 @@
 
 .invoice-preview {
   padding: var(--space-lg);
+  max-width: 100%;
   background-color: var(--color-white);
   color: var(--color-ink);
   font-size: var(--text-sm);
@@ -209,6 +225,26 @@
 
 .invoice-preview__from {
   min-width: 0;
+  overflow-wrap: break-word;
+}
+
+/* A real phone, not just "the toggle switched to one pane" — that breakpoint is about
+   the tool's layout, this one is about the document itself running out of room. Below
+   it, the header stacks and the padding backs off so a long address has somewhere to
+   go instead of forcing the card wider than the screen. */
+@media (width < 28rem) {
+  .invoice-preview {
+    padding: var(--space-sm);
+  }
+
+  .invoice-preview__header {
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .invoice-preview__meta {
+    text-align: left;
+  }
 }
 
 .invoice-preview__logo {
@@ -262,6 +298,15 @@
   width: 100%;
   margin-top: var(--space-lg);
   border-collapse: collapse;
+  /* Fixed, not content-sized: an unbroken word in a description otherwise stretches
+     the whole table past the card, the same overflow the grid fix above guards
+     against one layer up. Percentages below are the columns' only width source. */
+  table-layout: fixed;
+}
+
+.invoice-preview__table th:first-child,
+.invoice-preview__table td:first-child {
+  width: 46%;
 }
 
 .invoice-preview__table th {
@@ -280,8 +325,10 @@
 
 .invoice-preview__table td {
   padding-block: var(--space-2xs);
+  padding-right: var(--space-3xs);
   border-bottom: 1px solid var(--color-line);
   font-variant-numeric: tabular-nums;
+  overflow-wrap: break-word;
 }
 
 .invoice-preview__totals {

@@ -22,6 +22,7 @@ export function sampleInvoiceData(): InvoiceData {
       dueDate: isoDate(14),
       taxRate: '8',
       discountRate: '0',
+      currency: 'USD',
       notes: 'Payment due within 14 days. Thanks for the work.',
     },
     lineItems: [

@@ -26,6 +26,7 @@ export function InvoiceForm({ business, client, details, lineItems, actions }: I
         <h3>Line items</h3>
         <LineItemsEditor
           lineItems={lineItems}
+          currency={details.currency}
           onAdd={actions.addLineItem}
           onUpdate={actions.updateLineItem}
           onRemove={actions.removeLineItem}

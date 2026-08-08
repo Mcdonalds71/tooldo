@@ -55,6 +55,28 @@
   line-height: var(--leading-body);
 }
 
+.field__select-wrap {
+  position: relative;
+}
+
+.field__control--select {
+  width: 100%;
+  /* Room for the custom caret so its own text never runs under it. */
+  padding-right: var(--space-xl);
+  appearance: none;
+  cursor: pointer;
+}
+
+.field__select-caret {
+  position: absolute;
+  top: 50%;
+  right: var(--field-padding-x);
+  translate: 0 -50%;
+  display: flex;
+  color: var(--color-ink-faint);
+  pointer-events: none;
+}
+
 .field__hint {
   font-size: var(--text-xs);
   color: var(--color-ink-faint);
