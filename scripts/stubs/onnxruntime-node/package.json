@@ -1,7 +1,0 @@
-{
-  "name": "onnxruntime-node",
-  "version": "0.0.0",
-  "private": true,
-  "description": "Local stub. The real package is a native Node binary transformers.js never loads in a browser bundle — see the pnpm.overrides comment in the repo's package.json.",
-  "main": "index.js"
-}

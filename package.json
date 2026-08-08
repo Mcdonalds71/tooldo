@@ -10,19 +10,17 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "node scripts/fetch-fonts.mjs && node scripts/copy-onnx-runtime.mjs && astro build",
+    "build": "node scripts/fetch-fonts.mjs && astro build",
     "preview": "astro preview",
     "test": "vitest run",
     "test:e2e": "playwright test",
     "lint": "biome check .",
     "typecheck": "astro check && tsc --noEmit",
-    "brand": "node scripts/generate-brand-assets.mjs",
-    "postinstall": "node scripts/copy-onnx-runtime.mjs"
+    "brand": "node scripts/generate-brand-assets.mjs"
   },
   "dependencies": {
     "@astrojs/react": "^6.0.2",
     "@astrojs/sitemap": "^3.7.3",
-    "@huggingface/transformers": "^4.2.0",
     "@jsquash/avif": "^2.1.1",
     "@jsquash/jpeg": "^1.6.0",
     "@jsquash/resize": "^2.1.1",

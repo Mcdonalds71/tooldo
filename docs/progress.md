@@ -85,97 +85,28 @@ convert it to something lossy, and the FAQ says so. A resize mode besides "cap t
 longest side" — width/height fields would double the option panel for a case bulk
 conversion rarely needs.
 
-**Tool 3, Background Remover** (`/background`). Drop a photo, get back a transparent
-PNG — an on-device AI model (ormbg, Apache-2.0) finds the subject and cuts around it,
-general-purpose rather than portrait-only. This is the first tool with any network
-dependency at all: the model (`onnx-community/ormbg-ONNX`, ~40 MB quantized) is a
-public, cacheable file fetched once from Hugging Face, never anything of the visitor's.
-The photo itself still never leaves the tab. `connect-src` widened to `huggingface.co`
-and `*.hf.co` for exactly that fetch — see ADR 0008 and the CSP comment in
-`public/_headers`.
-
-**The model that shipped isn't the model that was first chosen, and the reason why is
-the most important thing this tool taught.** BiRefNet (MIT, strong quality, general-
-purpose) looked right on every axis that typecheck and unit tests can see — correct
-license, correct pipeline API, loads fine, starts running. It only failed where none of
-that checks: the forward pass itself, `std::bad_alloc` out of onnxruntime-web,
-reproduced consistently on real hardware and immune to every configuration knob tried
-against it (fp32 instead of fp16, the memory arena on and off). The actual cause is
-architectural — BiRefNet's transformer encoder has activation memory that scales with
-image resolution in a way WASM's 32-bit contiguous-memory model can't reliably serve,
-independently confirmed by another developer's public account of hitting the identical
-crash with the identical model. `onnx-community/ormbg-ONNX` is IS-Net — a plain
-convolutional architecture with none of that scaling — and the identical test that
-reliably crashed BiRefNet completed cleanly against it, repeatedly, verified with a real
-downloaded-and-compared output file, not just a state transition in the UI. Full story
-in ADR 0008. The lesson stated there plainly: a model needing WASM inference has to be
-verified by actually running the forward pass on ordinary hardware before the
-integration counts as done — nothing short of that would have caught this one.
-
-Along the way, two smaller real bugs surfaced the same way — by running the tool in a
-browser, not by reading the API. WebGPU throws on BiRefNet's shader (17 storage buffers
-against a 16 default limit); the pipeline asks for `device: 'wasm'` only, and that
-choice carried over to ormbg since WASM was already proven reliable. Separately,
-onnxruntime-web fetches its own WASM runtime from jsDelivr's CDN by default — a second
-third-party host with nothing to do with the model — so `scripts/copy-onnx-runtime.mjs`
-copies the four files it actually needs from the already-resolved dependency into
-`public/ort/` at install time instead (the WebGPU pair is deliberately excluded — see
-below).
-
-**A second worker shape.** Every other tool's compute is a `runInWorker` call: spin up
-a worker, run one task, terminate it. Wrong here — the model is a load worth keeping
-resident, not something to repeat per photo in a batch. `worker.ts` is a persistent
-worker instead, created once and kept alive for the whole session; `engine.ts`'s loaded
-pipeline lives in its module scope across every call. The unrelated stateless half — the
-sample image, zipping — still goes through the ordinary ephemeral worker. Full reasoning
-in ADR 0008.
-
-Typecheck, lint, all 112 unit tests, and the Playwright specs pass, including the one
-that downloads the real model and asserts a real transparent PNG comes back.
-
-**The model download is a hard dependency, and the failure it produces is the one worth
-designing for.** Every other tool in the suite makes zero network requests, so this is
-the first place a dropped connection can break a run — and it did, repeatedly, while
-this tool was being built: `net::ERR_NAME_NOT_RESOLVED` on `huggingface.co`, with Node's
-own `dns.resolve4` failing `ESERVFAIL` against the same host minutes apart. That cost
-real time to diagnose, mostly because the tool said the wrong thing about it. A model
-that won't download now stops the batch immediately with one clear message instead of
-marching through the queue marking every photo failed and suggesting a different photo —
-which pointed at the one thing that was never the problem. `e2e/background.spec.ts`
-covers it by aborting the Hugging Face route, so that path is tested without needing a
-network at all: it's the fastest spec in the file precisely because it never leaves the
-machine.
-
-The related trap, fixed at the same time: the loaded model was memoized as a promise,
-so a *rejected* load got cached too and "Try again" would replay the original failure
-forever on a connection that had since recovered. A failed load now clears itself.
-
-**The first version of that error message was itself wrong, and only live production
-traffic proved it.** After merge, the real, live site reproducibly failed to download
-the model for a real visitor — on their home connection and, separately, on a phone
-hotspot, ruling out anything local to one network. The first theory (broken IPv6 routing
-on their home connection) didn't survive the second data point and was retracted.
-Direct testing against the live model URL — the same request, sent moments apart from
-different vantage points — found the real shape of it: a clean `200` from one vantage
-point and a reproducible `503` from another, for both the small `config.json` and the
-actual 42 MiB model weights alike, always at Hugging Face's own `resolve/main` endpoint.
-That means the failure was never the visitor's connection at all — it's Hugging Face's
-CDN edge nodes caching independently, and a node that has cached an error for this
-model's files keeps serving that error to whoever it routes to, regardless of that
-visitor's own network. `env.fetch` (a documented `transformers.js` extension point) now
-retries up to 4 times with backoff, treating a `5xx` or a network-level failure as
-retryable and a `4xx` as not, since the latter means a real problem retrying can't fix.
-Tested directly against a vantage point that was reproducing the failure, all 4 attempts
-still failed identically — the retry is real resilience against the shorter-lived version
-of this failure, not a guarantee against a long-lived one. The error copy was corrected
-to match what's now known: it no longer tells anyone to check their connection, since
-the investigation proved that was never the problem. Full writeup, including what's
-still open, in ADR 0008.
+**Tool 3 was Background Remover, and it was removed.** It shipped, passed every
+automated check the suite has, and then failed in production for a real visitor,
+reproducibly, on two unrelated networks — traced to Hugging Face's CDN caching an error
+per edge node and serving it regardless of the visitor's own connection, not anything
+local. A retry-with-backoff mitigation shipped and deployed cleanly but didn't resolve
+it: tested directly against the failure after that fix was live, it still failed
+identically. The suite's whole premise is ten — now nine — small, self-contained tools
+that work offline after the first load; the one tool that needed a third-party model
+host at runtime was the one tool that could fail for a reason nothing in this codebase
+controls. Removed rather than escalated into hosting the model file on infrastructure
+tooldo would have to operate itself. Full history — the model architecture debugging
+that's still a good read for any future tool considering WASM inference, and the CDN
+investigation that diagnosed the production failure precisely rather than guessing at
+it — in ADR 0008. The removal decision itself is ADR 0009. Invoice Generator, already
+registered as `planned` and dependency-free by nature, takes its place next.
 
 ## Next
 
-Tools 4 to 10, each through the `new-tool` skill. The landing page's upload animation
-comes after the tools, not before — deliberately reordered from the original plan.
+Invoice Generator (`/invoice`) is up next, through the `new-tool` skill — fill a form,
+get a clean PDF, no external dependency of any kind. Then the rest of the `planned`
+roster in `lib/tools.ts`. The landing page's upload animation comes after the tools, not
+before — deliberately reordered from the original plan.
 
 **Not in the PDF tool, deliberately.** Compression, because pdf-lib copies page streams
 untouched and anything honest would mean re-encoding images and losing quality — the FAQ
@@ -231,8 +162,8 @@ Recorded properly in `docs/adr/`. The ones that catch people out:
   (ADR 0007). `script-src` had neither `'unsafe-eval'` nor `'wasm-unsafe-eval'`, and
   Chrome refuses `WebAssembly.instantiate()` without the latter — invisible until the
   real header was actually enforced in a browser, since `astro preview` never sends
-  `public/_headers` at all. Every future WASM codec (video, background removal) already
-  has what it needs; this wasn't a per-tool fix.
+  `public/_headers` at all. Every future WASM codec (video's ffmpeg.wasm included)
+  already has what it needs; this wasn't a per-tool fix.
 - **A download that waits on a worker first can silently fail.** Chrome only honours a
   programmatic `<a download>` click while the triggering user gesture is still "fresh" —
   `await` a Worker round trip before calling `download()` and the click can do nothing,
@@ -252,24 +183,15 @@ Recorded properly in `docs/adr/`. The ones that catch people out:
   full run, occasional only under full-suite concurrency. That's Chromium's own input
   classification on a touch-emulated device reacting to system load, not a resource knob
   this repo controls, which is what `retries` on CI exists to absorb.
-- **A hard, non-optional dependency isn't the same as a dependency you actually need**
-  (ADR 0008). `@huggingface/transformers` declares `onnxruntime-node` — a multi-platform
-  native binary bundle for its Node.js code path — as a regular dependency, not an
-  optional one, so `pnpm install` tries to fetch it regardless of whether a browser
-  bundle will ever import that path. It repeatedly timed out fetching in this
-  environment and would have bought nothing even on success.
-  `pnpm-workspace.yaml`'s `overrides` redirects it to a local stub
-  (`scripts/stubs/onnxruntime-node`) that throws if anything ever actually imports it.
 - **pnpm 11 stopped reading the `"pnpm"` field in `package.json`.** An `overrides` block
   placed there is silently ignored — a warning names the field, but nothing fails loudly.
   Config that used to live in `package.json` now belongs in `pnpm-workspace.yaml`, which
   this repo already had one for; the override joined it there instead of a second file.
-- **A model's own choice of accelerator can be wrong even when the API accepted it
-  without complaint.** BiRefNet's WebGPU path compiles and runs — it just throws
-  `Too many storage buffers in shader` on ordinary hardware the moment it executes,
-  because the shader needs 17 storage buffers against the platform's default limit of
-  16. Nothing about the pipeline API surfaces that until you actually run it. WASM has
-  no such ceiling, so that's the only device this pipeline asks for. See ADR 0008.
+- **Background Remover was removed** (ADR 0009, supersedes ADR 0008). A production CDN
+  reliability problem outside tooldo's control, not fixable by a retry, on the suite's
+  only tool with a runtime dependency on a service it doesn't operate. If `connect-src`
+  in `public/_headers` or a Hugging Face reference turns up somewhere, it's a leftover to
+  clean up, not something to build around.
 
 ## How we work
 

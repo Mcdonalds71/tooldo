@@ -1,7 +1,9 @@
 # ADR 0008 — Background Remover: model, device, and a second worker shape
 
 ## Status
-Accepted.
+Superseded by [ADR 0009](0009-remove-background-remover.md) — the tool this ADR is
+about was removed from the suite. Kept as the accurate record of what was tried, what
+was learned, and why it still wasn't enough.
 
 ## Context
 The Background Remover needed a segmentation model, a way to run it in the browser, and
