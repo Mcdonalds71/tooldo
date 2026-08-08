@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import type { ReactNode } from 'react';
 import { Button } from '../../design-system/components/Button';
+import { DropArt } from '../../design-system/components/DropArt';
 import { Dropzone } from '../../design-system/components/Dropzone';
 import { EmptyState } from '../../design-system/components/EmptyState';
 import { FileQueue, type QueueItem } from '../../design-system/components/FileQueue';
@@ -9,7 +10,6 @@ import { ToastProvider } from '../../design-system/components/Toast';
 import { fadeUp, instant, useReducedMotion } from '../../design-system/motion';
 import { download } from '../../lib/download';
 import { describeConvertFailure } from './errors';
-import { ImageArt } from './ImageArt';
 import { ImageOptions } from './ImageOptions';
 import type { ConvertOutcome } from './types';
 import { IMAGE_ACCEPT, MAX_FILES, MAX_IMAGE_BYTES } from './types';
@@ -36,7 +36,7 @@ function Workbench() {
     body = (
       <EmptyState
         variant="error"
-        illustration={<ImageArt />}
+        illustration={<DropArt />}
         headline={stage.message}
         subtext="Nothing was sent anywhere — the files never left your device."
         primaryAction={
@@ -64,7 +64,7 @@ function Workbench() {
         accept={IMAGE_ACCEPT}
         maxBytes={MAX_IMAGE_BYTES}
         maxFiles={MAX_FILES}
-        illustration={<ImageArt />}
+        illustration={<DropArt />}
         onFiles={actions.addFiles}
         onReject={actions.reject}
         sample={{ label: 'No file handy? Try a sample', onTry: actions.trySample }}

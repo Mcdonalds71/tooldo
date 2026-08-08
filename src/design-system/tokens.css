@@ -236,6 +236,21 @@
   --card-shadow-hover: 8px 8px 0 var(--color-signal);
   --card-lift: -3px;
 
+  /*
+   * The dropzone's folder illustration. Global rather than per-tool because every tool
+   * opens with the same drawing — see `DropArt`.
+   *
+   * The site blur is tuned for a nav capsule floating over a whole page; over a pane
+   * this small it erases the sheets instead of softening them. And smoked, not frosted:
+   * white sheets behind a cream pane are just white sheets, but put enough ink in the
+   * tint and they come through as soft light, which is the whole effect.
+   */
+  --art-blur: 7px;
+  --art-glass: color-mix(in srgb, var(--color-ink) 24%, var(--glass-tint-strong));
+  --art-glass-live: color-mix(in srgb, var(--color-signal) 30%, var(--art-glass));
+  /* Slower than any interaction easing: this one is ambient, not a response. */
+  --art-drift: 5s;
+
   --drop-radius: var(--radius-drop);
   --drop-border: 3px dashed var(--color-ink);
   --drop-border-active: 3px solid var(--color-signal);

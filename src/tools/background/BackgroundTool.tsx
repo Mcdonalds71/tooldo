@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import type { ReactNode } from 'react';
 import { Button } from '../../design-system/components/Button';
+import { DropArt } from '../../design-system/components/DropArt';
 import { Dropzone } from '../../design-system/components/Dropzone';
 import { EmptyState } from '../../design-system/components/EmptyState';
 import { FileQueue, type QueueItem } from '../../design-system/components/FileQueue';
@@ -8,7 +9,6 @@ import { ProcessingOverlay } from '../../design-system/components/ProcessingOver
 import { ToastProvider } from '../../design-system/components/Toast';
 import { fadeUp, instant, useReducedMotion } from '../../design-system/motion';
 import { download } from '../../lib/download';
-import { BackgroundArt } from './BackgroundArt';
 import { describeRemoveFailure } from './errors';
 import type { RemoveOutcome } from './types';
 import { BACKGROUND_ACCEPT, MAX_FILES, MAX_IMAGE_BYTES } from './types';
@@ -35,7 +35,7 @@ function Workbench() {
     body = (
       <EmptyState
         variant="error"
-        illustration={<BackgroundArt />}
+        illustration={<DropArt />}
         headline={stage.message}
         subtext="Nothing was sent anywhere — the photo never left your device."
         primaryAction={
@@ -63,7 +63,7 @@ function Workbench() {
         accept={BACKGROUND_ACCEPT}
         maxBytes={MAX_IMAGE_BYTES}
         maxFiles={MAX_FILES}
-        illustration={<BackgroundArt />}
+        illustration={<DropArt />}
         onFiles={actions.addFiles}
         onReject={actions.reject}
         sample={{ label: 'No photo handy? Try a sample', onTry: actions.trySample }}

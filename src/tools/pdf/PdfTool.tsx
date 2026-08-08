@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import type { ReactNode } from 'react';
 import { Button } from '../../design-system/components/Button';
+import { DropArt } from '../../design-system/components/DropArt';
 import { Dropzone } from '../../design-system/components/Dropzone';
 import { EmptyState } from '../../design-system/components/EmptyState';
 import { ProcessingOverlay } from '../../design-system/components/ProcessingOverlay';
@@ -8,7 +9,6 @@ import { ToastProvider } from '../../design-system/components/Toast';
 import { fadeUp, instant, useReducedMotion } from '../../design-system/motion';
 import { BoardToolbar } from './BoardToolbar';
 import { PageBoard } from './PageBoard';
-import { PdfArt } from './PdfArt';
 import { PdfResult } from './PdfResult';
 import { MAX_PDF_BYTES, PDF_ACCEPT } from './types';
 import { type Stage, usePdfWorkbench } from './usePdfWorkbench';
@@ -65,7 +65,7 @@ function Workbench() {
     body = (
       <EmptyState
         variant="error"
-        illustration={<PdfArt />}
+        illustration={<DropArt />}
         headline={stage.message}
         subtext="Nothing was sent anywhere — the file never left your device."
         primaryAction={
@@ -83,7 +83,7 @@ function Workbench() {
         hint="Its pages open as a board you can rearrange. All of it happens in this tab — nothing is uploaded."
         accept={PDF_ACCEPT}
         maxBytes={MAX_PDF_BYTES}
-        illustration={<PdfArt />}
+        illustration={<DropArt />}
         onFiles={actions.addFiles}
         onReject={actions.reject}
         sample={{ label: 'No file handy? Try a sample', onTry: actions.trySample }}
