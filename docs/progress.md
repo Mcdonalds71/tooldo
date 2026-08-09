@@ -197,6 +197,29 @@ URL, there's no `localStorage` or query param here — a QR code's content is no
 typed fresh each time, not resumed, and ADR 0010 and ADR 0011 both set the bar for
 reaching for storage at "this tool has its own reason," which this one didn't clear.
 
+**Tool 7, Screenshot Beautifier** (`/screenshot`). Drop a screenshot and it styles
+live as you adjust the panel — a background (five curated presets, solid or
+gradient), padding, rounded corners, a drop shadow, an optional browser-frame bar
+with its own traffic lights. Download the finished PNG. Back to a proper Worker
+after two tools in a row without one: `OffscreenCanvas` has no `document`
+dependency, so the actual compositing runs off the main thread the ordinary way,
+the same `runInWorker` every file-in tool already uses.
+
+The workbench itself still isn't the standard five-stage machine — `empty` and
+`ready` are the only two states, because the live preview *is* the result the whole
+time, not a screen a "Convert" button leads to. Every option change re-renders, but
+debounced 120ms and cancelled via the same `AbortController` pattern every tool's
+cancel button already uses, so a slider mid-drag doesn't spin up a dozen Workers a
+second for nine of which the answer's already stale. The very first render, from a
+drop or the sample, skips the debounce — nothing to protect against yet. Full
+reasoning in ADR 0013, which also covers why `layout.ts`'s canvas math is pure and
+tested while the actual paint calls in `engine.ts` aren't and structurally can't be,
+the same split the image tool already draws between `imageMath.ts` and its own
+`engine.ts`.
+
+The sample is drawn, not shipped — a plain mock dashboard, deliberately unstyled
+going in, since demonstrating the styling is the tool's whole job.
+
 ## Next
 
 The rest of the `planned` roster in `lib/tools.ts`, each through the `new-tool` skill.
@@ -317,6 +340,14 @@ Recorded properly in `docs/adr/`. The ones that catch people out:
   Finder's (ADR 0011) — `qr-code-styling` draws into a canvas it creates itself, which
   needs `document`, which a Worker doesn't have. Two tools, same absence, different
   cause; read the actual ADR before assuming which one applies to a third.
+- **A file-in tool doesn't automatically mean the five-stage machine** (ADR 0013).
+  Screenshot Beautifier drops a file through a real Worker like the image and PDF
+  tools, but the standard `processing`/`result` split assumes a one-shot action with
+  a finished screen at the end — this tool's preview *is* the result, continuously,
+  the same shape problem Invoice Generator's live preview had (ADR 0010) wearing a
+  dropzone instead of a form. Three tools now have their own reason to deviate from
+  one of the suite's two standard shapes; check which reason actually applies before
+  a fourth copies either one by default.
 
 ## How we work
 
