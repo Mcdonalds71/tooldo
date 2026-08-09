@@ -68,7 +68,22 @@ test('a page moves by dragging it across the board', async ({ page }) => {
   await expect(page.locator('.page-card__preview')).toHaveCount(SAMPLE_PAGES);
 
   const cards = page.locator('.page-slot');
-  await cards.first().scrollIntoViewIfNeeded();
+  // `scrollIntoViewIfNeeded()` only guarantees the *source* card is visible — on a short
+  // mobile viewport the target card (one grid row down) can still land below the fold.
+  // `elementFromPoint`, which the board's own hit-testing relies on, resolves to nothing
+  // for a point outside the viewport, so the scroll position is computed directly from
+  // both cards' geometry to keep them simultaneously on screen.
+  await page.evaluate(() => window.scrollTo(0, 0));
+  const origin = await cards.nth(0).boundingBox();
+  const target = await cards.nth(3).boundingBox();
+  if (!origin || !target) throw new Error('a page card has no box to drag from or to');
+
+  const viewportHeight = page.viewportSize()?.height ?? 0;
+  const spanTop = Math.min(origin.y, target.y);
+  const spanBottom = Math.max(origin.y + origin.height, target.y + target.height);
+  const centeredScroll = spanTop - (viewportHeight - (spanBottom - spanTop)) / 2;
+  await page.evaluate((y) => window.scrollTo(0, Math.max(0, y)), centeredScroll);
+
   const from = await cards.nth(0).boundingBox();
   const to = await cards.nth(3).boundingBox();
   if (!from || !to) throw new Error('a page card has no box to drag from or to');
@@ -77,12 +92,11 @@ test('a page moves by dragging it across the board', async ({ page }) => {
 
   await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
   await page.mouse.down();
-  // The `mobile` project emulates a touch-capable device, and Chromium can dispatch
-  // `page.mouse` input as `pointerType: 'touch'` there rather than `'mouse'` — which
-  // routes through PageCard's touch path (a still hold before the drag arms, so a swipe
-  // isn't mistaken for a reorder; see the constants at the top of PageCard.tsx). Holding
-  // here past that threshold makes the gesture land correctly under either
-  // interpretation, rather than assuming which one a given browser will pick.
+  // `page.mouse` input lands as `pointerType: 'mouse'` even under the `mobile` project's
+  // touch emulation (confirmed by logging PageCard's pointer handlers directly), so this
+  // wait doesn't currently arm anything here — PageCard's touch-hold path only runs for a
+  // real `pointerType: 'touch'` press. Left in as cheap defensive cover in case that ever
+  // changes, matching how a real touchscreen would need the hold before a drag commits.
   await page.waitForTimeout(250);
   await page.mouse.move(to.x + to.width / 2, to.y + to.height / 2, { steps: 20 });
   await page.mouse.up();
