@@ -77,6 +77,54 @@
   pointer-events: none;
 }
 
+.field__color-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+}
+
+.field__color-swatch {
+  width: var(--field-height);
+  height: var(--field-height);
+  padding: var(--space-3xs);
+  border: var(--field-border);
+  border-radius: var(--field-radius);
+  background-color: var(--field-bg);
+  cursor: pointer;
+}
+
+.field__color-swatch:hover {
+  border-color: var(--color-line-strong);
+}
+
+.field__color-swatch:focus-visible {
+  outline: none;
+  border: var(--field-border-focus);
+}
+
+/* The swatch itself is the `<input>`; this trims the browser's own inset frame so the
+   colour fills the field border cleanly instead of sitting in a smaller box inside it. */
+.field__color-swatch::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.field__color-swatch::-webkit-color-swatch {
+  border: none;
+  border-radius: calc(var(--field-radius) - var(--space-3xs));
+}
+
+.field__color-swatch::-moz-color-swatch {
+  border: none;
+  border-radius: calc(var(--field-radius) - var(--space-3xs));
+}
+
+.field__color-value {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-ink-faint);
+  text-transform: uppercase;
+}
+
 .field__hint {
   font-size: var(--text-xs);
   color: var(--color-ink-faint);

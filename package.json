@@ -38,6 +38,7 @@
     "motion": "^12.43.0",
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^6.2.108",
+    "qr-code-styling": "^1.9.2",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },
