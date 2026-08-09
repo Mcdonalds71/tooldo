@@ -115,7 +115,7 @@ export const tools = [
     description: 'Count, clean, convert, and compare text.',
     category: 'Data & text',
     icon: TextAaIcon,
-    status: 'planned',
+    status: 'live',
   },
 ] as const satisfies readonly Tool[];
 

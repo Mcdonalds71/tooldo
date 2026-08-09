@@ -7,6 +7,7 @@ export interface TextAreaFieldProps {
   readonly placeholder?: string;
   readonly hint?: string;
   readonly rows?: number;
+  readonly readOnly?: boolean;
   readonly className?: string;
 }
 
@@ -18,6 +19,7 @@ export function TextAreaField({
   placeholder,
   hint,
   rows = 3,
+  readOnly = false,
   className,
 }: TextAreaFieldProps) {
   const id = useId();
@@ -35,6 +37,7 @@ export function TextAreaField({
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
         rows={rows}
+        readOnly={readOnly}
         aria-describedby={hintId}
       />
       {hint ? (

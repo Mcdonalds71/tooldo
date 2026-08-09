@@ -1,0 +1,63 @@
+---
+import ToolLayout, { type FaqEntry } from '../layouts/ToolLayout.astro';
+import { TextTool } from '../tools/text/TextTool';
+import '../tools/text/text.css';
+
+const description =
+  'Paste text and watch live counts, cleanup, and case conversion — or switch to Compare and see exactly what changed, line by line. Everything happens right in your browser.';
+
+const steps = [
+  {
+    title: 'Paste your text',
+    body: 'Character, word, and line counts update as you type.',
+  },
+  {
+    title: 'Clean it up',
+    body: 'Trim whitespace, collapse blank lines, or change the case — the result updates live.',
+  },
+  {
+    title: 'Compare two versions',
+    body: 'Switch to Compare and paste a second version to see what changed, line by line.',
+  },
+];
+
+const faq: readonly FaqEntry[] = [
+  {
+    question: 'Does this send my text anywhere?',
+    answer: 'No. Everything runs in your browser — nothing you type or paste is uploaded.',
+  },
+  {
+    question: 'How does Compare work?',
+    answer:
+      'It lines up both versions and shows which lines were added, removed, or left alone — a real line-by-line diff, not just a same-or-different flag.',
+  },
+  {
+    question: 'What happens to line breaks when I convert to camelCase?',
+    answer:
+      "camelCase, snake_case, and kebab-case treat the whole text as one token, the way those conventions actually work, so line breaks don't carry through. UPPERCASE, lowercase, Title Case, and Sentence case all keep your original lines.",
+  },
+  {
+    question: 'Is there a size limit?',
+    answer:
+      'Up to 200,000 characters for editing, and up to 2,000 lines per side for comparing — past that, a line-by-line diff stops being something a person can actually read.',
+  },
+  {
+    question: 'Will it remember what I typed?',
+    answer: 'No. Nothing here is saved — reload the page and it starts blank again.',
+  },
+];
+---
+
+<ToolLayout
+  slug="text"
+  title="Text Toolbox — count, clean, convert, and compare text"
+  description={description}
+  steps={steps}
+  faq={faq}
+>
+  {
+    /* client:load, not client:visible: matches every other tool — the island is the
+       whole reason the route exists and opens above the fold. */
+  }
+  <TextTool client:load />
+</ToolLayout>

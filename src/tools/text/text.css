@@ -1,0 +1,161 @@
+.text-tool {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.text-tool__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.text-tool__toolbar-actions {
+  display: flex;
+  gap: var(--space-2xs);
+}
+
+/* ---------- Edit mode ---------- */
+
+.text-tool__edit {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-lg);
+}
+
+.text-tool__column,
+.text-tool__options {
+  min-width: 0;
+}
+
+@media (width >= 64rem) {
+  .text-tool__edit {
+    grid-template-columns: minmax(0, 1fr) 14rem minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+.text-tool__column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.text-tool__options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.text-tool__options-title {
+  font-family: var(--font-display);
+  font-weight: var(--weight-semibold);
+}
+
+.text-tool__stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2xs);
+}
+
+.text-tool__stat {
+  padding: var(--space-2xs);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-card);
+  text-align: center;
+}
+
+.text-tool__stat dt {
+  font-size: var(--text-xs);
+  color: var(--color-ink-faint);
+}
+
+.text-tool__stat dd {
+  font-family: var(--font-mono);
+  font-weight: var(--weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+.text-tool__actions {
+  display: flex;
+  gap: var(--space-2xs);
+}
+
+/* ---------- Compare mode ---------- */
+
+.text-tool__compare {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.text-tool__compare-inputs {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+}
+
+@media (width >= 48rem) {
+  .text-tool__compare-inputs {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
+.text-tool__diff-summary {
+  display: flex;
+  gap: var(--space-sm);
+  font-family: var(--font-mono);
+  font-weight: var(--weight-semibold);
+}
+
+.text-tool__diff-count--added {
+  color: var(--diff-added-text);
+}
+
+.text-tool__diff-count--removed {
+  color: var(--diff-removed-text);
+}
+
+.text-tool__diff {
+  display: flex;
+  flex-direction: column;
+  max-height: 30rem;
+  border-radius: var(--card-radius);
+  border: var(--hairline);
+  overflow: auto;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+}
+
+.text-tool__diff-line {
+  display: flex;
+  gap: var(--space-2xs);
+  padding-inline: var(--space-sm);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* No colour of its own — it inherits from the row, so the marker and the line's text
+   always read as the same colour rather than needing to be kept in sync by hand. */
+.text-tool__diff-marker {
+  flex-shrink: 0;
+  width: 1rem;
+  text-align: center;
+}
+
+.text-tool__diff-line--added {
+  background-color: var(--diff-added-bg);
+  color: var(--diff-added-text);
+}
+
+.text-tool__diff-line--removed {
+  background-color: var(--diff-removed-bg);
+  color: var(--diff-removed-text);
+}
+
+.text-tool__hint {
+  color: var(--color-ink-faint);
+  font-size: var(--text-sm);
+}
