@@ -6,6 +6,12 @@
       "runtimeExecutable": "pnpm",
       "runtimeArgs": ["exec", "astro", "preview", "--port", "4327"],
       "port": 4327
+    },
+    {
+      "name": "tooldo-dev",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["exec", "astro", "dev", "--port", "4328"],
+      "port": 4328
     }
   ]
 }

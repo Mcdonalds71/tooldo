@@ -148,6 +148,38 @@ off the padding. Confirmed after the fix with real numbers, not just a visual ch
 375px viewport now measures zero horizontal overflow, and consecutive line-item rows
 sit exactly one `--space-sm` apart.
 
+**Tool 5, Timezone Finder** (`/timezones`). Add cities, drag one shared time control,
+watch every city's clock and day-or-night strip update live at once — the same
+delight `luxon` makes cheap enough to do on every keystroke, not once per run. The
+suite's first tool with no Worker anywhere in it: every other tool routes real work
+off the main thread because the work is heavy, and this tool's only work is date
+arithmetic sub-millisecond regardless of how many cities are on screen, so there was
+never anything here that needed to leave the main thread. Full reasoning in ADR 0011.
+
+Selected cities live in two places for two different reasons: the URL (shareable — a
+comparison sent as a link shows the same cities to whoever opens it, no account, no
+sync) and `localStorage` (convenient — a solo return visit picks up where it left
+off). The URL wins when both are present. A fresh visit with neither isn't actually
+blank: the visitor's own timezone is detected and added as the first row, a real fact
+about them rather than a guessed default.
+
+**A real bug surfaced by checking the expected test values before writing them down,
+not by the test that would have passed either way.** The first version of the
+day-offset calculation (which city reads "Yesterday" versus "Tomorrow") computed how
+many hours apart two zones' midnights were and divided by twenty-four — which breaks
+exactly for the cities this tool exists to compare: a Tokyo viewer at their own
+midnight watches Los Angeles read the previous afternoon, seven hours away in
+absolute time but a full calendar day back, and the elapsed-time approach called that
+the same day. Comparing the two dates' plain year/month/day instead, with the zone
+stripped out entirely, gets it right regardless of how far apart the offsets are. A
+test written against the original, wrong assumption would have passed just as
+cleanly — it was only caught by verifying the expected numbers independently first.
+
+111 curated cities across every region (`cities.ts`), not the full ~400-zone IANA
+list — checked for slug collisions and real zone resolution, not assumed correct. 21
+unit tests, 4 Playwright specs including one that presses arrow keys on the shared
+time control and asserts every city's clock actually changes.
+
 ## Next
 
 The rest of the `planned` roster in `lib/tools.ts`, each through the `new-tool` skill.
@@ -243,6 +275,17 @@ Recorded properly in `docs/adr/`. The ones that catch people out:
   empty-state answer, and — deliberately, narrowly — the suite's first `localStorage`
   use. Read it before assuming the next input-in tool should copy the file-tool pattern,
   or that `localStorage` is now fair game elsewhere without the same reasoning.
+- **Not every tool needs a Worker, and Timezone Finder is where that first mattered**
+  (ADR 0011). The rule is "heavy compute runs in a Worker," not "every tool has one" —
+  this tool's only work is sub-millisecond date arithmetic, so there was nothing to move
+  off the main thread. Also the second (and independently-argued) use of `localStorage`,
+  paired here with a shareable URL that takes precedence over it on load.
+- **Comparing elapsed time between two zones' midnights is not the same question as
+  comparing their calendar dates**, and conflating the two silently breaks exactly the
+  cities furthest apart — the ones a timezone tool exists for. Caught before it became a
+  bug baked into a passing test, by checking the expected numbers independently first.
+  See ADR 0011 if a future date calculation needs the same "which day is it there"
+  answer.
 
 ## How we work
 

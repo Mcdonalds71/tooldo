@@ -99,7 +99,7 @@ export const tools = [
     description: 'Find the overlap across cities.',
     category: 'Media & utilities',
     icon: GlobeHemisphereWestIcon,
-    status: 'planned',
+    status: 'live',
   },
   {
     slug: 'qr',
