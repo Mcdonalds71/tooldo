@@ -1,0 +1,63 @@
+---
+import ToolLayout, { type FaqEntry } from '../layouts/ToolLayout.astro';
+import { DataTool } from '../tools/csv/DataTool';
+import '../tools/csv/data.css';
+
+const description =
+  'Drop a CSV or JSON file and see it as a clean, sortable table. Convert between formats and download the result — everything happens right in your browser.';
+
+const steps = [
+  {
+    title: 'Drop your file',
+    body: 'CSV or JSON, up to 30 MB.',
+  },
+  {
+    title: 'Read it as a table',
+    body: 'Every row and column, laid out cleanly. Click a header to sort it.',
+  },
+  {
+    title: 'Convert and download',
+    body: 'Save what you dropped as the other format, or the same one cleaned up.',
+  },
+];
+
+const faq: readonly FaqEntry[] = [
+  {
+    question: 'Does this upload my file anywhere?',
+    answer: 'No. Everything runs in your browser — nothing is sent to a server.',
+  },
+  {
+    question: 'What if my CSV has commas inside a field?',
+    answer:
+      'Handled correctly, as long as that field is quoted the normal way — the parser reads real CSV, not just a split on every comma.',
+  },
+  {
+    question: 'What happens to nested JSON?',
+    answer:
+      "A nested object or array inside a field shows as its JSON text in that cell — the underlying data round-trips correctly either way, it just can't spread across more table columns than the file actually has.",
+  },
+  {
+    question: 'Is there a size limit?',
+    answer:
+      'Up to 30 MB per file. The table itself shows the first 500 rows for something a browser can actually render smoothly — downloading always gets you everything, past that limit too.',
+  },
+  {
+    question: 'Will it remember my file?',
+    answer: 'No. Nothing here is saved — reload the page and it starts blank again.',
+  },
+];
+---
+
+<ToolLayout
+  slug="csv"
+  title="CSV / JSON Viewer — open, read, and convert data cleanly"
+  description={description}
+  steps={steps}
+  faq={faq}
+>
+  {
+    /* client:load, not client:visible: matches every other tool — the island is the
+       whole reason the route exists and opens above the fold. */
+  }
+  <DataTool client:load />
+</ToolLayout>

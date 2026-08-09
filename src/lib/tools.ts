@@ -91,7 +91,7 @@ export const tools = [
     description: 'Open, read, and convert data cleanly.',
     category: 'Data & text',
     icon: TableIcon,
-    status: 'planned',
+    status: 'live',
   },
   {
     slug: 'timezones',
