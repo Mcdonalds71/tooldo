@@ -1,0 +1,69 @@
+---
+import ToolLayout, { type FaqEntry } from '../layouts/ToolLayout.astro';
+import { TimezoneTool } from '../tools/timezones/TimezoneTool';
+import '../tools/timezones/timezones.css';
+
+const description =
+  'Add a few cities and watch their local time update live as you drag — find the hours that actually overlap, right in your browser. Share the exact comparison with a link.';
+
+const steps = [
+  {
+    title: 'Add your cities',
+    body: 'Search and add as many as the call needs. Your own city is added automatically to start.',
+  },
+  {
+    title: 'Drag the time',
+    body: "Every city's clock and day-or-night strip updates live as you move it.",
+  },
+  {
+    title: 'Share or save it',
+    body: 'The link updates with your cities, so you can send the exact comparison or come back to it later.',
+  },
+];
+
+const faq: readonly FaqEntry[] = [
+  {
+    question: 'Does this send my location anywhere?',
+    answer:
+      "No. Your own timezone is read locally by your browser and never leaves it — there's no server here to send it to, and no account to attach it to.",
+  },
+  {
+    question: 'Can I share a specific comparison?',
+    answer:
+      'Yes. The page URL updates with your cities as you add and remove them, so copying the link or bookmarking it captures exactly that comparison.',
+  },
+  {
+    question: 'Will it remember my cities next time?',
+    answer:
+      "Your selection is also saved on this device, so opening the tool fresh brings back your last comparison. Opening a link with cities in it always shows that link's cities instead.",
+  },
+  {
+    question: 'How many cities can I compare at once?',
+    answer: 'Up to ten.',
+  },
+  {
+    question: 'Does it handle daylight saving correctly?',
+    answer:
+      "Yes. Every time shown is computed for today's actual date, so a city currently observing daylight saving reads correctly against one that isn't — nothing here is a fixed UTC offset that would drift wrong for half the year.",
+  },
+  {
+    question: "What if my city isn't in the list?",
+    answer:
+      'The list covers roughly a hundred major cities across every region rather than every town, but your own city is detected and added automatically regardless — and any city sharing its timezone reads the identical time.',
+  },
+];
+---
+
+<ToolLayout
+  slug="timezones"
+  title="Timezone Finder — find the overlap across cities"
+  description={description}
+  steps={steps}
+  faq={faq}
+>
+  {
+    /* client:load, not client:visible: matches every other tool — the island is the
+       whole reason the route exists and opens above the fold. */
+  }
+  <TimezoneTool client:load />
+</ToolLayout>

@@ -284,6 +284,15 @@
   --field-textarea-min-height: 6rem;
   --field-error: var(--color-danger);
 
+  /* The day/night strip in Timezone Finder — the palette's own light-to-dark range
+     rather than a separate hue, so the strip reads as "paper, ink and signal" like
+     everything else instead of a generic four-color scale borrowed from elsewhere. */
+  --phase-night: var(--color-char-dim);
+  --phase-night-text: var(--color-paper-dim);
+  --phase-morning: var(--color-paper-dim);
+  --phase-day: var(--color-card);
+  --phase-evening: color-mix(in srgb, var(--color-paper-dim) 82%, var(--color-signal) 12%);
+
   --dur-press: 120ms;
   --dur-fast: 150ms;
   --dur-base: 250ms;
