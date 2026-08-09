@@ -101,36 +101,44 @@ function Workbench() {
         </Button>
       </div>
 
-      <div className="qr-tool__preview">
-        {hasContent ? (
-          <>
-            <div className="qr-tool__canvas-wrap">
-              <div ref={containerRef} className="qr-tool__canvas" />
-            </div>
-            <div className="qr-tool__downloads">
-              <Button
-                variant="primary"
-                icon={DownloadSimpleIcon}
-                disabled={!isReady}
-                onClick={() => void actions.downloadQr('png')}
-              >
-                Download PNG
-              </Button>
-              <Button
-                variant="secondary"
-                icon={DownloadSimpleIcon}
-                disabled={!isReady}
-                onClick={() => void actions.downloadQr('svg')}
-              >
-                Download SVG
-              </Button>
-            </div>
-          </>
-        ) : (
-          <p className="qr-tool__hint">
-            Type a link or message to see your QR code, or try a sample.
-          </p>
-        )}
+      {/* A hidden label the same height as "Content"'s real one — not decoration,
+           it's what lines the preview box up with the content field next to it
+           instead of the field's label above it. */}
+      <div className="field qr-tool__preview-col">
+        <span className="field__label qr-tool__preview-spacer" aria-hidden="true">
+          Preview
+        </span>
+        <div className="qr-tool__preview">
+          {hasContent ? (
+            <>
+              <div className="qr-tool__canvas-wrap">
+                <div ref={containerRef} className="qr-tool__canvas" />
+              </div>
+              <div className="qr-tool__downloads">
+                <Button
+                  variant="primary"
+                  icon={DownloadSimpleIcon}
+                  disabled={!isReady}
+                  onClick={() => void actions.downloadQr('png')}
+                >
+                  Download PNG
+                </Button>
+                <Button
+                  variant="secondary"
+                  icon={DownloadSimpleIcon}
+                  disabled={!isReady}
+                  onClick={() => void actions.downloadQr('svg')}
+                >
+                  Download SVG
+                </Button>
+              </div>
+            </>
+          ) : (
+            <p className="qr-tool__hint">
+              Type a link or message to see your QR code, or try a sample.
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );

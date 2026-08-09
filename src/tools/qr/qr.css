@@ -9,7 +9,7 @@
    its content's natural width, which is what let the preview overflow on narrow
    viewports before (see the invoice fix). */
 .qr-tool__form,
-.qr-tool__preview {
+.qr-tool__preview-col {
   min-width: 0;
 }
 
@@ -56,6 +56,19 @@
   border-radius: var(--radius-sm);
   border: var(--hairline);
   background-color: var(--color-card);
+}
+
+/* Only relevant below the desktop breakpoint's absence: on narrow viewports the two
+   `.field`-style panes stack, so the spacer would otherwise leave a gap above the
+   preview box that nothing next to it justifies. */
+@media (width < 64rem) {
+  .qr-tool__preview-spacer {
+    display: none;
+  }
+}
+
+.qr-tool__preview-spacer {
+  visibility: hidden;
 }
 
 .qr-tool__preview {
