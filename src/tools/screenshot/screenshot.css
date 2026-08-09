@@ -1,0 +1,69 @@
+.screenshot-tool {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-lg);
+}
+
+.screenshot-tool__preview,
+.screenshot-tool__panel {
+  min-width: 0;
+}
+
+@media (width >= 64rem) {
+  .screenshot-tool {
+    grid-template-columns: minmax(0, 1fr) 20rem;
+    align-items: start;
+  }
+}
+
+.screenshot-tool__preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 16rem;
+  padding: var(--space-lg);
+  border-radius: var(--card-radius);
+  border: var(--hairline);
+  background-color: var(--color-card);
+}
+
+.screenshot-tool__image {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  /* No border-radius here — the rendered PNG already carries whatever corner radius
+     the option panel set. Rounding the display element too would show a preview that
+     lies about what the download actually looks like. */
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+
+.screenshot-tool__image[data-rendering] {
+  opacity: 0.6;
+}
+
+.screenshot-tool__loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2xl);
+}
+
+/* No card frame here, unlike the preview — a dense options panel reads better plain,
+   the same call made for the QR tool's content and style sections. */
+.screenshot-tool__panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.screenshot-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.screenshot-tool__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs);
+}

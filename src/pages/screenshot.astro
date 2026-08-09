@@ -1,0 +1,63 @@
+---
+import ToolLayout, { type FaqEntry } from '../layouts/ToolLayout.astro';
+import { ScreenshotTool } from '../tools/screenshot/ScreenshotTool';
+import '../tools/screenshot/screenshot.css';
+
+const description =
+  'Drop a screenshot and watch it style live — a background, padding, rounded corners, a shadow, even a browser frame. Download the finished PNG, right in your browser.';
+
+const steps = [
+  {
+    title: 'Drop your screenshot',
+    body: 'PNG, JPEG, or WebP, up to 25 MB.',
+  },
+  {
+    title: 'Style it live',
+    body: 'Pick a background, adjust the padding and corners, toggle the shadow or a browser frame.',
+  },
+  {
+    title: 'Download it',
+    body: 'Save the finished PNG, ready to share.',
+  },
+];
+
+const faq: readonly FaqEntry[] = [
+  {
+    question: 'Does this upload my screenshot anywhere?',
+    answer: 'No. Everything happens in your browser — nothing is sent to a server.',
+  },
+  {
+    question: 'What file types can I drop in?',
+    answer: 'PNG, JPEG, or WebP, up to 25 MB.',
+  },
+  {
+    question: 'Can I pick my own background color?',
+    answer:
+      'Five curated backgrounds for now — solid or gradient, picked to look good together — rather than a full color picker to fuss over.',
+  },
+  {
+    question: 'Will the browser frame work for a phone screenshot?',
+    answer:
+      "The frame is optional, so leave it off for anything that isn't a browser window — a phone screenshot, a terminal, a design file.",
+  },
+  {
+    question: 'Does it resize or compress my screenshot?',
+    answer:
+      'No. Your screenshot keeps its original resolution — padding and the frame add around it, nothing about the image itself is scaled down.',
+  },
+];
+---
+
+<ToolLayout
+  slug="screenshot"
+  title="Screenshot Beautifier — turn plain screenshots into share-ready shots"
+  description={description}
+  steps={steps}
+  faq={faq}
+>
+  {
+    /* client:load, not client:visible: matches every other tool — the island is the
+       whole reason the route exists and opens above the fold. */
+  }
+  <ScreenshotTool client:load />
+</ToolLayout>

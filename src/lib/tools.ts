@@ -83,7 +83,7 @@ export const tools = [
     description: 'Turn plain screenshots into share-ready shots.',
     category: 'Images & photo',
     icon: FrameCornersIcon,
-    status: 'planned',
+    status: 'live',
   },
   {
     slug: 'csv',
