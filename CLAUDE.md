@@ -20,7 +20,7 @@ A suite of nine free, everyday utility tools (PDF, image, video, data, generator
 - **Motion** (`motion/react`) for UI micro-interactions; **GSAP** (+ScrollTrigger) for landing-page showpieces only.
 - **Phosphor Icons** (`@phosphor-icons/react`), duotone for large/expressive, regular for inline. **Never Lucide. Never emoji in shipped UI.**
 - **Zustand** only when a tool truly needs cross-component state; otherwise `useState`/`useReducer`.
-- Compute libs per tool: `pdf-lib`/`pdfjs-dist`, `@jsquash/*`+`libheif`, `@ffmpeg/ffmpeg`, `SheetJS`, `qr-code-styling`, `luxon`.
+- Compute libs per tool: `pdf-lib`/`pdfjs-dist`, `@jsquash/*`+`libheif`, `@ffmpeg/ffmpeg`, a hand-written parser for CSV/JSON ([ADR 0014](docs/adr/0014-csv-json-viewer-hand-written-parser.md) — SheetJS's npm distribution is stale; reach for it only if a tool needs real spreadsheet binary formats, pulled from SheetJS's own CDN), `qr-code-styling`, `luxon`.
 - Tooling: **pnpm**, **Biome** (lint+format), **Vitest** (unit), **Playwright** (smoke).
 - Palette: **"paper, ink & signal"** — cream paper base (`--color-paper #f4f0e7`), near-black ink text (`--color-ink #16130d`), one hot vermilion accent (`--color-signal #ff3b14`) used sparingly (primary CTA, focus, key emphasis only). Warm lines, light-first. Full tokens in `docs/build-spec.md` §4.1.
 - Fonts: self-hosted, `Clash Display` (headers, Fontshare — max weight 700) + `Inter` (UI/body) + `JetBrains Mono` (code/data). Free/OFL/Fontshare licences only.

@@ -248,6 +248,33 @@ conventions mean, not an inconsistency, and the FAQ says so. The word tokenizer 
 splits on existing camelCase/snake_case/kebab-case boundaries, so converting *between*
 conventions works, not only converting away from plain prose.
 
+**Tool 9, CSV / JSON Viewer** (`/csv`). Drop a CSV or JSON file, read it as a
+sortable table, download it back out as either format. `CLAUDE.md` names SheetJS for
+this category, and before reaching for it: `npm view xlsx time` shows the npm
+registry's last publish was 2022-03-24 — SheetJS kept developing, just moved the
+actively maintained build to their own CDN rather than npm. CSV and JSON don't need
+SheetJS's real value (XLS/XLSX binary formats), so this tool is a hand-written parser
+instead — no new dependency, and every line of it unit-tested rather than partly
+trusting a stale third party's internals. Full reasoning in ADR 0014, which also
+notes where the line is: a future tool that actually needs to read a `.xlsx` file's
+binary structure should reach for SheetJS's current CDN build, not revive the npm one.
+
+The CSV parser is a character-by-character state machine, not a comma split — a
+split breaks the moment a quoted field contains the delimiter or a newline, which
+real exports do constantly. Duplicate or empty header cells get disambiguated
+(`Column 2`, `Name (2)`) before becoming object keys, since a plain `Record` would
+otherwise silently drop every column but the last one sharing a name. JSON normalizes
+whatever shape it legally is into the same table — an array of objects directly,
+a single object as one row, primitives wrapped into a `value` column, and objects
+that don't share every key taking the union of all keys seen, leaving gaps blank
+rather than rejecting real-world, non-uniform data.
+
+No separate `ready` stage in the workbench, the same reasoning ADR 0013 gave
+Screenshot Beautifier — there's no option panel to fill in before parsing starts, so
+a drop goes straight to `processing`. Column sorting is a plain client-side re-order
+of already-parsed rows (numeric-looking columns sort as numbers, not lexicographically
+— "10" doesn't come before "2"), never a reason to touch the Worker a second time.
+
 ## Next
 
 The rest of the `planned` roster in `lib/tools.ts`, each through the `new-tool` skill.
@@ -382,6 +409,12 @@ Recorded properly in `docs/adr/`. The ones that catch people out:
   there is to say about it, no DOM dependency (ADR 0012) or state-machine wrinkle
   (ADR 0013) layered on top. Not every deviation needs its own ADR; this one just
   needed checking, which is the actual habit worth keeping.
+- **`CLAUDE.md`'s stack list named SheetJS; the CSV/JSON tool doesn't use it**
+  (ADR 0014). Checking what `pnpm add xlsx` would actually pull in — the npm
+  registry's last publish, from 2022 — is what caught this before it shipped, not a
+  hunch. A hand-written parser isn't a shortcut here; it's the more disciplined
+  choice; read the ADR before assuming the stack list itself is still current for
+  every entry in it.
 
 ## How we work
 
