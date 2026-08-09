@@ -180,6 +180,23 @@ list — checked for slug collisions and real zone resolution, not assumed corre
 unit tests, 4 Playwright specs including one that presses arrow keys on the shared
 time control and asserts every city's clock actually changes.
 
+**Tool 6, QR Code Studio** (`/qr`). Type a link or message and a styled QR code
+builds live in the preview as you type or adjust the style panel — colours, dot
+shape, corner shape, an optional logo dropped into the centre. Download as PNG or
+SVG. The suite's second tool with no Worker, for a different reason than Timezone
+Finder's: `qr-code-styling` draws straight into a `<canvas>`/`SVGElement` it creates
+itself, which needs `document` — a Worker has no DOM at all, so there's no version of
+this that could move off the main thread even if the drawing were expensive, which it
+isn't. Full reasoning in ADR 0012.
+
+A logo covers the centre of the code, so adding one raises error correction to the
+library's highest level automatically (`engine.ts`) — the standard fix for a partly
+obscured code, applied without needing a visitor to know to ask for it. No
+persistence: unlike the invoice tool's saved profile or Timezone Finder's shareable
+URL, there's no `localStorage` or query param here — a QR code's content is normally
+typed fresh each time, not resumed, and ADR 0010 and ADR 0011 both set the bar for
+reaching for storage at "this tool has its own reason," which this one didn't clear.
+
 ## Next
 
 The rest of the `planned` roster in `lib/tools.ts`, each through the `new-tool` skill.
@@ -286,6 +303,20 @@ Recorded properly in `docs/adr/`. The ones that catch people out:
   bug baked into a passing test, by checking the expected numbers independently first.
   See ADR 0011 if a future date calculation needs the same "which day is it there"
   answer.
+- **Reading `localStorage` inside a `useState` lazy initializer is a real, live
+  hydration bug, not a theoretical one — it shipped in the invoice tool and was caught
+  only by checking a fresh browser tab against the production build, not by the test
+  suite.** The static build's server pass has no `localStorage`; a returning visitor's
+  browser does; React silently discards and rebuilds the mismatched tree, which costs
+  a frame and logs an error every single visit. Fixed the same way ADR 0011 frames it:
+  start from the deterministic empty value on the first render, load the real one in a
+  mount effect. Any future `useState(() => readsSomethingBrowserOnly())` is this bug
+  until proven otherwise.
+- **Not every tool that skips the Worker skips it for the same reason** (ADR 0012).
+  QR Code Studio has no Worker either, but not because the work is cheap like Timezone
+  Finder's (ADR 0011) — `qr-code-styling` draws into a canvas it creates itself, which
+  needs `document`, which a Worker doesn't have. Two tools, same absence, different
+  cause; read the actual ADR before assuming which one applies to a third.
 
 ## How we work
 

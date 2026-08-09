@@ -107,7 +107,7 @@ export const tools = [
     description: 'Design QR codes with your brand.',
     category: 'Media & utilities',
     icon: QrCodeIcon,
-    status: 'planned',
+    status: 'live',
   },
   {
     slug: 'text',

@@ -1,0 +1,64 @@
+---
+import ToolLayout, { type FaqEntry } from '../layouts/ToolLayout.astro';
+import { QrTool } from '../tools/qr/QrTool';
+import '../tools/qr/qr.css';
+
+const description =
+  'Type a link or message and watch a styled QR code build live — pick colors, dot shapes, and drop in your own logo. Download as PNG or SVG, right in your browser.';
+
+const steps = [
+  {
+    title: 'Type your content',
+    body: 'A link, a WiFi note, any text up to 2,000 characters — the code updates as you type.',
+  },
+  {
+    title: 'Make it yours',
+    body: 'Pick colors, dot and corner styles, and add a logo if you want one in the middle.',
+  },
+  {
+    title: 'Download it',
+    body: 'PNG for sharing straight away, or SVG if you need it to scale up for print.',
+  },
+];
+
+const faq: readonly FaqEntry[] = [
+  {
+    question: 'Does this send my content anywhere?',
+    answer:
+      'No. The QR code is drawn entirely in your browser — nothing you type is uploaded or sent to a server.',
+  },
+  {
+    question: 'What can I put in a QR code?',
+    answer:
+      'Any text up to 2,000 characters — a URL, a WiFi password, a short message, anything a scanner can read back.',
+  },
+  {
+    question: 'Will adding a logo make it harder to scan?',
+    answer:
+      "No. Adding a logo raises the code's error correction automatically, the same fix real QR generators use, so scanners can still read it with the middle covered.",
+  },
+  {
+    question: "What's the difference between PNG and SVG?",
+    answer:
+      'PNG is a fixed-size image — good for sharing or dropping into a document. SVG scales to any size without blurring, which matters if you plan to print it large.',
+  },
+  {
+    question: 'Will it remember what I typed?',
+    answer: 'No. Nothing here is saved — reload the page and it starts blank again.',
+  },
+];
+---
+
+<ToolLayout
+  slug="qr"
+  title="QR Code Studio — design QR codes with your brand"
+  description={description}
+  steps={steps}
+  faq={faq}
+>
+  {
+    /* client:load, not client:visible: matches every other tool — the island is the
+       whole reason the route exists and opens above the fold. */
+  }
+  <QrTool client:load />
+</ToolLayout>

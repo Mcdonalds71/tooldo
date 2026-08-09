@@ -1,0 +1,96 @@
+.qr-tool {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-lg);
+}
+
+/* Both panes get `min-width: 0` and the desktop grid below sizes its tracks with
+   `minmax(0, 1fr)` rather than a bare `1fr` — a bare `1fr` track won't shrink below
+   its content's natural width, which is what let the preview overflow on narrow
+   viewports before (see the invoice fix). */
+.qr-tool__form,
+.qr-tool__preview {
+  min-width: 0;
+}
+
+.qr-tool__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+@media (width >= 64rem) {
+  .qr-tool {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+.qr-tool__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.qr-tool__section-title {
+  font-family: var(--font-display);
+  font-weight: var(--weight-semibold);
+}
+
+.qr-tool__style-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: var(--space-sm);
+}
+
+.qr-tool__logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+}
+
+.qr-tool__logo-preview {
+  width: 2.5rem;
+  height: 2.5rem;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+  border: var(--hairline);
+  background-color: var(--color-card);
+}
+
+.qr-tool__preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border-radius: var(--card-radius);
+  border: var(--hairline);
+  background-color: var(--color-card);
+}
+
+/* No background of its own: the rendered code already carries its own quiet zone
+   (`buildQrConfig`'s `margin`) in whatever colour the style panel set, so a second
+   frame here would just be redundant chrome around chrome. */
+.qr-tool__canvas-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qr-tool__canvas {
+  line-height: 0;
+}
+
+.qr-tool__downloads {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2xs);
+}
+
+.qr-tool__hint {
+  color: var(--color-ink-faint);
+  font-size: var(--text-sm);
+  text-align: center;
+}
