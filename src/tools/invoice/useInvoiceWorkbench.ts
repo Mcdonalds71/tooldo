@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useToast } from '../../design-system/components/Toast';
 import { download } from '../../lib/download';
 import {
@@ -37,12 +37,21 @@ function newLineItem(): LineItem {
  */
 export function useInvoiceWorkbench() {
   const { notify } = useToast();
-  const [business, setBusiness] = useState<BusinessProfile>(() => loadBusinessProfile());
+  const [business, setBusiness] = useState<BusinessProfile>(EMPTY_BUSINESS_PROFILE);
   const [client, setClient] = useState<ClientInfo>(EMPTY_CLIENT);
   const [details, setDetails] = useState<InvoiceDetails>(EMPTY_DETAILS);
   const [lineItems, setLineItems] = useState<readonly LineItem[]>(() => [newLineItem()]);
   const [stage, setStage] = useState<Stage>({ name: 'editing' });
   const running = useRef<AbortController | null>(null);
+
+  // A saved profile lives in localStorage, which the static build can't see at
+  // render time — reading it in the initial `useState` (as this used to) makes the
+  // server's markup and the client's first hydration pass disagree for anyone with
+  // one saved, which React can only recover from by discarding and re-rendering the
+  // whole tree. Loading it here instead runs strictly after hydration, client-only.
+  useEffect(() => {
+    setBusiness(loadBusinessProfile());
+  }, []);
 
   const totals = useMemo(
     () => calculateTotals(lineItems, details.taxRate, details.discountRate),
