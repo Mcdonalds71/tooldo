@@ -220,6 +220,34 @@ the same split the image tool already draws between `imageMath.ts` and its own
 The sample is drawn, not shipped — a plain mock dashboard, deliberately unstyled
 going in, since demonstrating the styling is the tool's whole job.
 
+**Tool 8, Text Toolbox** (`/text`) — the suite's first `Data & text` tool, and the
+first with two real modes under one shared toolbar. Edit: live counts, a set of
+cleanup toggles (trim lines, collapse spaces, collapse blank lines, trim the whole
+text's edges), a case converter, and a live result field, all recomputed with a
+plain `useMemo` on every keystroke. Compare: two text areas and a genuine line-level
+diff — added, removed, and unchanged lines, not a same-or-different flag — with a
+count of each. No Worker anywhere, confirmed rather than assumed: every operation
+here, the diff included at its capped size, is a synchronous string or array op
+finishing in a millisecond or two, the same reading ADR 0011 already gives the rest
+of the suite, not a new reason.
+
+The diff is a classic LCS backtrack, the standard textbook approach, written out with
+explicit `undefined` checks at every index rather than non-null assertions —
+`noUncheckedIndexedAccess` means the loop bounds alone don't prove safety to the
+compiler, and the checks double as documentation of which side advanced and why. 27
+unit tests, including the cases worth getting right on purpose rather than by luck:
+identical text, completely different text, an empty side, a pure insertion, a pure
+deletion, and interleaved changes — all passed first try, which is the result you
+want from writing the tests before trusting the algorithm, not a reason to have
+skipped them.
+
+UPPERCASE, lowercase, Title Case, and Sentence case all preserve the original line
+breaks, reading the text as prose. camelCase, snake_case, and kebab-case collapse it
+to one line, reading the text as a single identifier — that's inherent to what those
+conventions mean, not an inconsistency, and the FAQ says so. The word tokenizer also
+splits on existing camelCase/snake_case/kebab-case boundaries, so converting *between*
+conventions works, not only converting away from plain prose.
+
 ## Next
 
 The rest of the `planned` roster in `lib/tools.ts`, each through the `new-tool` skill.
@@ -348,6 +376,12 @@ Recorded properly in `docs/adr/`. The ones that catch people out:
   dropzone instead of a form. Three tools now have their own reason to deviate from
   one of the suite's two standard shapes; check which reason actually applies before
   a fourth copies either one by default.
+- **Text Toolbox has no Worker for the plain ADR 0011 reason, not a new one.** Worth
+  noting precisely because it's the boring case — the third tool now without a
+  Worker, and the first one where "the work is too cheap to move" is genuinely all
+  there is to say about it, no DOM dependency (ADR 0012) or state-machine wrinkle
+  (ADR 0013) layered on top. Not every deviation needs its own ADR; this one just
+  needed checking, which is the actual habit worth keeping.
 
 ## How we work
 

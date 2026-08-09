@@ -56,6 +56,13 @@
   --color-warning: #d97706;
   --color-danger: #dc2626;
 
+  /* Text Toolbox's line diff — tinted, not the raw saturated status colour, so a
+     whole line of background reads as a hint rather than an alarm. */
+  --diff-added-bg: color-mix(in srgb, var(--color-success) 12%, var(--color-paper));
+  --diff-added-text: var(--color-success);
+  --diff-removed-bg: color-mix(in srgb, var(--color-danger) 12%, var(--color-paper));
+  --diff-removed-text: var(--color-danger);
+
   /* Type. Clash Display tops out at 700 — map any heavier heading down to 600/700. */
   --font-display: "Clash Display", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
