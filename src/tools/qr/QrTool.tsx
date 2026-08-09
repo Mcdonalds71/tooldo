@@ -1,7 +1,6 @@
 import { DownloadSimpleIcon, TrashIcon, UploadSimpleIcon } from '@phosphor-icons/react/dist/ssr';
 import { useRef } from 'react';
 import { Button } from '../../design-system/components/Button';
-import { Card } from '../../design-system/components/Card';
 import { ColorField } from '../../design-system/components/ColorField';
 import { SelectField } from '../../design-system/components/SelectField';
 import { TextAreaField } from '../../design-system/components/TextAreaField';
@@ -24,7 +23,7 @@ function Workbench() {
   return (
     <div className="qr-tool">
       <div className="qr-tool__form">
-        <Card tone="calm" className="qr-tool__section">
+        <div className="qr-tool__section">
           <TextAreaField
             label="Content"
             value={content}
@@ -33,9 +32,9 @@ function Workbench() {
             hint={`${content.length}/${MAX_CONTENT_LENGTH}`}
             rows={3}
           />
-        </Card>
+        </div>
 
-        <Card tone="calm" className="qr-tool__section">
+        <div className="qr-tool__section">
           <h3 className="qr-tool__section-title">Style</h3>
           <div className="qr-tool__style-grid">
             <ColorField
@@ -95,7 +94,7 @@ function Workbench() {
               </Button>
             ) : null}
           </div>
-        </Card>
+        </div>
 
         <Button variant="ghost" size="sm" onClick={actions.trySample}>
           Try a sample
