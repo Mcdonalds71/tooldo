@@ -14,14 +14,6 @@ test('the home page shows every registered tool', async ({ page }) => {
   }
 });
 
-test('no tool card links to a page that does not exist yet', async ({ page }) => {
-  await page.goto('/');
-
-  for (const tool of tools.filter((candidate) => candidate.status === 'planned')) {
-    await expect(page.locator(`#tools a[href="/${tool.slug}"]`)).toHaveCount(0);
-  }
-});
-
 /**
  * Runs under the reduced-motion project too, which is the point: the bento has to
  * reach its resting state from CSS alone, without waiting on GSAP.

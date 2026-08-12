@@ -275,11 +275,52 @@ a drop goes straight to `processing`. Column sorting is a plain client-side re-o
 of already-parsed rows (numeric-looking columns sort as numbers, not lexicographically
 — "10" doesn't come before "2"), never a reason to touch the Worker a second time.
 
+**Tool 9, and the last on the roster, Video Compressor** (`/video`). Drop a video and
+shrink it for chat and email — cap the resolution, aim for a quality or a target size —
+or convert it to a GIF, then download the finished file. It closes out the nine-tool
+roster CLAUDE.md names, though it took a real detour to get there.
+
+It was built first against ffmpeg.wasm, the tool this category usually reaches for:
+self-hosted through Vite's own asset pipeline, `Cross-Origin-Embedder-Policy` scoped to
+`/video` alone for the multi-threaded core's `SharedArrayBuffer` requirement — the plan
+`public/_headers` had been carrying since the WASM CSP fix (ADR 0007). It typechecked,
+linted, and passed its unit tests. Then an actual production build, checked against the
+real deploy target rather than assumed, found `ffmpeg-core.wasm` at 30.7MB
+single-threaded and 31.2MB multi-threaded — both over Cloudflare Workers' hard 25MB
+per-asset limit, confirmed straight from the pinned `wrangler` package's own upload code.
+`wrangler deploy` would have rejected the build outright, and dropping the
+multi-threaded core doesn't rescue it: the single-threaded one alone is still over.
+
+The engine is rebuilt on [Mediabunny](https://mediabunny.dev) (pure TypeScript,
+WebCodecs-based, zero dependencies) for the MP4 path and `gifenc` (pure JS, no WASM) for
+GIF, since GIF isn't one of Mediabunny's own output formats. Full reasoning, including
+exactly what carried over from the ffmpeg draft and what didn't, in ADR 0015. No WASM
+blob means no cross-origin isolation requirement either — the COEP scoping and the
+core/core-mt fallback are gone from `public/_headers` and `astro.config.mjs` again.
+`dist/` for the whole site measures 17MB; nothing in it is over 3.4MB.
+
+Video Compressor also lands back on the standard `runInWorker`/`client.ts`/`worker.ts`
+shape every other file-in tool uses — Mediabunny doesn't spawn a worker of its own the
+way `FFmpeg.load()` did, so there's no exception to make here, unlike the ffmpeg draft's
+own reasoning would have needed. The sample clip is generated, not shipped, the same
+principle as every other tool's own sample: a bouncing vermilion circle on paper-and-ink,
+encoded straight through Mediabunny's `CanvasSource`. `computeScaledDimensions` (cap the
+longest side, never upscale, round to even for the codec) and
+`computeTargetVideoBitrateKbps` (solve a bitrate from a byte budget and the clip's own
+duration) are the pure, tested core; the actual decode/encode/mux orchestration in
+`engine.ts` isn't, the same split every WASM- or codec-bound tool in the suite draws
+between its own math and its own browser-API calls. 15 unit tests, 3 Playwright specs
+across desktop, mobile and reduced-motion (9 runs).
+
+Checking a real production build against the actual deploy target, not just typecheck
+and unit tests, is what caught the ffmpeg problem before it ever reached `main` — the
+reason this tool was given its own session in the first place.
+
 ## Next
 
-The rest of the `planned` roster in `lib/tools.ts`, each through the `new-tool` skill.
-The landing page's upload animation comes after the tools, not before — deliberately
-reordered from the original plan.
+All nine tools are live — the roster `lib/tools.ts` and CLAUDE.md name is complete.
+What's left is the landing page's upload animation, deliberately saved for after the
+tools rather than before.
 
 **Not in the PDF tool, deliberately.** Compression, because pdf-lib copies page streams
 untouched and anything honest would mean re-encoding images and losing quality — the FAQ
@@ -415,6 +456,15 @@ Recorded properly in `docs/adr/`. The ones that catch people out:
   hunch. A hand-written parser isn't a shortcut here; it's the more disciplined
   choice; read the ADR before assuming the stack list itself is still current for
   every entry in it.
+- **Video Compressor doesn't use ffmpeg.wasm, despite CLAUDE.md naming it** (ADR 0015).
+  The build was working and every local check passed; a real production build checked
+  against Cloudflare Workers' actual 25MB per-asset limit is what caught that
+  `ffmpeg-core.wasm` couldn't ship at all, over 30MB either build. The engine is
+  WebCodecs via Mediabunny and `gifenc` instead — no WASM, no cross-origin isolation
+  requirement, and `runInWorker` fits the tool normally again, unlike the exception the
+  ffmpeg draft would have needed. Read the ADR before assuming the stack list is
+  current for this entry either, or before reaching for `@ffmpeg/*` in a future tool
+  without checking the asset size first.
 
 ## How we work
 

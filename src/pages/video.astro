@@ -1,0 +1,68 @@
+---
+import ToolLayout, { type FaqEntry } from '../layouts/ToolLayout.astro';
+import { VideoTool } from '../tools/video/VideoTool';
+import '../tools/video/video.css';
+
+const description =
+  'Drop a video and shrink it for chat and email, or turn it into a GIF — pick a resolution cap and a quality or size target, then download the finished file. Everything runs in your browser.';
+
+const steps = [
+  {
+    title: 'Drop your video',
+    body: 'MP4, MOV, WebM, MKV, or AVI, up to 500 MB.',
+  },
+  {
+    title: 'Pick a format and a size',
+    body: 'Compress it and cap the resolution, aim for a target size, or convert it to a GIF.',
+  },
+  {
+    title: 'Download it',
+    body: 'Save the finished file, ready to send.',
+  },
+];
+
+const faq: readonly FaqEntry[] = [
+  {
+    question: 'Does this upload my video anywhere?',
+    answer:
+      'No. Compression runs entirely in your browser, through the same video decoding and encoding your browser already has built in — nothing is sent to a server.',
+  },
+  {
+    question: 'What file types can I drop in?',
+    answer: 'MP4, MOV, WebM, MKV, or AVI, up to 500 MB.',
+  },
+  {
+    question: 'Can I hit an exact file size?',
+    answer:
+      "Target size gets close, not exact — it works out a bitrate from your clip's length and encodes in a single pass, which real footage can miss by a bit either way. If you need to be under a hard limit, aim a little under it.",
+  },
+  {
+    question: 'Does the compressed video keep its audio?',
+    answer: "Yes. A GIF never carries audio — that's the format, not a limit of this tool.",
+  },
+  {
+    question: 'Does this work in every browser?',
+    answer:
+      "It needs a browser with modern video encoding built in — recent Chrome, Edge, and Safari all qualify. If yours doesn't, the tool says so rather than failing silently.",
+  },
+  {
+    question: 'Can I trim or cut the video before compressing?',
+    answer:
+      'Not yet — this tool compresses or converts the whole clip you drop. Trim it in your phone or editor first if you only need part of it.',
+  },
+];
+---
+
+<ToolLayout
+  slug="video"
+  title="Video Compressor — shrink video for chat, email, or GIF"
+  description={description}
+  steps={steps}
+  faq={faq}
+>
+  {
+    /* client:load, not client:visible: matches every other tool — the island is the
+       whole reason the route exists and opens above the fold. */
+  }
+  <VideoTool client:load />
+</ToolLayout>

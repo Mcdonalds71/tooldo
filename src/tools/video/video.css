@@ -1,0 +1,59 @@
+/*
+ * The Video Compressor workbench.
+ *
+ * Dense working UI throughout — the option panel and the queue both stay in the
+ * restraint rule's calm register (hairlines, no hard shadow); the dropzone above them
+ * carries the only loud surface, matching every other tool.
+ */
+
+.video-tool {
+  position: relative;
+}
+
+.video-tool__board {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.video-tool__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2xs);
+}
+
+@media (width < 40rem) {
+  .video-tool__actions {
+    display: grid;
+  }
+}
+
+.video-tool__preview {
+  display: block;
+  max-width: 100%;
+  max-height: 24rem;
+  margin-inline: auto;
+  border-radius: var(--card-radius);
+}
+
+/* ---- the option panel ---- */
+
+.video-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-md);
+}
+
+.video-options__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.video-options__label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-ink);
+}

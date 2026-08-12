@@ -67,7 +67,7 @@ export const tools = [
     description: 'Shrink video for chat, email, or GIF.',
     category: 'Media & utilities',
     icon: FilmStripIcon,
-    status: 'planned',
+    status: 'live',
   },
   {
     slug: 'invoice',
