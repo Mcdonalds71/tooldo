@@ -5,7 +5,7 @@ description: The end-to-end recipe for adding a tool to tooldo. Use whenever cre
 
 # Skill: new-tool
 
-Adds one tool to the suite. Follow every step in order. The point is that all ten tools are **structurally identical** — same shape, same quality — so the suite reads as one designed system. Obey `CLAUDE.md` throughout.
+Adds one tool to the suite. Follow every step in order. The point is that all nine tools are **structurally identical** — same shape, same quality — so the suite reads as one designed system. Obey `CLAUDE.md` throughout.
 
 ## Before you start
 

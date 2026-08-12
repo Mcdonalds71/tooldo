@@ -5,7 +5,7 @@ description: How to build interactive, non-boring empty states for tooldo. Use w
 
 # Skill: empty-state
 
-Empty states are where most tools feel dead — and where ours feel alive. Every "nothing here yet" moment is a **mini-onboarding plus a demo**, never a shrug. Use the shared `<EmptyState>` component so the polish is automatic across all ten tools. Obey `CLAUDE.md`.
+Empty states are where most tools feel dead — and where ours feel alive. Every "nothing here yet" moment is a **mini-onboarding plus a demo**, never a shrug. Use the shared `<EmptyState>` component so the polish is automatic across all nine tools. Obey `CLAUDE.md`.
 
 ## Principles
 

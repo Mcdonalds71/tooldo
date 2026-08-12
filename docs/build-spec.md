@@ -41,7 +41,7 @@ Concretely, your differentiators:
 
 1. **Nothing uploads.** Same privacy truth as Squoosh, stated as the headline promise. This is a *marketing hook*, not just a feature: *"Your files never leave your device."*
 2. **Batch everywhere.** The #1 Squoosh complaint is "20 photos = 20 clicks." You do drag-a-folder, queue, process-all, download-a-zip on every relevant tool. This alone beats Squoosh for real work.
-3. **One taste-level design system across ten tools.** Nobody in this category has craft. That's exactly why it reads as a portfolio piece — and why founders/recruiters remember it.
+3. **One taste-level design system across nine tools.** Nobody in this category has craft. That's exactly why it reads as a portfolio piece — and why founders/recruiters remember it.
 4. **No accounts, no ads, no rate limits.** The anti-dark-pattern positioning. Open source underlines the trust.
 5. **Offline-first PWA.** Visit once, use forever without internet. Great story, near-free to add with Astro/Vite PWA plugin.
 
@@ -163,7 +163,7 @@ Run ffmpeg.wasm, jsquash codecs, and the background-removal model **inside Web W
 
 ## 4. Design system
 
-This is the spine of the whole thing — the part that makes ten tools feel like one product and reads as senior design work.
+This is the spine of the whole thing — the part that makes nine tools feel like one product and reads as senior design work.
 
 ### 4.1 Design tokens (CSS variables → Tailwind theme)
 
@@ -264,7 +264,7 @@ Define everything as CSS custom properties in `tokens.css`, then map them into T
 
 **Inputs** take the same tactile treatment (chunky ink border + hard shadow), and on focus the shadow flips to vermilion — this is the accessible way to get the soft "neumo" feel you liked without its contrast problems.
 
-**The restraint rule (keeps it classy at ten-tools scale):** go **full neo-brut on the hero surfaces** — buttons, dropzones, tool cards, empty states, the landing. Keep the **dense working UI calmer** — option panels, data tables, long forms use lighter borders and no hard shadows, so real work stays comfortable. Loud where it delights, quiet where it works.
+**The restraint rule (keeps it classy at nine-tools scale):** go **full neo-brut on the hero surfaces** — buttons, dropzones, tool cards, empty states, the landing. Keep the **dense working UI calmer** — option panels, data tables, long forms use lighter borders and no hard shadows, so real work stays comfortable. Loud where it delights, quiet where it works.
 
 Reference implementation for all of the above (buttons, states, tactile input, dramatic dropzone) lives in `docs/inspiration/button-and-upload-style.html`.
 
@@ -319,7 +319,7 @@ Great instinct — empty states are where most tools feel dead, and where yours 
 - **Contextual empties beyond the first load:** no results after a filter ("Nothing matches 'x' — clear filters"), an error empty ("That file isn't a PDF — try another"), an offline empty. Each with a clear next action, never a dead end.
 - **Micro-delight, sparingly.** A subtle cursor-reactive tilt on the illustration, a staggered fade-in of the hint text, a tip that rotates. One tasteful beat per empty state — not a circus.
 
-Build one `<EmptyState>` component (icon/illustration slot, headline, subtext, primary action, optional "try sample") so all ten tools share the pattern and the polish is automatic.
+Build one `<EmptyState>` component (icon/illustration slot, headline, subtext, primary action, optional "try sample") so all nine tools share the pattern and the polish is automatic.
 
 ---
 
@@ -356,7 +356,7 @@ Pick **one easing + one duration family** and use them everywhere. Inconsistent 
 - Skeletons for anything that loads (model, ffmpeg engine) so there's never a blank flash.
 
 **Tier 3 — Landing showpieces (high, GSAP).** This is where recruiters go "whoa":
-- Hero: a scroll-driven or WebGL-lite moment — e.g. a gradient/mesh that reacts to cursor, or the ten tool icons assembling into a grid on load (GSAP timeline, staggered).
+- Hero: a scroll-driven or WebGL-lite moment — e.g. a gradient/mesh that reacts to cursor, or the nine tool icons assembling into a grid on load (GSAP timeline, staggered).
 - Scroll-triggered reveals for each section (GSAP ScrollTrigger), parallax on the privacy section.
 - An animated "before/after" hero demo showing an image compressing live.
 - Keep it **tasteful and fast** — one or two big moments, not a carnival. Award sites win on restraint + one unforgettable beat.
@@ -436,7 +436,7 @@ You're already architected for this, and it's worth understanding *why* it's a n
 - **Contribution surface.** Others may add tools/translations, which only grows the suite.
 
 **Make the repo itself a portfolio artifact:**
-- A **README** with hero image, live link, the "one system, ten tools, built solo" line, stack badges, and a GIF per tool.
+- A **README** with hero image, live link, the "one system, nine tools, built solo" line, stack badges, and a GIF per tool.
 - `CONTRIBUTING.md`, an MIT `LICENSE`, conventional commits, a tidy history.
 - **Screenshots/GIFs** in the README (huge — most people judge a repo in 10 seconds).
 - GitHub Actions: typecheck + lint + unit tests on PR. Green checks read as "this person ships properly."
@@ -448,7 +448,7 @@ You're already architected for this, and it's worth understanding *why* it's a n
 
 ## 10. Portfolio case study framing
 
-**Title:** *"One design system. Ten tools. Built solo."*
+**Title:** *"One design system. Nine tools. Built solo."*
 
 **The narrative arc (what makes founders/recruiters DM you):**
 1. **Insight** — the market is ugly, leaky, and ad-ridden *or* pretty but narrow. Show the gap (§1).
@@ -457,7 +457,7 @@ You're already architected for this, and it's worth understanding *why* it's a n
 4. **Ship** — "built solo, AI-native workflow, 10 tools live, open source, 100 Lighthouse." Link every tool. Link the repo.
 5. **Proof** — usage numbers once live (even "X files processed, 0 uploaded"), GitHub stars, any tweets.
 
-**Placement:** your Work section with the **Products / Landing Pages / Labs** filter you noted. This is the flagship "Product" entry. Lead the case study with a 10-second hero video montage of all ten tools' best moments.
+**Placement:** your Work section with the **Products / Landing Pages / Labs** filter you noted. This is the flagship "Product" entry. Lead the case study with a 10-second hero video montage of all nine tools' best moments.
 
 **Why it converts:** it simultaneously proves *design-system thinking* (the thing companies pay seniors for), *shipping ability* (10 live tools), and *modern workflow* (AI-native, solo). Most portfolios prove at most one. Yours proves three in one artifact.
 
@@ -551,7 +551,7 @@ docs/
   inspiration/       # your reference screenshots (button, fonts, layouts)
 ```
 
-**The README — make it a showpiece** (this is what most people actually see): a clean hero banner/logo, one-line pitch, the privacy promise, a live-demo link, an animated GIF per flagship tool, a concise "Architecture" section with a small diagram, the stack with reasoning, "run locally" steps, and the "One system, ten tools, built solo" story with a link to your portfolio. Add badges (build passing, license, Lighthouse score). A `docs/architecture.md` that explains the decisions is the thing that makes a senior engineer nod.
+**The README — make it a showpiece** (this is what most people actually see): a clean hero banner/logo, one-line pitch, the privacy promise, a live-demo link, an animated GIF per flagship tool, a concise "Architecture" section with a small diagram, the stack with reasoning, "run locally" steps, and the "One system, nine tools, built solo" story with a link to your portfolio. Add badges (build passing, license, Lighthouse score). A `docs/architecture.md` that explains the decisions is the thing that makes a senior engineer nod.
 
 ---
 
