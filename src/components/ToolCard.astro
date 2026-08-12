@@ -6,12 +6,17 @@ export type ToolCardSize = 'lg' | 'md' | 'sm';
 interface Props {
   tool: Tool;
   size?: ToolCardSize;
+  watermark?: boolean;
 }
 
-const { tool, size = 'sm' } = Astro.props;
+const { tool, size = 'sm', watermark } = Astro.props;
 const { icon: Glyph, status } = tool;
 const isLive = status === 'live';
 const Wrapper = isLive ? 'a' : 'div';
+/** Defaults to the two tall cards, but a caller can opt a wide `sm` card in too
+ *  (PDF Toolbox: short but six columns wide, so it has the same kind of spare
+ *  room a tall card has, just running sideways instead of underneath). */
+const hasWatermark = watermark ?? (size === 'lg' || size === 'md');
 ---
 
 <Wrapper
@@ -21,6 +26,17 @@ const Wrapper = isLive ? 'a' : 'div';
   data-status={status}
   data-size={size}
 >
+  {
+    /* Only the two cards tall enough to leave real space above a bottom-anchored
+       block get one — a single-row card has nothing worth covering. Same glyph as
+       the real icon, just huge and faint, so it reads as texture rather than a
+       second, competing icon. */
+    hasWatermark && (
+      <span class="card__watermark" aria-hidden="true">
+        <Glyph size="var(--watermark-size)" weight="duotone" />
+      </span>
+    )
+  }
   <span class="card__icon">
     <Glyph size="var(--tool-icon-glyph)" weight="duotone" aria-hidden />
   </span>
@@ -36,8 +52,14 @@ const Wrapper = isLive ? 'a' : 'div';
     position: relative;
     display: flex;
     flex-direction: column;
+    /* Bottom-left for every size, not just the feature card — consistency is the
+       point. On a card exactly as tall as its own content this is a no-op; on the
+       two the bento hands real spare height, it's what keeps the icon and text from
+       reading as stuck to the top of a box someone stretched. */
+    justify-content: flex-end;
     height: 100%;
     padding: var(--space-md);
+    overflow: hidden;
     border: var(--card-border);
     border-radius: var(--card-radius);
     box-shadow: var(--card-shadow);
@@ -53,6 +75,15 @@ const Wrapper = isLive ? 'a' : 'div';
   a.card:focus-visible {
     transform: translate(var(--card-lift), var(--card-lift));
     box-shadow: var(--card-shadow-hover);
+  }
+
+  .card__watermark {
+    position: absolute;
+    top: -12%;
+    right: -10%;
+    color: var(--color-ink);
+    opacity: 0.07;
+    pointer-events: none;
   }
 
   .card__icon {
@@ -71,10 +102,11 @@ const Wrapper = isLive ? 'a' : 'div';
       rotate var(--dur-base) var(--ease-out);
   }
 
-  /* The row layout at `md` needs this the way any flex child holding text does — a
-     long tool name would otherwise refuse to shrink below its own natural width and
-     push the card wider than its grid cell. */
+  /* The bento hands this card varied widths, and a flex child holding text refuses to
+     shrink below its own natural width by default — without this, a long tool name in
+     a narrow column pushes the card wider than the grid cell it's been placed in. */
   .card__text {
+    position: relative;
     min-width: 0;
   }
 
@@ -108,13 +140,32 @@ const Wrapper = isLive ? 'a' : 'div';
 
   /* Bento sizing is desktop-only (the grid itself only spans cards from this width
      up, in index.astro) — below it every card renders identically regardless of the
-     size it's been assigned, which is the "mobile view stays normal" promise. */
+     size it's been assigned, which is the "mobile view stays normal" promise. Shadow
+     weight, the watermark and the feature card's colour all follow the same gate:
+     mobile is the plain card throughout, no exceptions. */
   @media (width >= 64rem) {
-    .card[data-size='lg'] {
-      --tool-icon-size: 72px;
-      --tool-icon-glyph: 2.25rem;
-      justify-content: center;
+    .card[data-size='sm'] {
+      --watermark-size: 9rem;
+    }
+
+    .card[data-size='md'] {
+      --tool-icon-size: 58px;
+      --tool-icon-glyph: 1.75rem;
+      --watermark-size: 15rem;
       padding: var(--space-lg);
+      box-shadow: var(--shadow-brut);
+    }
+
+    .card[data-size='md'] .card__name {
+      font-size: var(--text-xl);
+    }
+
+    .card[data-size='lg'] {
+      --tool-icon-size: 76px;
+      --tool-icon-glyph: 2.5rem;
+      --watermark-size: 19rem;
+      padding: var(--space-lg);
+      box-shadow: var(--shadow-brut-lifted);
     }
 
     .card[data-size='lg'] .card__name {
@@ -122,20 +173,17 @@ const Wrapper = isLive ? 'a' : 'div';
     }
 
     .card[data-size='lg'] .card__description {
+      max-width: 34ch;
       margin-top: var(--space-2xs);
-      font-size: var(--text-base);
+      font-size: var(--text-lg);
     }
 
-    /* Wide, not tall — the icon sits beside the text rather than above it, so the
-       extra width reads as one deliberate row instead of a small card adrift in it. */
-    .card[data-size='md'] {
-      flex-direction: row;
-      align-items: center;
-      gap: var(--space-md);
-    }
-
-    .card[data-size='md'] .card__icon {
-      margin-bottom: 0;
+    /* The one place the hot accent appears outside a control — the feature card is
+       the suite's single "primary" moment on this page, the same way a view gets one
+       vermilion button and no more. */
+    .card[data-size='lg'] .card__icon {
+      background-color: var(--color-signal-fill);
+      color: var(--color-on-signal);
     }
   }
 </style>

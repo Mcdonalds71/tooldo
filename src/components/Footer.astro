@@ -1,5 +1,6 @@
 ---
 import { SITE } from '../lib/site';
+import FooterSticker from './FooterSticker.astro';
 
 const year = new Date().getFullYear();
 ---
@@ -27,14 +28,19 @@ const year = new Date().getFullYear();
       <a href={SITE.author.url}>{SITE.author.name}</a> for the people of the internet.
     </p>
   </div>
+
+  <FooterSticker />
 </footer>
 
 <style>
   /* The charcoal footer is an inverse surface: the ink scale is tuned for paper and
-     goes muddy here, so muted text steps up to the line tone instead. */
+     goes muddy here, so muted text steps up to the line tone instead.
+
+     No bottom padding — the sticker is the last thing on the page and sits flush on
+     the bottom edge, so what's under it is its own tight viewBox and nothing else. */
   .footer {
     margin-top: var(--space-4xl);
-    padding-block: var(--space-3xl) var(--space-lg);
+    padding-top: var(--space-3xl);
     background-color: var(--color-char);
     color: var(--color-line);
   }
