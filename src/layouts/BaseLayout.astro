@@ -14,6 +14,14 @@ interface Props {
 const { title, description = SITE.description, noindex = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const shareImage = new URL('/og/og.png', Astro.site);
+
+// Cloudflare Web Analytics: cookieless page-view counting, the one thing /privacy
+// names as ever acceptable to add. The token is per-Cloudflare-account, not a secret
+// (it ships inside a public <script> tag every visitor's browser downloads), but it
+// still lives in an env var rather than the repo — see docs/deploy.md — so a build
+// without it configured (a fork, a local preview) just carries no beacon rather than
+// someone else's token or a broken one.
+const analyticsToken = import.meta.env.CF_ANALYTICS_TOKEN;
 ---
 
 <!doctype html>
@@ -60,6 +68,17 @@ const shareImage = new URL('/og/og.png', Astro.site);
     <meta name="twitter:card" content="summary_large_image" />
 
     <ClientRouter />
+
+    {
+      analyticsToken && (
+        <script
+          is:inline
+          defer
+          src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon={JSON.stringify({ token: analyticsToken })}
+        />
+      )
+    }
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>

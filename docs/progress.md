@@ -465,6 +465,13 @@ Recorded properly in `docs/adr/`. The ones that catch people out:
   ffmpeg draft would have needed. Read the ADR before assuming the stack list is
   current for this entry either, or before reaching for `@ffmpeg/*` in a future tool
   without checking the asset size first.
+- **`connect-src` is no longer `'self'` alone** (ADR 0016). Cloudflare Web Analytics —
+  cookieless, no fingerprinting, opt-in per build via `CF_ANALYTICS_TOKEN` — is the one
+  named exception, chosen specifically because `/privacy` had already committed to
+  exactly this shape of tool before it existed. `src/headers.test.ts` asserts the
+  allowance is exactly Cloudflare's two beacon origins, nothing else; read the ADR
+  before assuming `connect-src 'self'` is still the whole story, or before adding a
+  second third-party host without the same scrutiny.
 
 ## How we work
 

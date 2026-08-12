@@ -24,14 +24,26 @@ describe('the shipped security headers', () => {
     expect(csp).toContain(directive);
   });
 
-  it('scopes connect-src to self alone — no tool makes an outbound request', () => {
-    // Every tool runs entirely on-device. A third-party host showing up here later
-    // should fail this test, not slip in unnoticed.
+  it('scopes connect-src to self plus exactly the analytics beacon, nothing else', () => {
+    // Every tool still runs entirely on-device — the one named exception is Cloudflare
+    // Web Analytics' cookieless beacon (ADR 0016), never a tool's own file or output.
+    // A second third-party host showing up here later should fail this test, not slip
+    // in unnoticed.
     const connectSrc = csp
       .split(';')
       .find((directive) => directive.trim().startsWith('connect-src'));
 
-    expect(connectSrc?.trim().split(/\s+/)).toEqual(['connect-src', "'self'"]);
+    expect(connectSrc?.trim().split(/\s+/)).toEqual([
+      'connect-src',
+      "'self'",
+      'https://cloudflareinsights.com',
+    ]);
+  });
+
+  it('scopes the analytics beacon script to exactly the Cloudflare Insights host', () => {
+    const scriptSrc = csp.split(';').find((directive) => directive.trim().startsWith('script-src'));
+
+    expect(scriptSrc).toContain('https://static.cloudflareinsights.com');
   });
 
   it('never allows full eval — only the narrower wasm-unsafe-eval the image codecs need', () => {
