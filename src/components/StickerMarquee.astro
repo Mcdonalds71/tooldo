@@ -1,0 +1,71 @@
+---
+import { SITE } from '../lib/site';
+
+/**
+ * The "sticker vibe" brand exploration, built fresh rather than traced from the
+ * reference — that mockup used a generic rounded sans, and the whole point here is
+ * Clash Display carrying the same puffy, die-cut feel. The outline is the page's own
+ * paper colour, not white — on this warm background that's what makes it read as a
+ * sticker cut from the same material it's sitting on, rather than a white label
+ * dropped on top of it.
+ *
+ * `-webkit-text-stroke` over an SVG outline: plain HTML text, so it repeats in the
+ * marquee track as cheaply as any other span, stays selectable and readable to a
+ * screen reader (moot here, since the track itself is aria-hidden — the wordmark
+ * already appears as real text in the nav and footer).
+ *
+ * Sixteen repeats is comfortably wider than any real viewport at the largest clamp
+ * size, so the seamless half-loop never shows a gap even on an ultrawide monitor.
+ */
+const REPEATS = 16;
+---
+
+<section class="marquee" aria-hidden="true">
+  <div class="marquee__track">
+    {
+      Array.from({ length: REPEATS * 2 }).map(() => (
+        <span class="marquee__word">{SITE.name}</span>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .marquee {
+    overflow: hidden;
+    padding-block: var(--space-xl);
+  }
+
+  .marquee__track {
+    display: flex;
+    align-items: center;
+    width: max-content;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .marquee__track {
+      animation: marquee-scroll 32s linear infinite;
+    }
+  }
+
+  .marquee__word {
+    flex-shrink: 0;
+    padding-inline: var(--space-lg);
+    font-family: var(--font-display);
+    font-weight: var(--weight-bold);
+    font-size: clamp(2.75rem, 7vw, 6rem);
+    line-height: 1;
+    color: var(--color-ink);
+    text-transform: lowercase;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    -webkit-text-stroke: 0.09em var(--color-paper);
+    filter: drop-shadow(0.045em 0.045em 0 var(--color-ink));
+  }
+
+  @keyframes marquee-scroll {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+</style>

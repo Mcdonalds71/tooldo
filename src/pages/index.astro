@@ -1,10 +1,28 @@
 ---
 import Hero from '../components/Hero.astro';
-import ToolCard from '../components/ToolCard.astro';
+import StickerMarquee from '../components/StickerMarquee.astro';
+import ToolCard, { type ToolCardSize } from '../components/ToolCard.astro';
 import Reveal from '../design-system/motion/Reveal.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE } from '../lib/site';
-import { tools } from '../lib/tools';
+import { type ToolSlug, tools } from '../lib/tools';
+
+/**
+ * The bento sizing for the suite grid, desktop only (ToolCard and the grid itself both
+ * gate the visual difference behind the same breakpoint — mobile renders every card
+ * identically regardless of what's assigned here). Invoice Generator is the one `lg`
+ * card by design; the two `md` cards reuse `POPULAR_SLUGS`' own "these three are
+ * promoted" signal rather than inventing a second, unrelated notion of importance.
+ */
+const CARD_SIZE: Partial<Record<ToolSlug, ToolCardSize>> = {
+  invoice: 'lg',
+  pdf: 'md',
+  images: 'md',
+};
+
+function cardSize(slug: ToolSlug): ToolCardSize {
+  return CARD_SIZE[slug] ?? 'sm';
+}
 ---
 
 <BaseLayout title={`${SITE.name} — ${SITE.tagline}`}>
@@ -23,14 +41,18 @@ import { tools } from '../lib/tools';
       <ul class="tools__grid">
         {
           tools.map((tool) => (
-            <li>
-              <ToolCard tool={tool} />
+            <li class="tools__item" data-size={cardSize(tool.slug)}>
+              <ToolCard tool={tool} size={cardSize(tool.slug)} />
             </li>
           ))
         }
       </ul>
     </div>
   </section>
+
+  <Reveal>
+    <StickerMarquee />
+  </Reveal>
 </BaseLayout>
 
 <style>
@@ -58,5 +80,24 @@ import { tools } from '../lib/tools';
     margin-top: var(--space-xl);
     text-align: start;
     list-style: none;
+  }
+
+  /* Bento, desktop only — a phone screen has no room for a card twice the width of
+     its neighbours to read as anything but cramped, so under this width every card
+     stays the plain equal-sized grid above. */
+  @media (width >= 64rem) {
+    .tools__grid {
+      grid-template-columns: repeat(4, 1fr);
+      grid-auto-flow: dense;
+    }
+
+    .tools__item[data-size='lg'] {
+      grid-column: span 2;
+      grid-row: span 2;
+    }
+
+    .tools__item[data-size='md'] {
+      grid-column: span 2;
+    }
   }
 </style>

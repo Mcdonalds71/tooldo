@@ -1,11 +1,14 @@
 ---
 import type { Tool } from '../lib/tools';
 
+export type ToolCardSize = 'lg' | 'md' | 'sm';
+
 interface Props {
   tool: Tool;
+  size?: ToolCardSize;
 }
 
-const { tool } = Astro.props;
+const { tool, size = 'sm' } = Astro.props;
 const { icon: Glyph, status } = tool;
 const isLive = status === 'live';
 const Wrapper = isLive ? 'a' : 'div';
@@ -16,19 +19,24 @@ const Wrapper = isLive ? 'a' : 'div';
   id={`tool-${tool.slug}`}
   href={isLive ? `/${tool.slug}` : undefined}
   data-status={status}
+  data-size={size}
 >
   <span class="card__icon">
     <Glyph size="var(--tool-icon-glyph)" weight="duotone" aria-hidden />
   </span>
-  <h3 class="card__name">{tool.name}</h3>
-  <p class="card__description">{tool.description}</p>
+  <div class="card__text">
+    <h3 class="card__name">{tool.name}</h3>
+    <p class="card__description">{tool.description}</p>
+  </div>
   {!isLive && <span class="card__status">Soon</span>}
 </Wrapper>
 
 <style>
   .card {
     position: relative;
-    display: block;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
     padding: var(--space-md);
     border: var(--card-border);
     border-radius: var(--card-radius);
@@ -49,6 +57,7 @@ const Wrapper = isLive ? 'a' : 'div';
 
   .card__icon {
     display: grid;
+    flex-shrink: 0;
     place-items: center;
     width: var(--tool-icon-size);
     height: var(--tool-icon-size);
@@ -60,6 +69,13 @@ const Wrapper = isLive ? 'a' : 'div';
       background-color var(--dur-base) var(--ease-out),
       color var(--dur-base) var(--ease-out),
       rotate var(--dur-base) var(--ease-out);
+  }
+
+  /* The row layout at `md` needs this the way any flex child holding text does — a
+     long tool name would otherwise refuse to shrink below its own natural width and
+     push the card wider than its grid cell. */
+  .card__text {
+    min-width: 0;
   }
 
   a.card:hover .card__icon {
@@ -88,5 +104,38 @@ const Wrapper = isLive ? 'a' : 'div';
     letter-spacing: var(--tracking-eyebrow);
     text-transform: uppercase;
     color: var(--color-ink-faint);
+  }
+
+  /* Bento sizing is desktop-only (the grid itself only spans cards from this width
+     up, in index.astro) — below it every card renders identically regardless of the
+     size it's been assigned, which is the "mobile view stays normal" promise. */
+  @media (width >= 64rem) {
+    .card[data-size='lg'] {
+      --tool-icon-size: 72px;
+      --tool-icon-glyph: 2.25rem;
+      justify-content: center;
+      padding: var(--space-lg);
+    }
+
+    .card[data-size='lg'] .card__name {
+      font-size: var(--text-2xl);
+    }
+
+    .card[data-size='lg'] .card__description {
+      margin-top: var(--space-2xs);
+      font-size: var(--text-base);
+    }
+
+    /* Wide, not tall — the icon sits beside the text rather than above it, so the
+       extra width reads as one deliberate row instead of a small card adrift in it. */
+    .card[data-size='md'] {
+      flex-direction: row;
+      align-items: center;
+      gap: var(--space-md);
+    }
+
+    .card[data-size='md'] .card__icon {
+      margin-bottom: 0;
+    }
   }
 </style>
