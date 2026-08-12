@@ -1,0 +1,108 @@
+---
+import { ArrowRightIcon } from '@phosphor-icons/react/dist/ssr';
+import { buttonClass } from '../design-system/components/Button';
+import Reveal from '../design-system/motion/Reveal.astro';
+import { tools } from '../lib/tools';
+
+/**
+ * The last thing before the footer sticker, and the loudest surface on the page after
+ * the hero — charcoal, so the vermilion button lands on it harder than it could on
+ * paper, and the eye has somewhere to finish.
+ */
+---
+
+<section class="closing">
+  <div class="shell">
+    <Reveal>
+      <div class="closing__card">
+        <h2 class="closing__heading">Got a file to fix?</h2>
+        <p class="closing__body">
+          Pick a tool and go. No sign-up, nothing to install, and {tools.length} of them waiting.
+        </p>
+        <a class={`${buttonClass({ variant: 'primary', size: 'lg' })} closing__cta`} href="/#tools">
+          Open the tools
+          <ArrowRightIcon size="1em" weight="bold" aria-hidden />
+        </a>
+      </div>
+    </Reveal>
+  </div>
+</section>
+
+<style>
+  .closing {
+    padding-block: var(--space-2xl);
+  }
+
+  .closing__card {
+    position: relative;
+    padding: var(--space-3xl) var(--space-lg);
+    overflow: hidden;
+    border: var(--brut-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-brut-lifted);
+    background-color: var(--color-char);
+    color: var(--color-paper);
+    text-align: center;
+  }
+
+  /* Two warm blooms rather than one centred behind the text, so the panel has a
+     direction to it and the button isn't sitting in the middle of a halo.
+     `pointer-events: none` is load-bearing, not hygiene: `::after` is the last box in
+     the card and paints over the button, so without it the glow swallows the click —
+     which is exactly what the mobile run of `e2e/landing.spec.ts` caught. */
+  .closing__card::before,
+  .closing__card::after {
+    content: '';
+    position: absolute;
+    width: 30rem;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    pointer-events: none;
+    background: radial-gradient(
+      circle,
+      color-mix(in srgb, var(--color-signal) 34%, transparent),
+      transparent 68%
+    );
+  }
+
+  .closing__card::before {
+    top: -60%;
+    left: -8%;
+  }
+
+  .closing__card::after {
+    right: -8%;
+    bottom: -60%;
+  }
+
+  .closing__heading,
+  .closing__body,
+  .closing__cta {
+    position: relative;
+  }
+
+  .closing__heading {
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-tight);
+  }
+
+  .closing__body {
+    max-width: var(--width-prose);
+    margin: var(--space-sm) auto 0;
+    font-size: var(--text-lg);
+    color: var(--color-line);
+  }
+
+  .closing__cta {
+    margin-top: var(--space-lg);
+  }
+
+  .closing__cta svg {
+    transition: translate var(--dur-base) var(--ease-out);
+  }
+
+  .closing__cta:hover svg {
+    translate: 0.25em 0;
+  }
+</style>

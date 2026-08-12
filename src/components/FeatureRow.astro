@@ -1,0 +1,94 @@
+---
+import { ArrowRightIcon } from '@phosphor-icons/react/dist/ssr';
+
+interface Props {
+  heading: string;
+  body: string;
+  href: string;
+  linkLabel: string;
+  /** Puts the artwork on the left. Alternating rows stop the section reading as a list. */
+  flip?: boolean;
+}
+
+const { heading, body, href, linkLabel, flip = false } = Astro.props;
+---
+
+<div class="row" data-flip={flip}>
+  <div class="row__text">
+    <h3 class="row__heading">{heading}</h3>
+    <p class="row__body">{body}</p>
+    <a class="row__link" href={href}>
+      {linkLabel}
+      <ArrowRightIcon size="1em" weight="bold" aria-hidden />
+    </a>
+  </div>
+
+  <div class="row__visual">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: var(--space-2xl);
+  }
+
+  .row + .row {
+    margin-top: var(--space-2xl);
+  }
+
+  /* Order rather than direction, so the DOM keeps text before artwork and a screen
+     reader hears every row the same way round however it happens to be laid out. */
+  .row[data-flip='true'] .row__text {
+    order: 2;
+  }
+
+  .row__heading {
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-tight);
+  }
+
+  .row__body {
+    max-width: 42ch;
+    margin-top: var(--space-sm);
+    font-size: var(--text-lg);
+    color: var(--color-ink-soft);
+  }
+
+  .row__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    margin-top: var(--space-md);
+    font-weight: var(--weight-semibold);
+    color: var(--color-signal-dark);
+    text-decoration: none;
+  }
+
+  /* The arrow leads the way out on hover — the one bit of motion a text link gets. */
+  .row__link svg {
+    transition: translate var(--dur-base) var(--ease-out);
+  }
+
+  .row__link:hover svg,
+  .row__link:focus-visible svg {
+    translate: 0.25em 0;
+  }
+
+  @media (width < 56rem) {
+    .row {
+      grid-template-columns: 1fr;
+      gap: var(--space-lg);
+    }
+
+    /* Artwork under text on every row on a phone — alternating sides needs two
+       columns to be legible as a rhythm, and one column just makes it look random. */
+    .row[data-flip='true'] .row__text {
+      order: 0;
+    }
+  }
+</style>

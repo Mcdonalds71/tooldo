@@ -1,0 +1,102 @@
+---
+import type { Icon } from '@phosphor-icons/react/lib';
+
+interface Props {
+  glyph: Icon;
+  lead: string;
+  trail: string;
+}
+
+/**
+ * The artwork half of a feature row: a neo-brutalist frame with a glass panel inside it.
+ *
+ * That pairing is the rule from CLAUDE.md rather than a style choice — the frame is
+ * chrome and stays hard-edged, while what's inside is purely drawn, has no hit target
+ * and never takes focus, so it's allowed to be soft. Warmed from paper and signal
+ * rather than borrowed cool violet, or it reads as a component from another product.
+ */
+const { glyph: Glyph, lead, trail } = Astro.props;
+---
+
+<div class="visual" aria-hidden="true">
+  <span class="visual__glyph">
+    <Glyph size="7rem" weight="duotone" />
+  </span>
+  <span class="visual__chip visual__chip--lead">{lead}</span>
+  <span class="visual__chip visual__chip--trail">{trail}</span>
+</div>
+
+<style>
+  .visual {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 17rem;
+    padding: var(--space-xl);
+    overflow: hidden;
+    border: var(--brut-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-brut);
+    background-image: var(--glass-gradient);
+    background-color: var(--color-card);
+  }
+
+  /* A warm bloom behind the glyph so the panel has a light source instead of reading
+     as a flat swatch. Sized in percentages so it tracks the panel at every width. */
+  .visual::before {
+    content: '';
+    position: absolute;
+    width: 78%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    pointer-events: none;
+    background: radial-gradient(
+      circle,
+      color-mix(in srgb, var(--color-signal) 22%, transparent),
+      transparent 68%
+    );
+  }
+
+  .visual__glyph {
+    position: relative;
+    display: grid;
+    place-items: center;
+    color: var(--color-ink);
+  }
+
+  .visual__chip {
+    position: absolute;
+    padding: var(--space-3xs) var(--space-xs);
+    border: var(--brut-border);
+    border-radius: var(--radius-full);
+    box-shadow: var(--card-shadow);
+    background-color: var(--color-card);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    white-space: nowrap;
+  }
+
+  /* Tucked toward opposite corners rather than centred, so the panel reads as a
+     composition with depth instead of three things stacked on one axis. */
+  .visual__chip--lead {
+    top: 14%;
+    left: 8%;
+    rotate: -4deg;
+  }
+
+  .visual__chip--trail {
+    right: 8%;
+    bottom: 14%;
+    rotate: 3deg;
+    background-color: var(--color-signal-fill);
+    border-color: var(--color-ink);
+    color: var(--color-on-signal);
+  }
+
+  @media (width < 48rem) {
+    .visual {
+      min-height: 13rem;
+      padding: var(--space-lg);
+    }
+  }
+</style>

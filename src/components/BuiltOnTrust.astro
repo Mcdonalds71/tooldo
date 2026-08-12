@@ -1,0 +1,147 @@
+---
+import {
+  CloudSlashIcon,
+  CurrencyDollarSimpleIcon,
+  EyeSlashIcon,
+  GitBranchIcon,
+  UserCircleDashedIcon,
+  WifiSlashIcon,
+} from '@phosphor-icons/react/dist/ssr';
+import Reveal from '../design-system/motion/Reveal.astro';
+import { SITE } from '../lib/site';
+
+const REASONS = [
+  {
+    glyph: CloudSlashIcon,
+    heading: 'Nothing uploads',
+    body: 'Your files are processed on your device and never sent anywhere.',
+  },
+  {
+    glyph: GitBranchIcon,
+    heading: 'Open source',
+    body: 'Every line is public on GitHub. Read it, fork it, check it yourself.',
+    href: SITE.repo,
+  },
+  {
+    glyph: WifiSlashIcon,
+    heading: 'Works offline',
+    body: 'Once a tool has loaded, it runs with no connection needed.',
+  },
+  {
+    glyph: UserCircleDashedIcon,
+    heading: 'No accounts',
+    body: 'No email walls, no passwords, and no profile to manage.',
+  },
+  {
+    glyph: EyeSlashIcon,
+    heading: 'No ads or trackers',
+    body: 'A quiet interface with nothing following you around.',
+  },
+  {
+    glyph: CurrencyDollarSimpleIcon,
+    heading: 'Free forever',
+    body: 'No trials, no tiers, and no paywall halfway through.',
+  },
+];
+---
+
+<section id="trust" class="trust">
+  <div class="shell">
+    <Reveal>
+      <p class="eyebrow">built on trust</p>
+      <h2 class="trust__heading">Why you can rely on it.</h2>
+    </Reveal>
+
+    <ul class="trust__grid">
+      {
+        REASONS.map(({ glyph: Glyph, heading, body, href }) => (
+          <li>
+            <Reveal>
+              <article class="reason">
+                <span class="reason__icon">
+                  <Glyph size="1.5rem" weight="duotone" aria-hidden />
+                </span>
+                <div>
+                  <h3 class="reason__heading">
+                    {href ? (
+                      <a class="reason__link" href={href} rel="noreferrer">
+                        {heading}
+                      </a>
+                    ) : (
+                      heading
+                    )}
+                  </h3>
+                  <p class="reason__body">{body}</p>
+                </div>
+              </article>
+            </Reveal>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .trust {
+    padding-block: var(--space-2xl);
+  }
+
+  .trust__heading {
+    margin-top: var(--space-xs);
+    margin-bottom: var(--space-xl);
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-tight);
+  }
+
+  .trust__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    gap: var(--space-md) var(--space-xl);
+    list-style: none;
+  }
+
+  /* Six short facts, not six more cards. This is the calm end of the restraint rule —
+     the loud surfaces on this page are the bento, the install card and the closing
+     call, and stacking a seventh set of hard shadows here would flatten all of them. */
+  .reason {
+    display: flex;
+    align-items: start;
+    gap: var(--space-sm);
+    padding-block: var(--space-sm);
+    border-top: 1px solid var(--color-line);
+  }
+
+  .reason__icon {
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: var(--radius-sm);
+    background-color: var(--color-paper-dim);
+    color: var(--color-ink);
+  }
+
+  .reason__heading {
+    font-size: var(--text-base);
+    font-weight: var(--weight-bold);
+  }
+
+  .reason__link {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .reason__link:hover,
+  .reason__link:focus-visible {
+    color: var(--color-signal-dark);
+  }
+
+  .reason__body {
+    margin-top: var(--space-3xs);
+    font-size: var(--text-sm);
+    color: var(--color-ink-soft);
+  }
+</style>

@@ -1,6 +1,12 @@
 ---
+import BuiltOnTrust from '../components/BuiltOnTrust.astro';
+import ClosingCall from '../components/ClosingCall.astro';
 import Hero from '../components/Hero.astro';
+import InstallOnce from '../components/InstallOnce.astro';
+import OfflineProof from '../components/OfflineProof.astro';
+import ThePrice from '../components/ThePrice.astro';
 import ToolCard, { type ToolCardSize } from '../components/ToolCard.astro';
+import WhyDifferent from '../components/WhyDifferent.astro';
 import Reveal from '../design-system/motion/Reveal.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE } from '../lib/site';
@@ -102,6 +108,13 @@ function cellVars(cell: BentoCell): string {
       </ul>
     </div>
   </section>
+
+  <WhyDifferent />
+  <OfflineProof />
+  <InstallOnce />
+  <ThePrice />
+  <BuiltOnTrust />
+  <ClosingCall />
 </BaseLayout>
 
 <style>

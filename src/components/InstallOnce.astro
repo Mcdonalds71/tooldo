@@ -1,0 +1,187 @@
+---
+import { DeviceMobileIcon, LightningIcon, WifiSlashIcon } from '@phosphor-icons/react/dist/ssr';
+import Reveal from '../design-system/motion/Reveal.astro';
+import { SITE } from '../lib/site';
+
+/**
+ * Deliberately careful copy. The service worker precaches the site but not each tool's
+ * engine (ADR 0017), so a tool you have never opened still needs a connection the first
+ * time. "The tools you've used keep working" is true; "everything works offline forever"
+ * is not, and this section is exactly where that would be tempting to write.
+ */
+const PILLS = [
+  { glyph: WifiSlashIcon, label: 'works offline' },
+  { glyph: DeviceMobileIcon, label: 'add to home screen' },
+  { glyph: LightningIcon, label: 'nothing to download' },
+];
+---
+
+<section class="install">
+  <div class="shell">
+    <Reveal>
+      <div class="install__card">
+        <div class="install__text">
+          <p class="eyebrow">offline-ready</p>
+          <h2 class="install__heading">Install it once, use it anywhere.</h2>
+          <p class="install__body">
+            Add {SITE.name} to your home screen and the tools you've opened keep working with no
+            connection at all — on a plane, on the underground, or with the wifi simply off.
+          </p>
+
+          <ul class="install__pills">
+            {
+              PILLS.map(({ glyph: Glyph, label }) => (
+                <li class="install__pill">
+                  <Glyph size="1.1em" weight="bold" aria-hidden />
+                  {label}
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+
+        <div class="install__stage" aria-hidden="true">
+          <div class="install__phone">
+            <img class="install__mark" src="/icon.svg" alt="" width="128" height="128" />
+            <span class="install__word">{SITE.name}</span>
+          </div>
+        </div>
+      </div>
+    </Reveal>
+  </div>
+</section>
+
+<style>
+  .install {
+    padding-block: var(--space-2xl);
+  }
+
+  .install__card {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    align-items: stretch;
+    overflow: hidden;
+    border: var(--brut-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-brut-lifted);
+    background-color: var(--color-card);
+  }
+
+  .install__text {
+    padding: var(--space-2xl);
+  }
+
+  .install__heading {
+    margin-top: var(--space-xs);
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-tight);
+  }
+
+  .install__body {
+    max-width: 44ch;
+    margin-top: var(--space-sm);
+    font-size: var(--text-lg);
+    color: var(--color-ink-soft);
+  }
+
+  .install__pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs);
+    margin-top: var(--space-lg);
+    list-style: none;
+  }
+
+  .install__pill {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3xs);
+    padding: var(--space-3xs) var(--space-xs);
+    border: var(--brut-border);
+    border-radius: var(--radius-full);
+    background-color: var(--color-paper);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+  }
+
+  /* The one charcoal surface on the page. An inverse panel is what makes a phone read
+     as a lit screen rather than a paper cut-out sitting on more paper. */
+  .install__stage {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 21rem;
+    overflow: hidden;
+    background-color: var(--color-char);
+  }
+
+  .install__stage::before {
+    content: '';
+    position: absolute;
+    top: -30%;
+    width: 26rem;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    pointer-events: none;
+    background: radial-gradient(
+      circle,
+      color-mix(in srgb, var(--color-signal) 42%, transparent),
+      transparent 70%
+    );
+  }
+
+  .install__phone {
+    position: relative;
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: var(--space-2xs);
+    width: 9.5rem;
+    aspect-ratio: 9 / 16;
+    border: var(--brut-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-brut);
+    background-color: var(--color-paper);
+  }
+
+  .install__mark {
+    width: 3.5rem;
+    height: 3.5rem;
+  }
+
+  .install__word {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-tight);
+  }
+
+  /* A slow breathing lift, so the phone reads as the live thing on the page. Paused
+     entirely rather than slowed for anyone who asked for less movement. */
+  @media (prefers-reduced-motion: no-preference) {
+    .install__phone {
+      animation: install-float 4.5s var(--ease-in-out) infinite alternate;
+    }
+  }
+
+  @keyframes install-float {
+    to {
+      transform: translateY(-0.75rem);
+    }
+  }
+
+  @media (width < 56rem) {
+    .install__card {
+      grid-template-columns: 1fr;
+    }
+
+    .install__text {
+      padding: var(--space-lg);
+    }
+
+    .install__stage {
+      min-height: 17rem;
+    }
+  }
+</style>

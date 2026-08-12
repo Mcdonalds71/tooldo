@@ -1,0 +1,67 @@
+---
+import { PackageIcon, ShieldCheckIcon, SquaresFourIcon } from '@phosphor-icons/react/dist/ssr';
+import Reveal from '../design-system/motion/Reveal.astro';
+import { tools } from '../lib/tools';
+import FeatureRow from './FeatureRow.astro';
+import FeatureVisual from './FeatureVisual.astro';
+---
+
+<section id="different" class="different">
+  <div class="shell">
+    <Reveal>
+      <p class="eyebrow">why it's different</p>
+      <h2 class="different__heading">Keep the simple things simple.</h2>
+    </Reveal>
+
+    <Reveal>
+      {/* The link deliberately isn't "Read the privacy promise": the hero already
+          carries that exact label, and two links sharing one accessible name and one
+          destination read as a duplicate in a screen reader's link list. */}
+      <FeatureRow
+        heading="Everything runs in your browser."
+        body="There's no server doing the work, so your files are never uploaded and nobody sees them but you. Close the tab and they're gone."
+        href="/privacy"
+        linkLabel="Read the promise in full"
+      >
+        <FeatureVisual glyph={ShieldCheckIcon} lead="0 uploads" trail="on your device" />
+      </FeatureRow>
+    </Reveal>
+
+    <Reveal>
+      <FeatureRow
+        flip
+        heading="Batch it, don't babysit it."
+        body="Drop a whole folder, set your options once, and take the lot back in a single pass. No twenty clicks, no waiting on one file at a time."
+        href="/images"
+        linkLabel="Try the image converter"
+      >
+        <FeatureVisual glyph={PackageIcon} lead="48 files" trail="one pass" />
+      </FeatureRow>
+    </Reveal>
+
+    <Reveal>
+      <FeatureRow
+        heading={`One look across all ${tools.length}.`}
+        body="Every tool shares the same buttons, spacing, and motion. Learn one and you've learned the rest."
+        href="/#tools"
+        linkLabel="Browse the tools"
+      >
+        <FeatureVisual glyph={SquaresFourIcon} lead="one system" trail={`${tools.length} tools`} />
+      </FeatureRow>
+    </Reveal>
+  </div>
+</section>
+
+<style>
+  .different {
+    padding-block: var(--space-2xl);
+  }
+
+  .different__heading {
+    margin-top: var(--space-xs);
+    margin-bottom: var(--space-2xl);
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-tight);
+  }
+</style>
