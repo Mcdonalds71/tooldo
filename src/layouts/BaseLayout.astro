@@ -22,6 +22,13 @@ const shareImage = new URL('/og/og.png', Astro.site);
 // without it configured (a fork, a local preview) just carries no beacon rather than
 // someone else's token or a broken one.
 const analyticsToken = import.meta.env.CF_ANALYTICS_TOKEN;
+
+// Registered after load so fetching the shell never competes with rendering the page
+// the visitor is actually looking at. Production only: the manifest the worker imports
+// is written by the build, so in dev there would be nothing for it to import.
+const REGISTER_WORKER = `if('serviceWorker' in navigator){
+  addEventListener('load',function(){navigator.serviceWorker.register('/sw.js')})
+}`;
 ---
 
 <!doctype html>
@@ -68,6 +75,8 @@ const analyticsToken = import.meta.env.CF_ANALYTICS_TOKEN;
     <meta name="twitter:card" content="summary_large_image" />
 
     <ClientRouter />
+
+    {import.meta.env.PROD && <script is:inline set:html={REGISTER_WORKER} />}
 
     {
       analyticsToken && (

@@ -319,8 +319,13 @@ reason this tool was given its own session in the first place.
 ## Next
 
 All nine tools are live — the roster `lib/tools.ts` and CLAUDE.md name is complete.
-What's left is the landing page's upload animation, deliberately saved for after the
-tools rather than before.
+The site is also genuinely offline-capable now (ADR 0017), which closes a real gap
+rather than adding a feature: the manifest had been advertising **Install app** since it
+was written, with nothing registering a service worker behind it.
+
+What's left is the landing page — the story sections below the suite grid, the closing
+call to action, and the upload animation, all deliberately saved for after the tools
+rather than before.
 
 **Not in the PDF tool, deliberately.** Compression, because pdf-lib copies page streams
 untouched and anything honest would mean re-encoding images and losing quality — the FAQ
@@ -343,6 +348,12 @@ Recorded properly in `docs/adr/`. The ones that catch people out:
   file. See `public/fonts/README.md`.
 - **`'unsafe-inline'` is allowed for scripts and styles** (ADR 0004). Astro's CSP hashing
   silently kills every Radix and Motion inline style, and there is no backend to protect.
+- **The service worker is hand-written, and skips every tool engine on purpose**
+  (ADR 0017). `@vite-pwa/astro` peers Astro `^1–^5` and this repo is on 7, so the build
+  spec's recommendation is stale. The precache is *the site* (~1.8MB); a tool's worker
+  and WASM (~9.2MB of the 17MB build) load the first time that tool runs. So a tool you
+  have never opened still needs a connection once — say "the tools you've used keep
+  working", never "everything works offline".
 - **Astro was upgraded across two majors before tool 1** (ADR 0005). Four pages is the
   cheapest that migration will ever be.
 - **`pnpm-workspace.yaml` gates install scripts.** Only listed packages may run them.

@@ -64,7 +64,7 @@ Keep a one-line "why this is different" on the landing page and in the case stud
 | **Landing scroll/hero animation** | **GSAP** (free as of 2025, incl. ScrollTrigger) | The engine behind most award-winning sites. Use it *only* on the landing page for scroll-driven, timeline-heavy hero moments. Don't reach for it inside tools. |
 | **Icons** | **Phosphor (duotone)** — not Lucide | Premium, characterful, six weights incl. duotone. Duotone at large sizes reads far richer than Lucide's hairline outlines. Free + open source. See §4.5 for the full icon strategy. |
 | **State (per tool)** | React local state + **Zustand** if a tool gets complex | Most tools need nothing beyond `useState`/`useReducer`. Zustand only where a tool has a lot of cross-component state. |
-| **PWA / offline** | `@vite-pwa/astro` | One plugin → installable, offline-capable. |
+| **PWA / offline** | hand-written `public/sw.js` | `@vite-pwa/astro` peers Astro `^1–^5`; we are on 7. See ADR 0017. |
 | **Package manager** | **pnpm** | Fast, disk-efficient, monorepo-friendly if you ever split. |
 | **Lint/format** | **Biome** (or ESLint + Prettier) | Biome is one fast tool for both; clean for a solo repo. |
 

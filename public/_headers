@@ -50,3 +50,12 @@
 
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
+
+# The worker and its precache list are the one pair that must never be served stale:
+# they are how every other cached thing gets replaced, so an HTTP cache holding an old
+# copy would pin visitors to an old build with no way to tell them otherwise.
+/sw.js
+  Cache-Control: no-cache
+
+/sw-manifest.js
+  Cache-Control: no-cache
