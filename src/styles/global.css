@@ -109,6 +109,25 @@
     text-transform: uppercase;
     color: var(--color-signal-dark);
   }
+
+  /*
+   * A text box is taller than the letters inside it: half the leading sits above the
+   * cap height, and the descender space sits below the baseline. Every section that
+   * opens with an eyebrow therefore *looked* further from the divider above it than a
+   * section opening with a card, even though both boxes sat exactly the same distance
+   * away — measured at 64px of box against 68px of visible ink. Trimming the box to
+   * the cap height and the baseline makes the two agree, so equal spacing in the CSS
+   * is equal spacing to the eye.
+   *
+   * Guarded because it is only in Chromium so far; without support the eyebrow keeps
+   * its untrimmed box, which is exactly today's behaviour rather than a broken one.
+   */
+  @supports (text-box-trim: trim-both) {
+    .eyebrow {
+      text-box-trim: trim-both;
+      text-box-edge: cap alphabetic;
+    }
+  }
 }
 
 /* Motion gates JS animation through useReducedMotion; this catches CSS and anything

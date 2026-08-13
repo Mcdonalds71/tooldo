@@ -11,10 +11,15 @@ import { tools } from '../lib/tools';
  */
 ---
 
+{
+  /* The card is full-bleed and the Reveal sits *inside* it, wrapping only the content.
+     A transform on the band itself would pull its own edges away from the viewport
+     edges and the footer it's flush against, flashing paper in the seams mid-scroll. */
+}
 <section class="closing">
-  <div class="shell">
-    <Reveal>
-      <div class="closing__card">
+  <div class="closing__card">
+    <div class="shell">
+      <Reveal from="scale">
         <h2 class="closing__heading">Got a file to fix?</h2>
         <p class="closing__body">
           Pick a tool and go. No sign-up, nothing to install, and {tools.length} of them waiting.
@@ -23,26 +28,34 @@ import { tools } from '../lib/tools';
           Open the tools
           <ArrowRightIcon size="1em" weight="bold" aria-hidden />
         </a>
-      </div>
-    </Reveal>
+      </Reveal>
+    </div>
   </div>
 </section>
 
 <style>
-  .closing {
-    padding-block: var(--space-2xl);
-  }
-
+  /* No padding on the section at all: the divider above owns the gap on that side,
+     and the bottom is flush against the footer by design — the two dark surfaces meet
+     with no paper between them and read as one closing block. */
   .closing__card {
     position: relative;
-    padding: var(--space-3xl) var(--space-lg);
+    /* The seam value, and the only reason this isn't just `--space-3xl` all round:
+       the bottom half of the gap at the footer boundary lives here and the top half
+       lives on `.footer`, so the two have to be written as the same token. Change one,
+       change the other. */
+    padding-block: var(--space-3xl) var(--space-2xl);
     overflow: hidden;
-    border: var(--brut-border);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-brut-lifted);
     background-color: var(--color-char);
     color: var(--color-paper);
     text-align: center;
+  }
+
+  /* Full-bleed, so no border, no radius and no hard shadow: all three are ways of
+     showing an edge against the paper, and this surface no longer has one to show. */
+  @media (width < 56rem) {
+    .closing__card {
+      padding-block: var(--space-2xl) var(--space-xl);
+    }
   }
 
   /* Two warm blooms rather than one centred behind the text, so the panel has a
@@ -94,7 +107,17 @@ import { tools } from '../lib/tools';
     color: var(--color-line);
   }
 
+  /*
+   * The button's own default shadow is ink — right everywhere else it's used, since
+   * every other button sits on the paper page. Here it sits on this card's own
+   * charcoal fill, where an ink-on-ink shadow has no contrast to cast with — so this
+   * re-points the two tokens the shared Button component actually reads rather than
+   * duplicating its shadow logic. `--btn-shadow-press` is left alone on purpose: its
+   * value is a zero-offset shadow either way, invisible in ink or paper alike.
+   */
   .closing__cta {
+    --btn-shadow: 4px 4px 0 var(--color-paper);
+    --btn-shadow-hover: 6px 6px 0 var(--color-paper);
     margin-top: var(--space-lg);
   }
 

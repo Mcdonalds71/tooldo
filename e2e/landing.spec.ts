@@ -16,6 +16,102 @@ test('the story sections are all present and in order', async ({ page }) => {
   expect([...tops].sort((a, b) => a - b)).toEqual(tops);
 });
 
+/**
+ * Every gap around every divider has to be the same, above and below, at whatever
+ * viewport. Asserting the gaps are equal *to each other* rather than to a hardcoded
+ * number is deliberate: desktop and mobile use different values on purpose, and the
+ * invariant that matters is evenness, not a specific pixel count.
+ *
+ * The two traps this test exists to catch, both of which shipped before it did:
+ *   - a section with a min-height and centred content, whose *box* sits the correct
+ *     distance from the divider while its visible content sits hundreds of pixels away;
+ *   - a GSAP `pin`, whose `pin-spacer` is by construction as tall as the pin's scroll
+ *     range, leaving a spacer-sized hole once the pin releases.
+ * Both are invisible to a measurement of section boxes, so this walks the DOM for the
+ * lowest and highest actually-painted element instead.
+ */
+test('every section boundary has the same gap above and below', async ({ page }) => {
+  await page.goto('/');
+
+  const result = await page.evaluate(async () => {
+    // Finished state for every reveal, so this measures layout rather than whatever
+    // happened to be mid-animation at this scroll position.
+    const settled = document.createElement('style');
+    settled.textContent =
+      '.reveal{animation:none!important;opacity:1!important;transform:none!important;clip-path:none!important}';
+    document.head.appendChild(settled);
+    await new Promise((r) => requestAnimationFrame(() => setTimeout(r, 300)));
+
+    const order = ['.tools', '#different', '.proof', '.install', '#price', '#trust', '.closing'];
+    const dividers = [...document.querySelectorAll('.divider')];
+    const sections = order.map((sel) => document.querySelector(sel));
+
+    function paintedBounds(root: Element) {
+      let top = Number.POSITIVE_INFINITY;
+      let bottom = Number.NEGATIVE_INFINITY;
+      const walk = (el: Element) => {
+        const cs = getComputedStyle(el);
+        if (cs.display === 'none' || cs.visibility === 'hidden' || cs.opacity === '0') return;
+        const r = el.getBoundingClientRect();
+        const paints =
+          el.childElementCount === 0 ||
+          cs.backgroundColor !== 'rgba(0, 0, 0, 0)' ||
+          cs.borderTopWidth !== '0px' ||
+          cs.borderBottomWidth !== '0px';
+        if (paints && r.height > 0 && r.width > 0) {
+          top = Math.min(top, r.top);
+          bottom = Math.max(bottom, r.bottom);
+        }
+        for (const c of el.children) walk(c);
+      };
+      walk(root);
+      return { top, bottom };
+    }
+
+    return dividers.map((d, i) => {
+      const dRect = d.getBoundingClientRect();
+      const a = paintedBounds(sections[i] as Element);
+      const b = paintedBounds(sections[i + 1] as Element);
+      return {
+        between: `${order[i]} -> ${order[i + 1]}`,
+        above: Math.round(dRect.top - a.bottom),
+        below: Math.round(b.top - dRect.bottom),
+      };
+    });
+  });
+
+  expect(result).toHaveLength(6);
+
+  const first = result[0]?.above ?? 0;
+  expect(first).toBeGreaterThan(0);
+
+  for (const gap of result) {
+    // Symmetric around its own divider, and identical to every other boundary.
+    expect(gap, `${gap.between} is asymmetric`).toMatchObject({ above: first, below: first });
+  }
+});
+
+test('the closing block runs full-bleed and meets the footer with no seam', async ({ page }) => {
+  await page.goto('/');
+
+  const seam = await page.evaluate(() => {
+    const card = document.querySelector('.closing__card') as Element;
+    const footer = document.querySelector('.footer') as Element;
+    return {
+      cardWidth: Math.round(card.getBoundingClientRect().width),
+      viewportWidth: document.documentElement.clientWidth,
+      gap: Math.round(footer.getBoundingClientRect().top - card.getBoundingClientRect().bottom),
+      cardPaddingBottom: getComputedStyle(card).paddingBottom,
+      footerPaddingTop: getComputedStyle(footer).paddingTop,
+    };
+  });
+
+  expect(seam.cardWidth).toBe(seam.viewportWidth);
+  expect(seam.gap).toBe(0);
+  // Both halves of the seam are written from the same token, so they must agree.
+  expect(seam.cardPaddingBottom).toBe(seam.footerPaddingTop);
+});
+
 test('the offline section does not overpromise', async ({ page }) => {
   await page.goto('/');
   const install = page.locator('.install');
@@ -37,9 +133,13 @@ test('the closing call sends you back to the suite', async ({ page }) => {
 });
 
 /** Scrubbed motion is driven by rAF, so a frame has to actually be painted between
- *  the scroll and the sample or every read comes back on the start value. */
+ *  the scroll and the sample or every read comes back on the start value.
+ *
+ *  `behavior: 'instant'` overrides the site's global `scroll-behavior: smooth`, which
+ *  would otherwise animate the jump and leave the sample reading a position the page
+ *  is still travelling through rather than the one this asked for. */
 async function scrollAndSettle(page: Page, y: number) {
-  await page.evaluate((top) => window.scrollTo(0, top), y);
+  await page.evaluate((top) => window.scrollTo({ top, behavior: 'instant' }), y);
   await page.evaluate(
     () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
   );
@@ -56,10 +156,28 @@ test('the proof plays its beats as you scroll through it', async ({ page }, test
   test.skip(testInfo.project.name === 'mobile', 'the cord is not on screen below 56rem');
 
   await page.goto('/');
-  const anchor = await page.locator('.proof').first().boundingBox();
-  const top = anchor ? anchor.y : 0;
 
-  await scrollAndSettle(page, top);
+  /* The trigger runs `top bottom` -> `bottom top`: progress 0 when the section's top
+     edge reaches the viewport's bottom edge, progress 1 when its bottom edge reaches
+     the viewport's top. So the whole scrub spans (sectionHeight + viewportHeight) of
+     scrolling, and a given progress maps to a scroll position directly — no guessing
+     at multiples of the viewport, which is what broke when this section stopped being
+     pinned and its scroll range stopped being `+=180%`. */
+  const geometry = await page.evaluate(() => {
+    const section = document.querySelector('.proof') as HTMLElement;
+    const rect = section.getBoundingClientRect();
+    return {
+      top: rect.top + window.scrollY,
+      height: rect.height,
+      viewportHeight: window.innerHeight,
+    };
+  });
+
+  const atProgress = (p: number) =>
+    geometry.top - geometry.viewportHeight + p * (geometry.height + geometry.viewportHeight);
+
+  // The cord retracts between timeline 0.42 and 0.64, the stamp lands from 0.64.
+  await scrollAndSettle(page, atProgress(0.3));
   const wireAtStart = await page
     .locator('.proof__wire')
     .evaluate((el) => getComputedStyle(el).transform);
@@ -67,8 +185,7 @@ test('the proof plays its beats as you scroll through it', async ({ page }, test
     .locator('.proof__stamp')
     .evaluate((el) => getComputedStyle(el).opacity);
 
-  const viewport = page.viewportSize();
-  await scrollAndSettle(page, top + (viewport ? viewport.height : 800) * 1.7);
+  await scrollAndSettle(page, atProgress(0.95));
   const wireAtEnd = await page
     .locator('.proof__wire')
     .evaluate((el) => getComputedStyle(el).transform);
@@ -92,6 +209,91 @@ test('the proof rests on its finished frame without motion', async ({ page }, te
   await expect(page.locator('.proof__stamp')).toBeVisible();
   await expect(page.locator('.proof__done')).toBeVisible();
   expect(await page.locator('.pin-spacer').count()).toBe(0);
+});
+
+/**
+ * Absolute scroll positions computed from the element's own page geometry, the same
+ * pattern the GSAP proof test above uses — `scrollIntoViewIfNeeded` plus a guessed
+ * pixel offset was landing inconsistently inside or outside the animation's `entry`
+ * range depending on the element's height, which is exactly the flake that pattern
+ * exists to avoid.
+ */
+async function elementTop(locator: import('@playwright/test').Locator): Promise<number> {
+  const box = await locator.boundingBox();
+  const scrollY = await locator.page().evaluate(() => window.scrollY);
+  return (box?.y ?? 0) + scrollY;
+}
+
+test('section headings wipe into view rather than just appearing', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name === 'reduced-motion', 'motion is off there by design');
+
+  await page.goto('/');
+  const heading = page.locator('#different .reveal--mask').first();
+  const top = await elementTop(heading);
+  const viewportHeight = page.viewportSize()?.height ?? 800;
+
+  /** The right-hand inset of `inset(0px R% 0px 0px)` — how much of the element is
+   *  still hidden behind the wipe. 100 means untouched, 0 means fully revealed. */
+  function clipRightPercent(clipPath: string): number {
+    const match = clipPath.match(/inset\([^ ]+ ([\d.]+)%/);
+    return match?.[1] ? Number.parseFloat(match[1]) : 0;
+  }
+
+  // 0% entry: the element's top edge sits exactly at the viewport's bottom edge, so
+  // it has only just begun to enter and the wipe has barely started.
+  await scrollAndSettle(page, top - viewportHeight);
+  const before = await heading.evaluate((el) => getComputedStyle(el).clipPath);
+
+  // Scrolled well past the 32% completion point.
+  await scrollAndSettle(page, top - viewportHeight * 0.4);
+  const after = await heading.evaluate((el) => getComputedStyle(el).clipPath);
+
+  expect(before).not.toBe(after);
+  // Started almost fully hidden, ends almost fully revealed.
+  expect(clipRightPercent(before)).toBeGreaterThan(80);
+  expect(clipRightPercent(after)).toBeLessThan(5);
+});
+
+test('feature row text and artwork travel in from opposite sides', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name === 'reduced-motion', 'motion is off there by design');
+  test.skip(testInfo.project.name === 'mobile', 'directional reveals collapse to up on mobile');
+
+  await page.goto('/');
+  const row = page.locator('.row').first();
+  const text = row.locator('.row__text .reveal');
+  const visual = row.locator('.row__visual .reveal');
+
+  await expect(text).toHaveClass(/reveal--left/);
+  await expect(visual).toHaveClass(/reveal--right/);
+
+  const top = await elementTop(row);
+  const viewportHeight = page.viewportSize()?.height ?? 800;
+
+  /** translateX distance from a `matrix(a, b, c, d, tx, ty)` string — 'none' reads
+   *  as 0, matching the settled state without requiring the exact string. */
+  function translateXMagnitude(transform: string): number {
+    const match = transform.match(/matrix\(([^)]+)\)/);
+    if (!match?.[1]) return 0;
+    const parts = match[1].split(',').map((n) => Number.parseFloat(n.trim()));
+    return Math.abs(parts[4] ?? 0);
+  }
+
+  await scrollAndSettle(page, top - viewportHeight);
+  const textBefore = await text.evaluate((el) => getComputedStyle(el).transform);
+  const visualBefore = await visual.evaluate((el) => getComputedStyle(el).transform);
+
+  await scrollAndSettle(page, top - viewportHeight * 0.4);
+  const textAfter = await text.evaluate((el) => getComputedStyle(el).transform);
+  const visualAfter = await visual.evaluate((el) => getComputedStyle(el).transform);
+
+  expect(textAfter).not.toBe(textBefore);
+  expect(visualAfter).not.toBe(visualBefore);
+  // Both started meaningfully off-position and travelled back toward their resting
+  // place — text arrived from the left (negative tx), artwork from the right.
+  expect(translateXMagnitude(textBefore)).toBeGreaterThan(20);
+  expect(translateXMagnitude(visualBefore)).toBeGreaterThan(20);
+  expect(translateXMagnitude(textAfter)).toBeLessThan(5);
+  expect(translateXMagnitude(visualAfter)).toBeLessThan(5);
 });
 
 test('the trust grid names every promise once', async ({ page }) => {

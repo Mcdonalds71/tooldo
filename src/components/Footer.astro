@@ -1,6 +1,5 @@
 ---
 import { SITE } from '../lib/site';
-import FooterSticker from './FooterSticker.astro';
 
 const year = new Date().getFullYear();
 ---
@@ -28,19 +27,23 @@ const year = new Date().getFullYear();
       <a href={SITE.author.url}>{SITE.author.name}</a> for the people of the internet.
     </p>
   </div>
-
-  <FooterSticker />
 </footer>
 
 <style>
   /* The charcoal footer is an inverse surface: the ink scale is tuned for paper and
      goes muddy here, so muted text steps up to the line tone instead.
 
-     No bottom padding — the sticker is the last thing on the page and sits flush on
-     the bottom edge, so what's under it is its own tight viewBox and nothing else. */
+     No margin-top of its own: the closing card immediately above this sets its own
+     padding-bottom precisely so this gap matches every other section transition on
+     the page (the same value the divider system uses between story sections). A
+     margin here on top of that padding was two numbers doing one job, and the two
+     summed to a gap roughly twice the size of any other on the page. */
+  /* The top value is the other half of the seam with `.closing__card` above, which
+     sits flush against this with no paper between them — both sides of that join use
+     the same token deliberately, so the closing block's breathing room reads as
+     symmetrical rather than as one surface crowding the other. */
   .footer {
-    margin-top: var(--space-4xl);
-    padding-top: var(--space-3xl);
+    padding-block: var(--space-2xl) var(--space-3xl);
     background-color: var(--color-char);
     color: var(--color-line);
   }
@@ -89,5 +92,11 @@ const year = new Date().getFullYear();
     border-top: 1px solid color-mix(in srgb, var(--color-paper) 8%, transparent);
     font-size: var(--text-sm);
     color: var(--color-line);
+  }
+
+  @media (width < 56rem) {
+    .footer {
+      padding-block: var(--space-xl) var(--space-2xl);
+    }
   }
 </style>

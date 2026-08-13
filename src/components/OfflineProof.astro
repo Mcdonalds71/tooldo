@@ -3,8 +3,8 @@ import { CheckIcon, HardDrivesIcon } from '@phosphor-icons/react/dist/ssr';
 
 /**
  * The page's second and last big motion beat (the hero owns the first), and the only
- * one that argues rather than decorates: the section pins, the cable to the server is
- * pulled, and the work carries on finishing in front of you.
+ * one that argues rather than decorates: the cable to the server is pulled as you
+ * scroll, and the work carries on finishing in front of you.
  *
  * It earns the scroll because it is the product's actual claim rather than an effect —
  * there is no server in this architecture, so severing the line changes nothing, and
@@ -30,7 +30,15 @@ import { CheckIcon, HardDrivesIcon } from '@phosphor-icons/react/dist/ssr';
             <span class="proof__dot"></span>
           </div>
           <div class="proof__screen">
-            <p class="proof__file">holiday-photos.zip</p>
+            <div class="proof__filerow">
+              <p class="proof__file">holiday-photos.zip</p>
+              {/* The finished value, like every other resting state in this file: the
+                  bar is full and the done line is showing in plain CSS, so the number
+                  beside them has to agree. The timeline sets it back to 18% at the
+                  start of the scrub and counts it up from there — and on mobile, where
+                  the scrub never runs at all, this is the only value ever shown. */}
+              <span class="proof__percent" aria-hidden="true">100%</span>
+            </div>
             <div class="proof__track" aria-hidden="true">
               <span class="proof__fill"></span>
             </div>
@@ -58,14 +66,14 @@ import { CheckIcon, HardDrivesIcon } from '@phosphor-icons/react/dist/ssr';
 </section>
 
 <style>
-  .proof {
-    padding-block: var(--space-2xl);
-  }
-
+  /* No min-height: this section is exactly as tall as its content, like every other
+     one. It previously stood at 82svh with its content centred, which parked the
+     artwork in the middle of a near-empty screen — the gap a reader actually saw
+     either side of it ran to hundreds of pixels while the section *box* sat the same
+     64px from its dividers as everywhere else. Measuring boxes said the spacing was
+     even; looking at the page said otherwise, and the page was right. */
   .proof__pin {
     display: grid;
-    align-content: center;
-    min-height: 100svh;
   }
 
   .proof__heading {
@@ -110,10 +118,25 @@ import { CheckIcon, HardDrivesIcon } from '@phosphor-icons/react/dist/ssr';
     padding: var(--space-lg);
   }
 
+  .proof__filerow {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-sm);
+  }
+
   .proof__file {
     font-family: var(--font-mono);
     font-size: var(--text-sm);
     color: var(--color-ink-soft);
+  }
+
+  .proof__percent {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    font-variant-numeric: tabular-nums;
+    color: var(--color-signal-dark);
   }
 
   .proof__track {
@@ -154,6 +177,11 @@ import { CheckIcon, HardDrivesIcon } from '@phosphor-icons/react/dist/ssr';
   .proof__wire {
     width: 100%;
     height: 0.35rem;
+    /* Retracted at rest — the CSS default has to be the disconnected end of the
+       story, per this file's own doc comment, or reduced motion and no-JS would
+       show a wire that's still plugged in. The timeline's `.from()` below is what
+       makes it look connected at the top of the scrub and pull free by the middle. */
+    transform: scaleX(0);
     /* Origin at the device end, so retracting reads as the plug being pulled out of
        the server rather than the cable shrinking from both ends at once. */
     transform-origin: left center;
@@ -172,6 +200,7 @@ import { CheckIcon, HardDrivesIcon } from '@phosphor-icons/react/dist/ssr';
   }
 
   .proof__server {
+    position: relative;
     display: grid;
     place-items: center;
     gap: var(--space-3xs);
@@ -181,6 +210,35 @@ import { CheckIcon, HardDrivesIcon } from '@phosphor-icons/react/dist/ssr';
     box-shadow: var(--card-shadow);
     background-color: var(--color-card);
     color: var(--color-ink-faint);
+  }
+
+  /* A quiet idle tell, independent of scroll — the section has some life to it even
+     before anyone starts scrubbing through the beats below. */
+  .proof__server::before {
+    content: '';
+    position: absolute;
+    inset: -0.4rem;
+    border: 1.5px solid var(--color-line);
+    border-radius: inherit;
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .proof__server::before {
+      animation: proof-pulse-ring 2.6s var(--ease-out) infinite;
+    }
+  }
+
+  @keyframes proof-pulse-ring {
+    from {
+      opacity: 0.6;
+      scale: 1;
+    }
+
+    to {
+      opacity: 0;
+      scale: 1.35;
+    }
   }
 
   .proof__serverLabel {
@@ -215,22 +273,32 @@ import { CheckIcon, HardDrivesIcon } from '@phosphor-icons/react/dist/ssr';
       min-height: auto;
     }
 
-    /* The cable is a horizontal idea. On one column it has nothing to span, so the
-       device and the server stack and the wire steps out of the layout entirely. */
+    /* The cable is a horizontal idea, and with nothing to span it goes — and the
+       server goes with it, because a lone box labelled "server" with no line running
+       to it isn't context, it's a mystery. What's left is the thing the section is
+       actually about: the file finishing, with the stamp landing across the corner of
+       it the way a stamp lands on paper. */
     .proof__stage {
       grid-template-columns: 1fr;
-      gap: var(--space-md);
       justify-items: center;
     }
 
-    .proof__link {
+    .proof__link,
+    .proof__server {
       display: none;
     }
 
+    /* Sat across the lower corner of the card rather than hanging off its edge. The
+       stamp is rotated, and a rotated box's *bounding* box is taller than its layout
+       box — roughly 11px here — so anything that puts its edge near the section's
+       edge overruns the boundary and eats into the gap below it. Keeping it well
+       inside the card means the card's own bottom stays the section's bottom, and the
+       gap to the divider is the same as every other section's. */
     .proof__stamp {
       top: auto;
-      right: auto;
-      bottom: 0;
+      right: var(--space-md);
+      bottom: var(--space-lg);
+      translate: 0;
     }
   }
 </style>
@@ -251,29 +319,69 @@ import { CheckIcon, HardDrivesIcon } from '@phosphor-icons/react/dist/ssr';
      viewport to tell that story would cost a phone a screen of scrolling for nothing. */
   gsap.matchMedia().add('(prefers-reduced-motion: no-preference) and (width >= 56rem)', () => {
     const stage = document.querySelector('.proof__stage');
+    const percentEl = document.querySelector('.proof__percent');
     if (!stage) return;
+
+    /* A plain tween target rather than the DOM: GSAP can animate a number smoothly
+       through a scrub, but there's no CSS property to scrub text through, so the
+       number lives on this object and onUpdate writes it to the element by hand. */
+    const counter = { value: 18 };
 
     const timeline = gsap.timeline({
       scrollTrigger: {
         trigger: '.proof',
-        start: 'top top',
-        end: '+=180%',
-        pin: '.proof__pin',
+        /* Not pinned, deliberately. Pinning buys a viewport-hijacking moment at the
+           cost of a `pin-spacer` — an element as tall as the pin's whole scroll
+           range, inserted into the document. The pinned content sits at the top of
+           that spacer, so once the pin lets go there is a spacer-sized hole between
+           this section's artwork and whatever follows it: measured at 1360px here,
+           against the 64px every other section boundary uses. No arrangement of
+           `start`/`end` removes that hole, because the spacer *is* the scroll
+           distance the scrub needs.
+
+           Scrubbing across the section's own pass through the viewport instead costs
+           nothing in layout: the section stays exactly as tall as its content, the
+           gaps either side stay the shared 64px, and the beats still play under the
+           reader's thumb rather than on a timer. */
+        start: 'top bottom',
+        end: 'bottom top',
         scrub: 0.6,
       },
     });
 
     timeline
-      .from('.proof__fill', { scaleX: 0.18, ease: 'none' }, 0)
-      .from('.proof__done', { opacity: 0, y: 8, ease: 'none' }, 0)
-      .from('.proof__stamp', { opacity: 0, scale: 1.8, rotate: 6, ease: 'none' }, 0)
-      .fromTo('.proof__pulse', { opacity: 1, x: 0 }, { x: '100%', ease: 'none' }, 0)
+      // Beat one, 0 -> 0.4: the file finishes copying. Bar and counter move together
+      // since they're reporting the same number two ways.
+      .from('.proof__fill', { scaleX: 0.18, ease: 'none', duration: 0.4 }, 0)
+      .to(
+        counter,
+        {
+          value: 100,
+          ease: 'none',
+          duration: 0.4,
+          onUpdate: () => {
+            if (percentEl) percentEl.textContent = `${Math.round(counter.value)}%`;
+          },
+        },
+        0,
+      )
+      .from('.proof__done', { opacity: 0, y: 8, ease: 'none', duration: 0.1 }, 0.32)
+      .fromTo('.proof__pulse', { opacity: 1, x: 0 }, { x: '100%', ease: 'none', duration: 0.42 }, 0)
 
-      // The pull itself, held to the middle of the scroll so it reads as the turn in
-      // the story rather than something that happened on the way past.
-      .to('.proof__pulse', { opacity: 0, duration: 0.1 }, 0.35)
-      .to('.proof__wire', { scaleX: 0, ease: 'power2.in', duration: 0.25 }, 0.35)
-      .to('.proof__server', { opacity: 0.25, x: 24, ease: 'power2.in', duration: 0.25 }, 0.35);
+      // Beat two, 0.42 -> 0.64: the pull. The turn in the story, so it gets its own
+      // clear stretch of scroll rather than overlapping the first beat.
+      .to('.proof__pulse', { opacity: 0, duration: 0.06 }, 0.42)
+      .from('.proof__wire', { scaleX: 1, ease: 'power2.in', duration: 0.22 }, 0.42)
+      .to('.proof__server', { opacity: 0.25, x: 24, ease: 'power2.in', duration: 0.22 }, 0.42)
+
+      // Beat three, 0.64 -> 0.92: the stamp lands with a touch of overshoot — a scrub
+      // still honours an eased tween's own internal curve as you cross its range, it
+      // just isn't driven by a clock while doing it.
+      .from(
+        '.proof__stamp',
+        { opacity: 0, scale: 2, rotate: 10, ease: 'back.out(1.7)', duration: 0.28 },
+        0.64,
+      );
 
     return () => timeline.kill();
   });

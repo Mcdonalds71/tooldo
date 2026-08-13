@@ -39,6 +39,17 @@ const { glyph: Glyph, lead, trail } = Astro.props;
     box-shadow: var(--shadow-brut);
     background-image: var(--glass-gradient);
     background-color: var(--color-card);
+    transition:
+      transform var(--dur-base) var(--ease-out),
+      box-shadow var(--dur-base) var(--ease-out);
+  }
+
+  /* The one hover state on an otherwise decorative panel — it isn't a control, but a
+     hand resting near it still gets a reply, the same "feels alive" register as every
+     hoverable card elsewhere on the site. */
+  .visual:hover {
+    transform: translate(calc(var(--brut-lift) * 1.4), calc(var(--brut-lift) * 1.4));
+    box-shadow: var(--shadow-brut-lifted);
   }
 
   /* A warm bloom behind the glyph so the panel has a light source instead of reading
@@ -62,6 +73,11 @@ const { glyph: Glyph, lead, trail } = Astro.props;
     display: grid;
     place-items: center;
     color: var(--color-ink);
+    transition: rotate var(--dur-base) var(--ease-out);
+  }
+
+  .visual:hover .visual__glyph {
+    rotate: -8deg;
   }
 
   .visual__chip {
@@ -74,6 +90,7 @@ const { glyph: Glyph, lead, trail } = Astro.props;
     font-family: var(--font-mono);
     font-size: var(--text-xs);
     white-space: nowrap;
+    transition: translate var(--dur-base) var(--ease-out);
   }
 
   /* Tucked toward opposite corners rather than centred, so the panel reads as a
@@ -84,6 +101,10 @@ const { glyph: Glyph, lead, trail } = Astro.props;
     rotate: -4deg;
   }
 
+  .visual:hover .visual__chip--lead {
+    translate: -0.2rem -0.2rem;
+  }
+
   .visual__chip--trail {
     right: 8%;
     bottom: 14%;
@@ -91,6 +112,10 @@ const { glyph: Glyph, lead, trail } = Astro.props;
     background-color: var(--color-signal-fill);
     border-color: var(--color-ink);
     color: var(--color-on-signal);
+  }
+
+  .visual:hover .visual__chip--trail {
+    translate: 0.2rem 0.2rem;
   }
 
   @media (width < 48rem) {

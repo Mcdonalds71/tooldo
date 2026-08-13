@@ -47,7 +47,7 @@ const REASONS = [
 
 <section id="trust" class="trust">
   <div class="shell">
-    <Reveal>
+    <Reveal from="mask">
       <p class="eyebrow">built on trust</p>
       <h2 class="trust__heading">Why you can rely on it.</h2>
     </Reveal>
@@ -83,10 +83,6 @@ const REASONS = [
 </section>
 
 <style>
-  .trust {
-    padding-block: var(--space-2xl);
-  }
-
   .trust__heading {
     margin-top: var(--space-xs);
     margin-bottom: var(--space-xl);
@@ -143,5 +139,39 @@ const REASONS = [
     margin-top: var(--space-3xs);
     font-size: var(--text-sm);
     color: var(--color-ink-soft);
+  }
+
+  /* The auto-fit grid can land on two or three columns depending on width, and the
+     row/column tricks below only make sense once the count is fixed and known. Below
+     this, the auto-fit rule above stands and every reason keeps its top rule as the
+     only separator, mobile included. */
+  @media (width >= 64rem) {
+    .trust__grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    /* The first row's top rule sits right under the heading with nothing to divide
+       from — every other row's rule is doing real work (separating it from the row
+       above); the first one is just a line for its own sake. */
+    .trust__grid > li:nth-child(-n + 3) .reason {
+      border-top: none;
+    }
+
+    /* Short and centred in the column gap, not edge to edge — a full-height rule
+       would compete with the horizontal ones above; this only needs to say "new
+       column," not draw a cage around each item. */
+    .trust__grid > li:not(:nth-child(3n + 1)) .reason {
+      position: relative;
+    }
+
+    .trust__grid > li:not(:nth-child(3n + 1)) .reason::before {
+      content: '';
+      position: absolute;
+      top: 20%;
+      bottom: 20%;
+      left: calc(var(--space-xl) / -2);
+      width: 1px;
+      background-color: var(--color-line);
+    }
   }
 </style>

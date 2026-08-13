@@ -163,6 +163,9 @@
   --nav-float: var(--space-xs);
   --nav-gap-outer: var(--space-sm);
   --nav-gap-inner: var(--space-xs);
+  /* Measured off the real nav — 60px tall, floated 12px down — with room to spare, so
+     anything that pins on scroll comes to rest clear of it rather than under it. */
+  --sticky-below-nav: 5.5rem;
   /* Its own step rather than a new rung on the spacing scale: the clear paper under a
      floating capsule is a specific measurement, not a general one. Wider screens carry
      more of it, the way a poster needs a deeper margin than a postcard. */

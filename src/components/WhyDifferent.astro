@@ -8,12 +8,21 @@ import FeatureVisual from './FeatureVisual.astro';
 
 <section id="different" class="different">
   <div class="shell">
-    <Reveal>
+    <Reveal from="mask">
       <p class="eyebrow">why it's different</p>
       <h2 class="different__heading">Keep the simple things simple.</h2>
     </Reveal>
 
-    <Reveal>
+    {
+      /* No wrapping Reveal here — each FeatureRow reveals its own text and artwork
+         independently, from opposite sides, so a second animation-timeline wrapped
+         around the whole row would only fight the two already inside it. Spacing
+         moves to this flex container's own `gap` rather than a `.row + .row` margin,
+         which never actually matched: each row is FeatureRow's root element, and the
+         `+` combinator needs real DOM siblings, not two elements that both happen to
+         be the only child of their own wrapper. */
+    }
+    <div class="different__rows">
       {/* The link deliberately isn't "Read the privacy promise": the hero already
           carries that exact label, and two links sharing one accessible name and one
           destination read as a duplicate in a screen reader's link list. */}
@@ -25,9 +34,7 @@ import FeatureVisual from './FeatureVisual.astro';
       >
         <FeatureVisual glyph={ShieldCheckIcon} lead="0 uploads" trail="on your device" />
       </FeatureRow>
-    </Reveal>
 
-    <Reveal>
       <FeatureRow
         flip
         heading="Batch it, don't babysit it."
@@ -37,9 +44,7 @@ import FeatureVisual from './FeatureVisual.astro';
       >
         <FeatureVisual glyph={PackageIcon} lead="48 files" trail="one pass" />
       </FeatureRow>
-    </Reveal>
 
-    <Reveal>
       <FeatureRow
         heading={`One look across all ${tools.length}.`}
         body="Every tool shares the same buttons, spacing, and motion. Learn one and you've learned the rest."
@@ -48,20 +53,32 @@ import FeatureVisual from './FeatureVisual.astro';
       >
         <FeatureVisual glyph={SquaresFourIcon} lead="one system" trail={`${tools.length} tools`} />
       </FeatureRow>
-    </Reveal>
+    </div>
   </div>
 </section>
 
 <style>
-  .different {
-    padding-block: var(--space-2xl);
-  }
-
   .different__heading {
     margin-top: var(--space-xs);
     margin-bottom: var(--space-2xl);
     font-size: var(--text-3xl);
     font-weight: var(--weight-bold);
     letter-spacing: var(--tracking-tight);
+  }
+
+  .different__rows {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xl);
+  }
+
+  @media (width < 56rem) {
+    .different__heading {
+      margin-bottom: var(--space-lg);
+    }
+
+    .different__rows {
+      gap: var(--space-xl);
+    }
   }
 </style>
