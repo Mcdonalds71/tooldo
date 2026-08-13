@@ -359,3 +359,25 @@ test('the trust grid names every promise once', async ({ page }) => {
   // The suite count in the copy is derived, so it cannot drift from the registry.
   await expect(page.locator('#different')).toContainText(`One look across all ${tools.length}`);
 });
+
+test('each reason’s icon sits centred beside its text, not pinned to the top', async ({ page }) => {
+  await page.goto('/');
+
+  const reason = page.locator('.reason').first();
+  await expect(reason).toHaveCSS('align-items', 'center');
+
+  const icon = reason.locator('.reason__icon');
+  // The direct-child div wrapping the heading and body together — comparing against
+  // this rather than the heading alone, since flex centres the icon against the
+  // *whole* sibling (heading + body stacked), not against the first line of it.
+  const textBlock = reason.locator(':scope > div');
+  const [iconBox, textBox] = await Promise.all([icon.boundingBox(), textBlock.boundingBox()]);
+  if (!iconBox || !textBox) throw new Error('missing icon or text-block box');
+
+  // Centred means the two midpoints coincide; 'start' would leave the icon's top
+  // pinned to the text block's top instead, offsetting the centres by roughly half
+  // the height difference between them.
+  const iconCenter = iconBox.y + iconBox.height / 2;
+  const textCenter = textBox.y + textBox.height / 2;
+  expect(Math.abs(iconCenter - textCenter)).toBeLessThan(2);
+});
