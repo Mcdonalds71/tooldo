@@ -98,12 +98,21 @@ test('every section boundary has the same gap above and below', async ({ page })
   }
 });
 
-test('the closing card runs straight on from the last reason, no divider, no gap', async ({
+/**
+ * There is deliberately no `.divider` element on this one boundary — the closing card
+ * follows the last reason with nothing between them but paper — but the *gap* still
+ * has to match every other section boundary on the page, just without the line and
+ * mark. A card whose own `margin-top` happens to equal the shared spacing value only
+ * proves the number is right; it doesn't prove nothing else nudged the layout since,
+ * so this compares it against a real divider's gap on the same page load rather than
+ * asserting a literal pixel count.
+ */
+test('the closing card has no divider but the same gap as every other boundary', async ({
   page,
 }) => {
   await page.goto('/');
 
-  const gap = await page.evaluate(async () => {
+  const result = await page.evaluate(async () => {
     const settled = document.createElement('style');
     settled.textContent =
       '.reveal{animation:none!important;opacity:1!important;transform:none!important;clip-path:none!important}';
@@ -117,14 +126,23 @@ test('the closing card runs straight on from the last reason, no divider, no gap
       return p > trust.getBoundingClientRect().top && p < closing.getBoundingClientRect().bottom;
     });
 
+    const referenceDivider = document.querySelector('.divider') as Element;
+    const referenceSection = referenceDivider.previousElementSibling as Element;
+
     return {
       hasDivider: !!dividerBetween,
-      gap: Math.round(closing.getBoundingClientRect().top - trust.getBoundingClientRect().bottom),
+      trustToClosingGap: Math.round(
+        closing.getBoundingClientRect().top - trust.getBoundingClientRect().bottom,
+      ),
+      referenceGap: Math.round(
+        referenceDivider.getBoundingClientRect().top -
+          referenceSection.getBoundingClientRect().bottom,
+      ),
     };
   });
 
-  expect(gap.hasDivider).toBe(false);
-  expect(gap.gap).toBe(0);
+  expect(result.hasDivider).toBe(false);
+  expect(result.trustToClosingGap).toBe(result.referenceGap);
 });
 
 test('the closing block runs full-bleed and meets the footer with no seam', async ({ page }) => {
