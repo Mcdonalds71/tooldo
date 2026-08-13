@@ -145,14 +145,19 @@ test('the phone card stack pins each card under the nav', async ({ page }, testI
     // Deeper in, where the first card has been fully buried and has finished receding.
     await jumpTo(gridTop + 500);
 
-    /** Rendered scale and opacity of a card, which is how far it has receded. */
+    /** Rendered scale and brightness of a card, which is how far it has receded.
+     *  Brightness rather than opacity: the dim is a `filter`, deliberately, so a
+     *  buried card's ink border and hard shadow darken instead of turning
+     *  translucent and letting the next card show straight through them. */
     const receded = (el: HTMLElement) => {
       const card = el.querySelector('.card');
-      if (!card) return { scale: 1, opacity: 1 };
+      if (!card) return { scale: 1, brightness: 1 };
       const cs = getComputedStyle(card);
       const matrix = cs.transform.match(/matrix\(([^)]+)\)/);
       const scale = matrix?.[1] ? Number.parseFloat(matrix[1].split(',')[0] ?? '1') : 1;
-      return { scale, opacity: Number(cs.opacity) };
+      const brightnessMatch = cs.filter.match(/brightness\(([^)]+)\)/);
+      const brightness = brightnessMatch?.[1] ? Number.parseFloat(brightnessMatch[1]) : 1;
+      return { scale, brightness };
     };
 
     return {
@@ -181,10 +186,28 @@ test('the phone card stack pins each card under the nav', async ({ page }, testI
   expect(stack.secondAtB).toBeLessThan(stack.secondAtA);
   /* The buried card has visibly shrunk and dimmed — the half of the effect that reads
      as movement, and the half a `view()` timeline could not drive because a stuck
-     element stops moving exactly when this needs to run. */
+     element stops moving exactly when this needs to run. Brightness, not opacity, so
+     the border and shadow darken rather than turning see-through. */
   expect(stack.firstReceded.scale).toBeLessThan(0.95);
-  expect(stack.firstReceded.opacity).toBeLessThan(0.8);
+  expect(stack.firstReceded.brightness).toBeLessThan(0.9);
   // Nothing ever covers the last card, so it never recedes.
   expect(stack.lastReceded.scale).toBe(1);
-  expect(stack.lastReceded.opacity).toBe(1);
+  expect(stack.lastReceded.brightness).toBe(1);
+});
+
+/**
+ * The 'reduced-motion' project runs at desktop width, so it never sees the phone deck
+ * at all — this asserts the gate directly instead, by forcing the preference on a
+ * mobile-width page. `sticky` and the climb it produces are motion regardless of
+ * whether anything is separately animated on top, so this has to disable the deck
+ * entirely rather than merely skip the shrink-and-dim tween.
+ */
+test('the phone deck turns itself off under reduced motion', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile', 'only meaningful at phone width');
+
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+
+  const first = page.locator('.tools__item').first();
+  await expect(first).toHaveCSS('position', 'static');
 });

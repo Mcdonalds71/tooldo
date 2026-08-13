@@ -29,6 +29,11 @@ test('the story sections are all present and in order', async ({ page }) => {
  *     range, leaving a spacer-sized hole once the pin releases.
  * Both are invisible to a measurement of section boxes, so this walks the DOM for the
  * lowest and highest actually-painted element instead.
+ *
+ * `#trust -> .closing` is checked on its own, separately, below: that boundary has no
+ * divider at all by design (the closing card runs straight on from the last reason),
+ * so it can't be folded into "every divider has an equal gap" — it asserts the
+ * opposite, that there is no gap.
  */
 test('every section boundary has the same gap above and below', async ({ page }) => {
   await page.goto('/');
@@ -42,7 +47,9 @@ test('every section boundary has the same gap above and below', async ({ page })
     document.head.appendChild(settled);
     await new Promise((r) => requestAnimationFrame(() => setTimeout(r, 300)));
 
-    const order = ['.tools', '#different', '.proof', '.install', '#price', '#trust', '.closing'];
+    // Every boundary that still carries a divider — #trust -> .closing deliberately
+    // does not, and is asserted separately.
+    const order = ['.tools', '#different', '.proof', '.install', '#price', '#trust'];
     const dividers = [...document.querySelectorAll('.divider')];
     const sections = order.map((sel) => document.querySelector(sel));
 
@@ -80,7 +87,7 @@ test('every section boundary has the same gap above and below', async ({ page })
     });
   });
 
-  expect(result).toHaveLength(6);
+  expect(result).toHaveLength(5);
 
   const first = result[0]?.above ?? 0;
   expect(first).toBeGreaterThan(0);
@@ -89,6 +96,35 @@ test('every section boundary has the same gap above and below', async ({ page })
     // Symmetric around its own divider, and identical to every other boundary.
     expect(gap, `${gap.between} is asymmetric`).toMatchObject({ above: first, below: first });
   }
+});
+
+test('the closing card runs straight on from the last reason, no divider, no gap', async ({
+  page,
+}) => {
+  await page.goto('/');
+
+  const gap = await page.evaluate(async () => {
+    const settled = document.createElement('style');
+    settled.textContent =
+      '.reveal{animation:none!important;opacity:1!important;transform:none!important;clip-path:none!important}';
+    document.head.appendChild(settled);
+    await new Promise((r) => requestAnimationFrame(() => setTimeout(r, 300)));
+
+    const trust = document.querySelector('#trust') as Element;
+    const closing = document.querySelector('.closing') as Element;
+    const dividerBetween = [...document.querySelectorAll('.divider')].find((d) => {
+      const p = d.getBoundingClientRect().top;
+      return p > trust.getBoundingClientRect().top && p < closing.getBoundingClientRect().bottom;
+    });
+
+    return {
+      hasDivider: !!dividerBetween,
+      gap: Math.round(closing.getBoundingClientRect().top - trust.getBoundingClientRect().bottom),
+    };
+  });
+
+  expect(gap.hasDivider).toBe(false);
+  expect(gap.gap).toBe(0);
 });
 
 test('the closing block runs full-bleed and meets the footer with no seam', async ({ page }) => {
