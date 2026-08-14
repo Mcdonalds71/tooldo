@@ -91,10 +91,16 @@ const REASONS = [
     letter-spacing: var(--tracking-tight);
   }
 
+  /* No row-gap: each row already carries equal padding-block above and below its
+     own content, and that's what should read as "the gap" — stacking a grid gap on
+     top of it pushed every divider line toward the row below instead of sitting
+     centred between the two. Column-gap stays; it's still doing real work on desktop,
+     both as horizontal breathing room and as the width the short divider rule below
+     centres itself in. */
   .trust__grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
-    gap: var(--space-md) var(--space-xl);
+    gap: 0 var(--space-xl);
     list-style: none;
   }
 
