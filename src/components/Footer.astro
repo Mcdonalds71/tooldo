@@ -27,6 +27,15 @@ const year = new Date().getFullYear();
       <a href={SITE.author.url}>{SITE.author.name}</a> for the people of the internet.
     </p>
   </div>
+
+  {
+    /* Pure decoration — the name is already announced by the lockup above, so a screen
+       reader has no reason to hit it twice. Sized past anything read as a heading and
+       bled off the footer's own bottom edge: `overflow: hidden` on `.footer` is what
+       turns "oversized text" into "a wordmark the page cuts off," the same technique
+       the closing card's mobile glow uses to bleed off its own edge. */
+  }
+  <p class="footer__wordmark shell" aria-hidden="true">{SITE.name}</p>
 </footer>
 
 <style>
@@ -43,6 +52,8 @@ const year = new Date().getFullYear();
      the same token deliberately, so the closing block's breathing room reads as
      symmetrical rather than as one surface crowding the other. */
   .footer {
+    position: relative;
+    overflow: hidden;
     padding-block: var(--space-2xl) var(--space-3xl);
     background-color: var(--color-char);
     color: var(--color-line);
@@ -58,6 +69,7 @@ const year = new Date().getFullYear();
   .footer__brand {
     font-size: var(--text-xl);
     color: var(--color-paper);
+    text-transform: uppercase;
     margin-inline-start: -0.5em;
   }
 
@@ -92,6 +104,30 @@ const year = new Date().getFullYear();
     border-top: 1px solid color-mix(in srgb, var(--color-paper) 8%, transparent);
     font-size: var(--text-sm);
     color: var(--color-line);
+  }
+
+  /* Pinned to the footer's own bottom edge, independent of `padding-block-end` —
+     tying the bleed to that padding would mean shrinking it to make room, and it's
+     shared with nothing here to shrink against. Pushed down another third of its own
+     line height so the glyphs bleed past the edge instead of sitting inside it;
+     `overflow: hidden` on `.footer` is what turns that overflow into a clean cut
+     rather than a scrollbar. Negative `z-index` keeps it under the real content on
+     the off chance the two ever overlap — the colour is faint enough that it barely
+     matters, but it costs nothing to be sure. */
+  .footer__wordmark {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: -1;
+    translate: 0 38%;
+    font-family: var(--font-display);
+    font-size: var(--text-display);
+    font-weight: var(--weight-bold);
+    line-height: 0.8;
+    letter-spacing: var(--tracking-tight);
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--color-paper) 7%, transparent);
+    user-select: none;
   }
 
   @media (width < 56rem) {
