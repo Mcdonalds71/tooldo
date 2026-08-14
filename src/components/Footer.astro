@@ -53,6 +53,12 @@ const year = new Date().getFullYear();
      symmetrical rather than as one surface crowding the other. */
   .footer {
     position: relative;
+    /* Without this, `.footer` never becomes a stacking context of its own — plain
+       `position: relative` doesn't create one on its own — so the wordmark's negative
+       `z-index` below escapes to the page's root context instead of staying scoped
+       here, and ends up painted behind this element's own background rather than
+       behind its content. Invisible, not merely dim. */
+    isolation: isolate;
     overflow: hidden;
     padding-block: var(--space-2xl) var(--space-3xl);
     background-color: var(--color-char);
