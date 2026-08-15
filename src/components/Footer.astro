@@ -33,9 +33,19 @@ const year = new Date().getFullYear();
        reader has no reason to hit it twice. Sized past anything read as a heading and
        bled off the footer's own bottom edge: `overflow: hidden` on `.footer` is what
        turns "oversized text" into "a wordmark the page cuts off," the same technique
-       the closing card's mobile glow uses to bleed off its own edge. */
+       the closing card's mobile glow uses to bleed off its own edge.
+
+       Two elements, not one: the outer `shell` div is what's positioned and sized (it
+       carries the same capped width and gutters every other row in this footer lines
+       up against), and the inner `<p>` is what's sized in `cqw` against it. Querying a
+       container from the element that IS that container is a circularity CSS can't
+       resolve — it falls back to measuring something else, silently, which is how a
+       first pass at this rendered at the wrong size on a wide screen despite reading
+       correct in every computed-style check. */
   }
-  <p class="footer__wordmark shell" aria-hidden="true">{SITE.name}</p>
+  <div class="footer__wordmarkWrap shell">
+    <p class="footer__wordmark" aria-hidden="true">{SITE.name}</p>
+  </div>
 </footer>
 
 <style>
@@ -114,24 +124,37 @@ const year = new Date().getFullYear();
 
   /* Pinned to the footer's own bottom edge, independent of `padding-block-end` —
      tying the bleed to that padding would mean shrinking it to make room, and it's
-     shared with nothing here to shrink against. Pushed down another third of its own
-     line height so the glyphs bleed past the edge instead of sitting inside it;
-     `overflow: hidden` on `.footer` is what turns that overflow into a clean cut
-     rather than a scrollbar. Negative `z-index` keeps it under the real content on
-     the off chance the two ever overlap — the colour is faint enough that it barely
-     matters, but it costs nothing to be sure. */
-  .footer__wordmark {
+     shared with nothing here to shrink against. Negative `z-index` keeps it under the
+     real content on the off chance the two ever overlap — the colour below is faint
+     enough that it barely matters, but it costs nothing to be sure.
+
+     `container-type` lives here, not on the text itself: this is the box with a real,
+     content-independent width (`.shell`'s `max-width`, same as every other row in the
+     footer), so it's what `cqw` on the text below should measure against. */
+  .footer__wordmarkWrap {
+    container-type: inline-size;
     position: absolute;
     inset-inline: 0;
     bottom: 0;
     z-index: -1;
+  }
+
+  /* Sized in `cqw` off the wrapper's own box rather than `vw`: a viewport unit keeps
+     growing past `.shell`'s `max-width`, while the box this is meant to fill has
+     already stopped — exactly what left it reading small and short of the edges on a
+     wide monitor. `cqw` tracks the wrapper's actual rendered width at every size
+     instead. Pushed down a third of its own line height, after sizing, so the glyphs
+     bleed past the footer's edge rather than sitting inside it — `overflow: hidden`
+     on `.footer` is what turns that overflow into a clean cut, not a scrollbar. */
+  .footer__wordmark {
     translate: 0 38%;
     font-family: var(--font-display);
-    font-size: var(--text-display);
+    font-size: 23.1cqw;
     font-weight: var(--weight-bold);
     line-height: 0.8;
     letter-spacing: var(--tracking-tight);
     text-transform: uppercase;
+    white-space: nowrap;
     color: color-mix(in srgb, var(--color-paper) 7%, transparent);
     user-select: none;
   }
