@@ -316,16 +316,59 @@ Checking a real production build against the actual deploy target, not just type
 and unit tests, is what caught the ffmpeg problem before it ever reached `main` — the
 reason this tool was given its own session in the first place.
 
-## Next
+## Landing page (built on `feat/pdf-toolbox`, not yet merged to `main`)
 
 All nine tools are live — the roster `lib/tools.ts` and CLAUDE.md name is complete.
 The site is also genuinely offline-capable now (ADR 0017), which closes a real gap
 rather than adding a feature: the manifest had been advertising **Install app** since it
 was written, with nothing registering a service worker behind it.
 
-What's left is the landing page — the story sections below the suite grid, the closing
-call to action, and the upload animation, all deliberately saved for after the tools
-rather than before.
+The landing page below the hero is now built out: four story sections
+(`WhyDifferent`, `OfflineProof`, `InstallOnce`, `BuiltOnTrust`), a full-bleed closing
+CTA card, and the footer — each boundary using the same shared `SectionDivider`
+gap (`--space-2xl` desktop / `--space-lg` mobile, both directions, including the
+divider-less closing→footer seam, which matches the same gap via `margin-top` alone).
+
+On mobile, the tools grid becomes a sticky "card deck" — each card pins under the nav
+and the next rides over it, shrinking and dimming (`filter: brightness()`, never
+`opacity`, so the ink border stays opaque) via GSAP ScrollTrigger, gated off entirely
+under `prefers-reduced-motion`.
+
+The footer got two real, non-obvious bugs worth knowing about if the wordmark ever
+looks wrong again:
+- **A `position: relative` element without a `z-index` doesn't establish its own
+  stacking context.** The footer's giant background wordmark was given `z-index: -1`
+  to sit behind the real content, but `.footer` had no `isolation`/`z-index` of its
+  own — so the wordmark's negative z-index escaped to the page's root stacking
+  context and painted *behind the footer's own background*, fully invisible, not
+  merely faint. `computed style` checks all read correct; only a real rendered
+  screenshot caught it. Fix: `isolation: isolate` on `.footer`.
+- **An element can't be its own container-query container for a property like
+  `font-size`.** The wordmark was first sized in `vw` with a fixed `rem` cap, which
+  stopped tracking `.shell`'s actual (narrower) width past a certain viewport size —
+  small and short of the edges on a wide monitor. Switching to `cqw` initially kept
+  `container-type: inline-size` on the same element being sized, which is circular
+  and silently falls back to the wrong reference. Fix: a separate wrapper
+  (`.footer__wordmarkWrap`, carrying `.shell`'s width) establishes the container; the
+  text inside queries *that*.
+
+**Known gap, dropped mid-build:** a scroll-scrubbed version of the `OfflineProof`
+animation for mobile (progress forward on scroll down, backward on scroll up,
+matching the desktop cord-pull beat) was attempted and reverted. Building it —
+correctly, using one shared `gsap.matchMedia()` instance rather than two — still
+caused a confirmed, 100%-reproducible regression in an unrelated section's CSS
+`animation-timeline: view()` reveal (`#different .reveal--mask`, in
+`e2e/landing.spec.ts`'s "section headings wipe into view" test). Bisected down to one
+of the four tweens in that timeline (or a combination) without finding the exact
+line before time ran out — ruled out: the tokens file, the bare `ScrollTrigger`
+instance, and the fill/counter/done tweens individually in isolation. Never tested
+`.proof__stamp` alone or paired combinations. Mobile currently just shows the
+finished resting frame (same as reduced-motion), which is correct, just static.
+Revisit with `git log` around this note for the exact bisection trail if picked back
+up.
+
+**Still open:** the hero showcase card's tool animation or process/userflow video —
+the stage has been reserved for it since the hero was first built, never filled in.
 
 **Not in the PDF tool, deliberately.** Compression, because pdf-lib copies page streams
 untouched and anything honest would mean re-encoding images and losing quality — the FAQ
