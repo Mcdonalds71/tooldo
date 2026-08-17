@@ -5,7 +5,7 @@ description: How to add or modify a component in the tooldo design system. Use w
 
 # Skill: design-system
 
-The design system is the spine of the product — one language across ten tools. Consistency here is what makes the suite read as senior, designed work. Obey `CLAUDE.md`.
+The design system is the spine of the product — one language across nine tools. Consistency here is what makes the suite read as senior, designed work. Obey `CLAUDE.md`.
 
 ## Design language: neo-brutalism (locked)
 

@@ -75,7 +75,7 @@ A suite of nine free, everyday utility tools (PDF, image, video, data, generator
 - Never `dangerouslySetInnerHTML` with user content. Let React escape. If rich content is unavoidable, sanitise with DOMPurify.
 - Treat all file contents and text input as untrusted: validate type/size before processing, cap sizes, guard malformed files (zip bombs, bad PDFs), wrap parsing in try/catch so a crafted file can't hang the tab.
 - Sanitise anything that becomes a download filename or URL param.
-- No secrets in the repo (there are none by design). Don't add analytics/telemetry that collects file data or PII.
+- No secrets in the repo (there are none by design). Don't add analytics/telemetry that collects file data or PII — Cloudflare Web Analytics ([ADR 0016](docs/adr/0016-cloudflare-web-analytics.md)) is the one deliberate exception: a cookieless page-view beacon, opt-in via `CF_ANALYTICS_TOKEN`, that never sees a file.
 - Ship the security headers + tight CSP from the build spec (§15). Run the `security-check` skill before deploy.
 
 ## 9. Testing

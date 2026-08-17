@@ -1,0 +1,266 @@
+---
+import { DeviceMobileIcon, LightningIcon, WifiSlashIcon } from '@phosphor-icons/react/dist/ssr';
+import Reveal from '../design-system/motion/Reveal.astro';
+import { SITE } from '../lib/site';
+
+/**
+ * Deliberately careful copy. The service worker precaches the site but not each tool's
+ * engine (ADR 0017), so a tool you have never opened still needs a connection the first
+ * time. "The tools you've used keep working" is true; "everything works offline forever"
+ * is not, and this section is exactly where that would be tempting to write.
+ */
+const PILLS = [
+  { glyph: WifiSlashIcon, label: 'works offline' },
+  { glyph: DeviceMobileIcon, label: 'add to home screen' },
+  { glyph: LightningIcon, label: 'nothing to download' },
+];
+---
+
+<section class="install">
+  <div class="shell">
+    <div class="install__card">
+      <div class="install__text">
+        <Reveal from="left">
+          <p class="eyebrow">offline-ready</p>
+          <h2 class="install__heading">Install it once, use it anywhere.</h2>
+          <p class="install__body">
+            Add {SITE.name} to your home screen and the tools you've opened keep working with no
+            connection at all — on a plane, on the underground, or with the wifi simply off.
+          </p>
+
+          <ul class="install__pills">
+            {
+              PILLS.map(({ glyph: Glyph, label }) => (
+                <li class="install__pill">
+                  <Glyph size="1.1em" weight="bold" aria-hidden />
+                  {label}
+                </li>
+              ))
+            }
+          </ul>
+        </Reveal>
+      </div>
+
+      <div class="install__stage">
+        <Reveal from="right" aria-hidden="true">
+          {
+            /* A real phone chassis, not a rounded rectangle with a logo in it: the
+               notch, status time and home indicator are what actually read as "phone"
+               rather than "card." The icon sits the way a real home-screen icon does —
+               its own tile, the wordmark as the caption underneath — with a row of
+               empty tiles beside it standing in for the rest of a home screen without
+               having to draw one. */
+          }
+          <div class="install__phone">
+            <span class="install__notch"></span>
+            <p class="install__statusbar">9:41</p>
+            <div class="install__homescreen">
+              <img class="install__appicon" src="/icon-192.png" alt="" width="192" height="192" />
+              <span class="install__word">{SITE.name}</span>
+              <div class="install__dots">
+                <span></span><span></span><span></span>
+              </div>
+            </div>
+            <span class="install__homebar"></span>
+          </div>
+        </Reveal>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .install__card {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    align-items: stretch;
+    overflow: hidden;
+    border: var(--brut-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-brut-lifted);
+    background-color: var(--color-card);
+  }
+
+  .install__text {
+    padding: var(--space-2xl);
+  }
+
+  .install__heading {
+    margin-top: var(--space-xs);
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-tight);
+  }
+
+  .install__body {
+    max-width: 44ch;
+    margin-top: var(--space-sm);
+    font-size: var(--text-lg);
+    color: var(--color-ink-soft);
+  }
+
+  .install__pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs);
+    margin-top: var(--space-lg);
+    list-style: none;
+  }
+
+  .install__pill {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3xs);
+    padding: var(--space-3xs) var(--space-xs);
+    border: var(--brut-border);
+    border-radius: var(--radius-full);
+    background-color: var(--color-paper);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+  }
+
+  /* The one charcoal surface on the page. An inverse panel is what makes a phone read
+     as a lit screen rather than a paper cut-out sitting on more paper. */
+  .install__stage {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 21rem;
+    overflow: hidden;
+    background-color: var(--color-char);
+  }
+
+  .install__stage::before {
+    content: '';
+    position: absolute;
+    top: -30%;
+    width: 26rem;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    pointer-events: none;
+    background: radial-gradient(
+      circle,
+      color-mix(in srgb, var(--color-signal) 42%, transparent),
+      transparent 70%
+    );
+  }
+
+  .install__phone {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 9.5rem;
+    aspect-ratio: 9 / 16;
+    border: var(--brut-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-brut);
+    background-color: var(--color-paper);
+    overflow: hidden;
+  }
+
+  .install__notch {
+    position: absolute;
+    top: 0.5rem;
+    left: 50%;
+    z-index: 1;
+    width: 2.4rem;
+    height: 0.4rem;
+    border-radius: var(--radius-full);
+    background-color: var(--color-ink);
+    translate: -50% 0;
+  }
+
+  .install__statusbar {
+    padding-top: 1.1rem;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: var(--weight-semibold);
+    color: var(--color-ink-faint);
+  }
+
+  .install__homescreen {
+    display: grid;
+    flex: 1;
+    place-items: center;
+    align-content: center;
+    gap: var(--space-3xs);
+    padding: var(--space-sm);
+  }
+
+  .install__appicon {
+    width: 3.5rem;
+    height: 3.5rem;
+    border: 1.5px solid var(--color-ink);
+    border-radius: var(--radius-md);
+    box-shadow: var(--card-shadow);
+  }
+
+  .install__word {
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-tight);
+  }
+
+  /* Ghost tiles standing in for the rest of a home screen, faint enough to read as
+     "more icons here" without competing with the one that's actually the point. */
+  .install__dots {
+    display: flex;
+    gap: var(--space-2xs);
+    margin-top: var(--space-sm);
+  }
+
+  .install__dots span {
+    width: 1.3rem;
+    height: 1.3rem;
+    border-radius: var(--radius-sm);
+    background-color: var(--color-paper-dim);
+  }
+
+  .install__homebar {
+    align-self: center;
+    width: 3.4rem;
+    height: 0.28rem;
+    margin-block: 0.55rem;
+    border-radius: var(--radius-full);
+    background-color: var(--color-ink);
+    opacity: 0.6;
+  }
+
+  /* A slow breathing lift, so the phone reads as the live thing on the page. Paused
+     entirely rather than slowed for anyone who asked for less movement. */
+  @media (prefers-reduced-motion: no-preference) {
+    .install__phone {
+      animation: install-float 4.5s var(--ease-in-out) infinite alternate;
+    }
+  }
+
+  @keyframes install-float {
+    to {
+      transform: translateY(-0.75rem);
+    }
+  }
+
+  @media (width < 56rem) {
+    .install__card {
+      grid-template-columns: 1fr;
+    }
+
+    .install__text {
+      padding: var(--space-lg);
+    }
+
+    .install__stage {
+      min-height: 17rem;
+    }
+
+    /* Left/right entrances need the two halves to actually sit side by side to read
+       as arriving toward each other — stacked on a phone, they'd both just slide up
+       from the bottom regardless, so both settle for the up-and-fade instead. */
+    .install__text :global(.reveal),
+    .install__stage :global(.reveal) {
+      animation-name: reveal-in-up;
+    }
+  }
+</style>

@@ -1,10 +1,92 @@
 ---
+import BuiltOnTrust from '../components/BuiltOnTrust.astro';
+import ClosingCall from '../components/ClosingCall.astro';
 import Hero from '../components/Hero.astro';
-import ToolCard from '../components/ToolCard.astro';
+import InstallOnce from '../components/InstallOnce.astro';
+import OfflineProof from '../components/OfflineProof.astro';
+import SectionDivider from '../components/SectionDivider.astro';
+import ThePrice from '../components/ThePrice.astro';
+import ToolCard, { type ToolCardSize } from '../components/ToolCard.astro';
+import WhyDifferent from '../components/WhyDifferent.astro';
 import Reveal from '../design-system/motion/Reveal.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE } from '../lib/site';
-import { tools } from '../lib/tools';
+import { type ToolSlug, tools } from '../lib/tools';
+
+interface BentoCell {
+  readonly column: number;
+  readonly columnSpan: number;
+  readonly row: number;
+  readonly rowSpan: number;
+}
+
+/**
+ * Every card placed by hand on a 12-column, 4-row grid, because a tessellation is a
+ * fact about the number of cards, not something auto-placement can be trusted to find:
+ * nine cards, 48 cells, no holes, a clean rectangular edge on all four sides.
+ *
+ * Five different sizes, not two — a bento reads as a bento because most of the cards
+ * disagree with each other, not because one card is big and the rest are a uniform
+ * grid with a hero glued on top. The tiers: Invoice at 6x2 (12 cells, the feature),
+ * Images at 4x2 (8, a clear second), PDF at 6x1 (6, wide rather than tall), Video and
+ * Screenshot at 3x1 (3 each), and CSV / Timezones / QR / Text at 4x1 (4 each).
+ * 12 + 8 + 6 + 3 + 3 + 4 + 4 + 4 + 4 = 48 = 12 x 4 exactly.
+ *
+ * Invoice, PDF and Images take the three biggest tiers because they're already
+ * `POPULAR_SLUGS` — the nav's own "these three are promoted" signal — rather than a
+ * second, unrelated notion of importance invented just for this grid.
+ *
+ * Typed as a `Record` over every slug on purpose: add a tenth tool and this stops
+ * compiling, which is correct, since a tenth card doesn't fit this rectangle and the
+ * layout has to be re-solved by hand, not silently auto-placed somewhere.
+ */
+const BENTO: Record<ToolSlug, BentoCell> = {
+  invoice: { column: 1, columnSpan: 6, row: 1, rowSpan: 2 },
+  pdf: { column: 7, columnSpan: 6, row: 1, rowSpan: 1 },
+  video: { column: 7, columnSpan: 3, row: 2, rowSpan: 1 },
+  screenshot: { column: 10, columnSpan: 3, row: 2, rowSpan: 1 },
+  images: { column: 1, columnSpan: 4, row: 3, rowSpan: 2 },
+  csv: { column: 5, columnSpan: 4, row: 3, rowSpan: 1 },
+  timezones: { column: 9, columnSpan: 4, row: 3, rowSpan: 1 },
+  qr: { column: 5, columnSpan: 4, row: 4, rowSpan: 1 },
+  text: { column: 9, columnSpan: 4, row: 4, rowSpan: 1 },
+};
+
+/** Reading order, so the DOM matches what a sighted visitor sees rather than leaving
+ *  a screen reader to walk the grid in a different order than the eye does. */
+const laidOut = [...tools].sort(
+  (a, b) => BENTO[a.slug].row - BENTO[b.slug].row || BENTO[a.slug].column - BENTO[b.slug].column,
+);
+
+/** The card's own internal treatment tracks height, not width — Invoice and Images are
+ *  the only two cards tall enough to leave real space above a bottom-anchored icon and
+ *  label, so they're the only two that get a watermark and upsized type to fill it.
+ *  PDF is wider than either but only one row tall, the same height as every small card,
+ *  so it stays `sm`: there's no vertical gap on a single-row card for a bigger
+ *  treatment to justify. */
+function sizeOf(slug: ToolSlug): ToolCardSize {
+  if (slug === 'invoice') return 'lg';
+  if (slug === 'images') return 'md';
+  return 'sm';
+}
+
+/** PDF is the one `sm` card worth the exception — six columns wide on a single
+ *  row, so it carries the same amount of dead space a tall card does, just
+ *  running sideways instead of underneath it. */
+function hasWatermark(slug: ToolSlug): boolean {
+  return slug === 'invoice' || slug === 'images' || slug === 'pdf';
+}
+
+function cellVars(cell: BentoCell, order: number): string {
+  return [
+    `--col: ${cell.column} / span ${cell.columnSpan}`,
+    `--row: ${cell.row} / span ${cell.rowSpan}`,
+    /* Read only by the phone card stack, where a later card has to paint over the one
+       already pinned above it. The bento never reads it — no `z-index` is set at that
+       width, so this is an inert custom property there. */
+    `--stack-order: ${order}`,
+  ].join('; ');
+}
 ---
 
 <BaseLayout title={`${SITE.name} — ${SITE.tagline}`}>
@@ -22,21 +104,48 @@ import { tools } from '../lib/tools';
 
       <ul class="tools__grid">
         {
-          tools.map((tool) => (
-            <li>
-              <ToolCard tool={tool} />
+          laidOut.map((tool, index) => (
+            <li class="tools__item" style={cellVars(BENTO[tool.slug], index + 1)}>
+              <ToolCard tool={tool} size={sizeOf(tool.slug)} watermark={hasWatermark(tool.slug)} />
             </li>
           ))
         }
       </ul>
     </div>
   </section>
+
+  <SectionDivider />
+  <WhyDifferent />
+  <SectionDivider />
+  <OfflineProof />
+  <SectionDivider />
+  <InstallOnce />
+  <SectionDivider />
+  <ThePrice />
+  <SectionDivider />
+  <BuiltOnTrust />
+  {
+    /* No divider here, deliberately — the last reason runs straight into the closing
+       card with nothing between them, which is the point: the trust-building is over
+       and the ask follows immediately rather than after another breath of paper. */
+  }
+  <ClosingCall />
 </BaseLayout>
 
 <style>
+  /* Top only — the divider now following this section owns the gap on that side, the
+     same as every other story section. Hero precedes this with no divider between
+     them (a divider fits a run of story sections, not the hero-to-content handoff),
+     so this is the one side that still needs a number of its own. */
   .tools {
-    padding-block: var(--space-2xl);
+    padding-top: var(--space-2xl);
     text-align: center;
+  }
+
+  @media (width < 56rem) {
+    .tools {
+      padding-top: var(--space-xl);
+    }
   }
 
   .tools__heading {
@@ -59,4 +168,136 @@ import { tools } from '../lib/tools';
     text-align: start;
     list-style: none;
   }
+
+  /*
+   * Phone-only card deck. Each card pins under the nav while the next rides up over it,
+   * reversing on the way back because that is simply what `sticky` does — the pinning
+   * needs no scroll listener and nothing here fights the user's own scrolling. The
+   * shrink-and-dim on the card being buried is the one part that does need script, and
+   * lives in the module at the end of this file.
+   *
+   * `.tools__item` is made sticky *itself* rather than wrapping the card in a new
+   * element. That matters: `ToolCard` sizes itself with `height: 100%`, so any extra
+   * box between the grid item and the card becomes the percentage's new reference and
+   * every card in the desktop bento collapses to its content height — which is exactly
+   * what an earlier attempt at this did to the tessellation.
+   *
+   * A grid item can't stick, because its containing block is its own grid area and an
+   * element has no room to travel inside a box its own size. So the container drops to
+   * `display: block` here, which makes each card's containing block the whole list and
+   * gives it the entire stack's height to move within.
+   *
+   * Capped at 48rem rather than the bento's own 64rem: between the two the auto-fill
+   * grid still gets two comfortable columns, and cards stacking full-width there would
+   * be a worse layout than the one it replaced.
+   */
+  @media (width < 48rem) {
+    .tools__grid {
+      display: block;
+    }
+
+    .tools__item + .tools__item {
+      margin-top: var(--space-md);
+    }
+  }
+
+  /* The deck itself, gated separately from the plain-list rules above: `sticky` and
+     the climb it produces are still motion a reduced-motion reader asked not to see,
+     even though the shrink-and-dim script already respects the same preference on its
+     own. Without this, turning reduced motion on would silence the animation but
+     leave the cards pinning and covering each other regardless — motion with the
+     polish removed is still motion. Un-gated, every card is simply a normal list item
+     in the block layout above. */
+  @media (width < 48rem) and (prefers-reduced-motion: no-preference) {
+    .tools__item {
+      position: sticky;
+      top: var(--sticky-below-nav);
+      z-index: var(--stack-order);
+    }
+
+    /* Shrinking toward the top edge keeps the card's header pinned where the eye is
+       already resting; scaling from the centre would slide it down as it shrinks.
+       The explicit `brightness(1)` gives the recede tween below a real starting
+       filter to interpolate from, rather than animating from the implicit `none`. */
+    .tools__item :global(.card) {
+      transform-origin: top center;
+      filter: brightness(1);
+    }
+  }
+
+  /* The bento is desktop-only. A phone has no width for a card six columns wide to be
+     anything but cramped, so below this the grid above stands and every card is equal —
+     the placement variables are simply never read. */
+  @media (width >= 64rem) {
+    .tools__grid {
+      grid-template-columns: repeat(12, 1fr);
+      /* `auto` on the upper bound so a row grows for its content rather than clipping;
+         rows stay uniform across their own width either way, so the outer edge of the
+         composition is square regardless. */
+      grid-auto-rows: minmax(12rem, auto);
+    }
+
+    .tools__item {
+      grid-column: var(--col);
+      grid-row: var(--row);
+    }
+  }
 </style>
+
+<script>
+  import gsap from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  /**
+   * The recede half of the phone card deck. CSS pins each card; this shrinks and dims
+   * the one being buried, which is the part that actually reads as movement — pinning
+   * alone just swaps one flat card for another with nothing in between.
+   *
+   * Dimmed with `filter: brightness()`, not `opacity`. Opacity was the first version
+   * of this and it was wrong: the card's own ink border and hard shadow are the
+   * signature of this design system, and fading the whole element made them go
+   * translucent along with everything else — the next card's edge showing straight
+   * through the one supposedly still in front of it. Brightness darkens the same
+   * pixels without ever making them see-through.
+   *
+   * A sticky element's own box stops moving the moment it sticks, so anything that
+   * measures it live — a `view()` timeline, a scroll handler reading
+   * `getBoundingClientRect` — stalls exactly when this animation needs to run.
+   * ScrollTrigger resolves `start`/`end` to absolute scroll offsets once, up front,
+   * and maps scroll position to progress from there, so it keeps advancing while the
+   * card is stuck. That is the whole reason this is GSAP and not a CSS scroll timeline.
+   *
+   * The range is the card's own pinned lifetime: from its top reaching the pin offset
+   * to its bottom reaching it, which is exactly while the next card climbs over it.
+   */
+  gsap.matchMedia().add('(prefers-reduced-motion: no-preference) and (width < 48rem)', () => {
+    const items = gsap.utils.toArray<HTMLElement>('.tools__item');
+    const rootFontSize = Number.parseFloat(getComputedStyle(document.documentElement).fontSize);
+    const pinOffset = rootFontSize * 5.5;
+
+    // The last card is never covered by anything, so it never recedes.
+    const tweens = items.slice(0, -1).map((item) =>
+      gsap.to(item.querySelector('.card'), {
+        scale: 0.9,
+        filter: 'brightness(0.82)',
+        ease: 'none',
+        scrollTrigger: {
+          trigger: item,
+          start: `top ${pinOffset}px`,
+          end: `bottom ${pinOffset}px`,
+          scrub: true,
+        },
+      }),
+    );
+
+    // Cleaning up here is what stops these surviving a resize up into the bento.
+    return () => {
+      for (const tween of tweens) {
+        tween.scrollTrigger?.kill();
+        tween.kill();
+      }
+    };
+  });
+</script>

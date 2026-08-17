@@ -4,7 +4,7 @@ How tooldo is built, and why. This document is the reasoning behind the code —
 
 ## What it is, in one line
 
-A suite of ten free utility tools that run entirely in the browser — no backend, no database, no accounts, no uploads. Privacy is the product: *your files never leave your device.*
+A suite of nine free utility tools that run entirely in the browser — no backend, no database, no accounts, no uploads. Privacy is the product: *your files never leave your device.*
 
 ## The one decision everything follows from
 
@@ -66,7 +66,7 @@ Heavy compute (ffmpeg.wasm, image codecs, the background-removal model) runs ins
 
 ## Design system
 
-One shared system (`design-system/`) gives ten tools a single visual language.
+One shared system (`design-system/`) gives nine tools a single visual language.
 
 - **Design tokens** as CSS variables (colour, spacing, radius, type, shadow, motion) drive everything; components never hardcode values. Dark mode swaps token values, not component code.
 - **Radix UI** provides accessible primitives (menus, dialogs, sliders, tabs); we style them with tokens rather than re-solving accessibility.

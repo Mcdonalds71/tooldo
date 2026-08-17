@@ -1,0 +1,183 @@
+---
+import {
+  CloudSlashIcon,
+  CurrencyDollarSimpleIcon,
+  EyeSlashIcon,
+  GitBranchIcon,
+  UserCircleDashedIcon,
+  WifiSlashIcon,
+} from '@phosphor-icons/react/dist/ssr';
+import Reveal from '../design-system/motion/Reveal.astro';
+import { SITE } from '../lib/site';
+
+const REASONS = [
+  {
+    glyph: CloudSlashIcon,
+    heading: 'Nothing uploads',
+    body: 'Your files are processed on your device and never sent anywhere.',
+  },
+  {
+    glyph: GitBranchIcon,
+    heading: 'Open source',
+    body: 'Every line is public on GitHub. Read it, fork it, check it yourself.',
+    href: SITE.repo,
+  },
+  {
+    glyph: WifiSlashIcon,
+    heading: 'Works offline',
+    body: 'Once a tool has loaded, it runs with no connection needed.',
+  },
+  {
+    glyph: UserCircleDashedIcon,
+    heading: 'No accounts',
+    body: 'No email walls, no passwords, and no profile to manage.',
+  },
+  {
+    glyph: EyeSlashIcon,
+    heading: 'No ads or trackers',
+    body: 'A quiet interface with nothing following you around.',
+  },
+  {
+    glyph: CurrencyDollarSimpleIcon,
+    heading: 'Free forever',
+    body: 'No trials, no tiers, and no paywall halfway through.',
+  },
+];
+---
+
+<section id="trust" class="trust">
+  <div class="shell">
+    <Reveal from="mask">
+      <p class="eyebrow">built on trust</p>
+      <h2 class="trust__heading">Why you can rely on it.</h2>
+    </Reveal>
+
+    <ul class="trust__grid">
+      {
+        REASONS.map(({ glyph: Glyph, heading, body, href }) => (
+          <li>
+            <Reveal>
+              <article class="reason">
+                <span class="reason__icon">
+                  <Glyph size="1.5rem" weight="duotone" aria-hidden />
+                </span>
+                <div>
+                  <h3 class="reason__heading">
+                    {href ? (
+                      <a class="reason__link" href={href} rel="noreferrer">
+                        {heading}
+                      </a>
+                    ) : (
+                      heading
+                    )}
+                  </h3>
+                  <p class="reason__body">{body}</p>
+                </div>
+              </article>
+            </Reveal>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .trust__heading {
+    margin-top: var(--space-xs);
+    margin-bottom: var(--space-xl);
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-tight);
+  }
+
+  /* No row-gap: each row already carries equal padding-block above and below its
+     own content, and that's what should read as "the gap" — stacking a grid gap on
+     top of it pushed every divider line toward the row below instead of sitting
+     centred between the two. Column-gap stays; it's still doing real work on desktop,
+     both as horizontal breathing room and as the width the short divider rule below
+     centres itself in. */
+  .trust__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    gap: 0 var(--space-xl);
+    list-style: none;
+  }
+
+  /* Six short facts, not six more cards. This is the calm end of the restraint rule —
+     the loud surfaces on this page are the bento, the install card and the closing
+     call, and stacking a seventh set of hard shadows here would flatten all of them. */
+  .reason {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding-block: var(--space-sm);
+    border-top: 1px solid var(--color-line);
+  }
+
+  .reason__icon {
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: var(--radius-sm);
+    background-color: var(--color-paper-dim);
+    color: var(--color-ink);
+  }
+
+  .reason__heading {
+    font-size: var(--text-base);
+    font-weight: var(--weight-bold);
+  }
+
+  .reason__link {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .reason__link:hover,
+  .reason__link:focus-visible {
+    color: var(--color-signal-dark);
+  }
+
+  .reason__body {
+    margin-top: var(--space-3xs);
+    font-size: var(--text-sm);
+    color: var(--color-ink-soft);
+  }
+
+  /* The auto-fit grid can land on two or three columns depending on width, and the
+     row/column tricks below only make sense once the count is fixed and known. Below
+     this, the auto-fit rule above stands and every reason keeps its top rule as the
+     only separator, mobile included. */
+  @media (width >= 64rem) {
+    .trust__grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    /* The first row's top rule sits right under the heading with nothing to divide
+       from — every other row's rule is doing real work (separating it from the row
+       above); the first one is just a line for its own sake. */
+    .trust__grid > li:nth-child(-n + 3) .reason {
+      border-top: none;
+    }
+
+    /* Short and centred in the column gap, not edge to edge — a full-height rule
+       would compete with the horizontal ones above; this only needs to say "new
+       column," not draw a cage around each item. */
+    .trust__grid > li:not(:nth-child(3n + 1)) .reason {
+      position: relative;
+    }
+
+    .trust__grid > li:not(:nth-child(3n + 1)) .reason::before {
+      content: '';
+      position: absolute;
+      top: 20%;
+      bottom: 20%;
+      left: calc(var(--space-xl) / -2);
+      width: 1px;
+      background-color: var(--color-line);
+    }
+  }
+</style>

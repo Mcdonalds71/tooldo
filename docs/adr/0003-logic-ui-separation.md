@@ -4,7 +4,7 @@
 Accepted.
 
 ## Context
-Ten tools must stay consistent, testable, and readable on a public portfolio repo.
+Nine tools must stay consistent, testable, and readable on a public portfolio repo.
 
 ## Decision
 Each tool splits into a pure, framework-free `engine.ts` (all computation, fully typed) and a thin `<Tool>.tsx` island (state + orchestration only). Heavy work runs in a Web Worker.

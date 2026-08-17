@@ -26,7 +26,8 @@ the versions from the repo, so a change to either travels with the commit that n
 
 ## Environment variables
 
-None. The build needs nothing set to produce the real site.
+None required. The build produces a working site with nothing set — analytics is the one
+optional exception.
 
 Clash Display is fetched from the `tooldo-assets` R2 bucket at build time, and the address
 lives in `scripts/fetch-fonts.mjs` rather than in each environment's settings — see
@@ -36,6 +37,14 @@ but its URL can. `CLASH_DISPLAY_URL` overrides the default if the object ever mo
 Use a plain public URL there, never a presigned one. R2's S3-compatible signatures expire
 after at most seven days, which would change the site's face mid-month with nothing in the
 commit log to explain it.
+
+`CF_ANALYTICS_TOKEN`, if set, embeds Cloudflare Web Analytics' beacon into every page at
+build time (see [ADR 0016](adr/0016-cloudflare-web-analytics.md)). It isn't a secret — the
+token ships inside a public `<script>` tag every visitor's browser downloads — but it
+still lives in an env var rather than the repo, the same reasoning `CLASH_DISPLAY_URL`
+already follows: a fork or a local preview build should carry no beacon by default, not
+someone else's token. Set it in the Cloudflare Workers project's build environment
+variables, not in `wrangler.jsonc`, since it only needs to exist at `pnpm build` time.
 
 ## Install scripts
 

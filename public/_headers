@@ -24,15 +24,19 @@
 # are the first thing in the suite that touches WebAssembly at all; nothing before it
 # needed the keyword, which is why it wasn't here already.
 #
-# connect-src stays 'self' alone. Every tool runs entirely on-device — no uploads, no
-# fetches, nothing about a visitor or their files ever leaves the tab.
+# connect-src is 'self' plus exactly one third-party origin: Cloudflare Web Analytics'
+# own beacon endpoint (ADR 0016). Every tool still runs entirely on-device — no upload,
+# no fetch, nothing about a visitor's file or a tool's own work ever leaves the tab. The
+# one thing that does leave is a cookieless page-view ping, the same thing /privacy
+# names as the only analytics this site would ever add, and the reason it's a named
+# exception here rather than a plain 'self' the way it used to read.
 #
 # Everything else stays locked down. blob: is allowed for images, media and workers
 # because tools preview and download their own output through object URLs — never a
 # remote fetch.
 
 /*
-  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; frame-src 'none'; form-action 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; worker-src 'self' blob:; media-src 'self' blob:; manifest-src 'self'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; frame-src 'none'; form-action 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://cloudflareinsights.com; worker-src 'self' blob:; media-src 'self' blob:; manifest-src 'self'; upgrade-insecure-requests
   Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
@@ -46,3 +50,12 @@
 
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
+
+# The worker and its precache list are the one pair that must never be served stale:
+# they are how every other cached thing gets replaced, so an HTTP cache holding an old
+# copy would pin visitors to an old build with no way to tell them otherwise.
+/sw.js
+  Cache-Control: no-cache
+
+/sw-manifest.js
+  Cache-Control: no-cache

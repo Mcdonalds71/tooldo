@@ -1,0 +1,165 @@
+---
+import { ArrowRightIcon } from '@phosphor-icons/react/dist/ssr';
+import { buttonClass } from '../design-system/components/Button';
+import Reveal from '../design-system/motion/Reveal.astro';
+import { tools } from '../lib/tools';
+
+/**
+ * The last thing before the footer sticker, and the loudest surface on the page after
+ * the hero — charcoal, so the vermilion button lands on it harder than it could on
+ * paper, and the eye has somewhere to finish.
+ */
+---
+
+{
+  /* The card is full-bleed and the Reveal sits *inside* it, wrapping only the content.
+     A transform on the band itself would pull its own edges away from the viewport
+     edges and the footer it's flush against, flashing paper in the seams mid-scroll. */
+}
+<section class="closing">
+  <div class="closing__card">
+    <div class="shell">
+      <Reveal from="scale">
+        <h2 class="closing__heading">Got a file to fix?</h2>
+        <p class="closing__body">
+          Pick a tool and go. No sign-up, nothing to install, and {tools.length} of them waiting.
+        </p>
+        <a class={`${buttonClass({ variant: 'primary', size: 'lg' })} closing__cta`} href="/#tools">
+          Open the tools
+          <ArrowRightIcon size="1em" weight="bold" aria-hidden />
+        </a>
+      </Reveal>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* No padding on the *section*: the gap above the card is a margin on the card
+     itself (below), and the bottom is flush against the footer by design — the two
+     dark surfaces meet with no paper between them and read as one closing block. */
+  .closing__card {
+    position: relative;
+    /* This margin is the whole reason there's a gap above the card at all — there is
+       no divider on this boundary, so nothing else creates one. It's written to the
+       same --space-2xl every other section-to-section gap uses, so removing the
+       divider's line and mark didn't quietly remove the spacing along with it. */
+    margin-top: var(--space-2xl);
+    /* The seam value, and the only reason this isn't just `--space-3xl` all round:
+       the bottom half of the gap at the footer boundary lives here and the top half
+       lives on `.footer`, so the two have to be written as the same token. Change one,
+       change the other. */
+    padding-block: var(--space-3xl) var(--space-2xl);
+    overflow: hidden;
+    background-color: var(--color-char);
+    color: var(--color-paper);
+    text-align: center;
+  }
+
+  /* Full-bleed, so no border, no radius and no hard shadow: all three are ways of
+     showing an edge against the paper, and this surface no longer has one to show. */
+  @media (width < 56rem) {
+    .closing__card {
+      /* Half the desktop value, matching how every other mobile gap on this page
+         relates to its desktop counterpart. */
+      margin-top: var(--space-lg);
+      padding-block: var(--space-2xl) var(--space-xl);
+    }
+  }
+
+  /* Two warm blooms rather than one centred behind the text, so the panel has a
+     direction to it and the button isn't sitting in the middle of a halo.
+     `pointer-events: none` is load-bearing, not hygiene: `::after` is the last box in
+     the card and paints over the button, so without it the glow swallows the click —
+     which is exactly what the mobile run of `e2e/landing.spec.ts` caught. */
+  .closing__card::before,
+  .closing__card::after {
+    content: '';
+    position: absolute;
+    width: 30rem;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    pointer-events: none;
+    background: radial-gradient(
+      circle,
+      color-mix(in srgb, var(--color-signal) 34%, transparent),
+      transparent 68%
+    );
+  }
+
+  .closing__card::before {
+    top: -60%;
+    left: -8%;
+  }
+
+  .closing__card::after {
+    right: -8%;
+    bottom: -60%;
+  }
+
+  /*
+   * Mobile trades the two corner blooms for one dome rising from the card's own
+   * floor: `::after` is hidden, and `::before` is recentred so only its top half
+   * clears the bottom edge (`overflow: hidden` on the card does the actual clipping).
+   *
+   * Kept off desktop on purpose. A glow anchored to the bottom edge would sit right
+   * at the seam this card shares with the footer below it — the one boundary on the
+   * page with no gap at all — and warming exactly the line that's supposed to read as
+   * "this surface ends here" would work against telling the two apart, not for it.
+   * The existing two-blob composition already gives the desktop card its own
+   * identity without concentrating any of it at that edge.
+   */
+  @media (width < 56rem) {
+    .closing__card::after {
+      display: none;
+    }
+
+    .closing__card::before {
+      top: auto;
+      left: 50%;
+      bottom: 0;
+      width: 22rem;
+      translate: -50% 50%;
+    }
+  }
+
+  .closing__heading,
+  .closing__body,
+  .closing__cta {
+    position: relative;
+  }
+
+  .closing__heading {
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-tight);
+  }
+
+  .closing__body {
+    max-width: var(--width-prose);
+    margin: var(--space-sm) auto 0;
+    font-size: var(--text-lg);
+    color: var(--color-line);
+  }
+
+  /*
+   * The button's own default shadow is ink — right everywhere else it's used, since
+   * every other button sits on the paper page. Here it sits on this card's own
+   * charcoal fill, where an ink-on-ink shadow has no contrast to cast with — so this
+   * re-points the two tokens the shared Button component actually reads rather than
+   * duplicating its shadow logic. `--btn-shadow-press` is left alone on purpose: its
+   * value is a zero-offset shadow either way, invisible in ink or paper alike.
+   */
+  .closing__cta {
+    --btn-shadow: 4px 4px 0 var(--color-paper);
+    --btn-shadow-hover: 6px 6px 0 var(--color-paper);
+    margin-top: var(--space-lg);
+  }
+
+  .closing__cta svg {
+    transition: translate var(--dur-base) var(--ease-out);
+  }
+
+  .closing__cta:hover svg {
+    translate: 0.25em 0;
+  }
+</style>

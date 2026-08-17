@@ -1,0 +1,54 @@
+---
+/**
+ * The seam between two sections, stated rather than left to whitespace alone. Short and
+ * centred rather than full-bleed — a line that stops well short of both edges reads as
+ * a deliberate mark, where one running edge to edge reads as a rule the browser drew for
+ * free. The mark at its centre is the same wordless glyph used everywhere else the brand
+ * appears alone, so this reads as the site's own seam, not a generic `<hr>`.
+ *
+ * This is also the *only* source of vertical space between two story sections — every
+ * section that sits next to a divider carries no padding-block of its own for that
+ * side. One number, defined once, used by both neighbours automatically: the gap above
+ * a divider and the gap below it can't drift apart the way they could if each section
+ * were setting its own top/bottom padding independently, which is exactly how they'd
+ * gone uneven before this.
+ */
+---
+
+<div class="divider" role="presentation">
+  <span class="divider__line"></span>
+  <img class="divider__mark" src="/icon.svg" alt="" width="32" height="32" />
+  <span class="divider__line"></span>
+</div>
+
+<style>
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    width: min(100%, 18rem);
+    margin-block: var(--space-2xl);
+    margin-inline: auto;
+  }
+
+  /* Half the desktop gap, not a nudge off it. A phone's viewport is roughly a third
+     the height of a laptop's, so a 4rem gap eats a far bigger share of the screen
+     there and reads as a hole rather than a breath. */
+  @media (width < 56rem) {
+    .divider {
+      margin-block: var(--space-lg);
+    }
+  }
+
+  .divider__line {
+    flex: 1;
+    height: 1px;
+    background-color: var(--color-line);
+  }
+
+  .divider__mark {
+    width: 1.1rem;
+    height: 1.1rem;
+    opacity: 0.55;
+  }
+</style>

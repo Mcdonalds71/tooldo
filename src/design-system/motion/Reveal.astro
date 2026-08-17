@@ -4,42 +4,134 @@
  * ships no JavaScript at all — which keeps `script-src 'self'` free of inline hashes.
  *
  * Everything is progressive: without support for view timelines, or with reduced motion
- * requested, the content is simply there. Only transform and opacity animate.
+ * requested, the content is simply there. Only transform, opacity and clip-path animate.
  *
  * Motion (the library) is for islands; a marketing section shouldn't hydrate to fade in.
  */
 
 interface Props {
   class?: string;
+  /**
+   * 'up' rises and fades — the workhorse, used for anything that doesn't need a more
+   * particular entrance. 'left'/'right' slide in from that side, for a pair of elements
+   * that should read as arriving from opposite edges toward each other. 'scale' grows
+   * in from slightly small, for the one or two moments that should announce themselves.
+   * 'mask' wipes into view left-to-right behind a moving clip edge rather than fading —
+   * reserved for section headings, where a curtain-style reveal reads as a bigger
+   * statement than a fade ever does.
+   */
+  from?: 'up' | 'left' | 'right' | 'scale' | 'mask';
+  [attr: string]: unknown;
 }
 
-const { class: className } = Astro.props;
+const { class: className, from = 'up', ...rest } = Astro.props;
 ---
 
-<div class:list={['reveal', className]}>
+<div class:list={['reveal', `reveal--${from}`, className]} {...rest}>
   <slot />
 </div>
 
 <style>
   @supports (animation-timeline: view()) {
     @media (prefers-reduced-motion: no-preference) {
+      /* Longhands only, deliberately never the `animation` shorthand: Lightning CSS
+         (Vite's CSS transform) rebuilds the shorthand from its parts at build time,
+         and its rebuild drops `animation-timeline` back to `auto` even when it's the
+         longhand written last in source — confirmed by inspecting the actual compiled
+         rule, where `animation-timeline: auto` sat right there in the cssText despite
+         this file never writing that value. Writing no shorthand at all leaves the
+         minifier nothing to reconstruct, and `view()` survives the build correctly. */
       .reveal {
-        animation: reveal-in linear both;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
         animation-timeline: view();
-        animation-range: entry 0% entry 45%;
+        /* Shorter than it looks: finishing by the 32% mark rather than lingering
+           through the whole entry means the motion resolves with some snap to it
+           instead of a slow graceful drift, which reads as more energy for the same
+           travel distance. */
+        animation-range: entry 0% entry 32%;
+      }
+
+      .reveal--up {
+        animation-name: reveal-in-up;
+      }
+
+      .reveal--left {
+        animation-name: reveal-in-left;
+      }
+
+      .reveal--right {
+        animation-name: reveal-in-right;
+      }
+
+      .reveal--scale {
+        animation-name: reveal-in-scale;
+      }
+
+      .reveal--mask {
+        animation-name: reveal-in-mask;
       }
     }
   }
 
-  @keyframes reveal-in {
+  @keyframes reveal-in-up {
     from {
       opacity: 0;
-      transform: translateY(28px);
+      transform: translateY(2.5rem) scale(0.97);
     }
 
     to {
       opacity: 1;
       transform: none;
+    }
+  }
+
+  @keyframes reveal-in-left {
+    from {
+      opacity: 0;
+      transform: translateX(-5rem) scale(0.95);
+    }
+
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes reveal-in-right {
+    from {
+      opacity: 0;
+      transform: translateX(5rem) scale(0.95);
+    }
+
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes reveal-in-scale {
+    from {
+      opacity: 0;
+      transform: scale(0.82);
+    }
+
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* No opacity here on purpose — the clip edge is what's doing the revealing, so the
+     content stays fully opaque and just becomes visible as the mask sweeps clear of
+     it. Fading it too would fight the wipe rather than support it. */
+  @keyframes reveal-in-mask {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+
+    to {
+      clip-path: inset(0 0 0 0);
     }
   }
 </style>

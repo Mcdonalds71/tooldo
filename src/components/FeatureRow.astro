@@ -1,0 +1,118 @@
+---
+import { ArrowRightIcon } from '@phosphor-icons/react/dist/ssr';
+import Reveal from '../design-system/motion/Reveal.astro';
+
+interface Props {
+  heading: string;
+  body: string;
+  href: string;
+  linkLabel: string;
+  /** Puts the artwork on the left. Alternating rows stop the section reading as a list. */
+  flip?: boolean;
+}
+
+const { heading, body, href, linkLabel, flip = false } = Astro.props;
+---
+
+{
+  /* Text and artwork reveal from opposite edges toward each other — each entering from
+     the side it's actually adjacent to off-screen, which is what makes it read as
+     sliding into its own slot rather than two unrelated animations that happen to run
+     together. `Reveal` is nested one level inside the grid item rather than given the
+     item's own class, so `.row__text`/`.row__visual` stay elements this file renders
+     directly (and so keep this file's own style scope) instead of being handed to a
+     child component to render on our behalf. */
+}
+<div class="row" data-flip={flip}>
+  <div class="row__text">
+    <Reveal from={flip ? 'right' : 'left'}>
+      <h3 class="row__heading">{heading}</h3>
+      <p class="row__body">{body}</p>
+      <a class="row__link" href={href}>
+        {linkLabel}
+        <ArrowRightIcon size="1em" weight="bold" aria-hidden />
+      </a>
+    </Reveal>
+  </div>
+
+  <div class="row__visual">
+    <Reveal from={flip ? 'left' : 'right'}>
+      <slot />
+    </Reveal>
+  </div>
+</div>
+
+<style>
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: var(--space-2xl);
+  }
+
+  /* Order rather than direction, so the DOM keeps text before artwork and a screen
+     reader hears every row the same way round however it happens to be laid out. */
+  .row[data-flip='true'] .row__text {
+    order: 2;
+  }
+
+  /* row__heading sits one clear tier below the section's own H2 (text-3xl) now — at
+     text-2xl the two read as the same weight of statement instead of a heading
+     introducing a list of smaller claims underneath it. */
+  .row__heading {
+    font-size: var(--text-xl);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-tight);
+  }
+
+  .row__body {
+    max-width: 42ch;
+    margin-top: var(--space-sm);
+    font-size: var(--text-lg);
+    color: var(--color-ink-soft);
+  }
+
+  .row__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    margin-top: var(--space-md);
+    font-weight: var(--weight-semibold);
+    color: var(--color-signal-dark);
+    text-decoration: none;
+  }
+
+  /* The arrow leads the way out on hover — the one bit of motion a text link gets. */
+  .row__link svg {
+    transition: translate var(--dur-base) var(--ease-out);
+  }
+
+  .row__link:hover svg,
+  .row__link:focus-visible svg {
+    translate: 0.25em 0;
+  }
+
+  @media (width < 56rem) {
+    .row {
+      grid-template-columns: 1fr;
+      gap: var(--space-lg);
+      padding-top: var(--space-lg);
+      border-top: 1px solid var(--color-line);
+    }
+
+    /* Artwork under text on every row on a phone — alternating sides needs two
+       columns to be legible as a rhythm, and one column just makes it look random. */
+    .row[data-flip='true'] .row__text {
+      order: 0;
+    }
+
+    /* A single narrow column has no room for content to travel in sideways from —
+       48px of horizontal movement is a real fraction of a phone's width and risks a
+       moment of horizontal scroll, so every row settles for the up-and-fade regardless
+       of which direction it was given for the two-column layout above this width. */
+    .row__text :global(.reveal),
+    .row__visual :global(.reveal) {
+      animation-name: reveal-in-up;
+    }
+  }
+</style>

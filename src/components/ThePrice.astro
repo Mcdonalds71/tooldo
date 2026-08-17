@@ -1,0 +1,126 @@
+---
+import { InfinityIcon, ProhibitIcon, UserCircleDashedIcon } from '@phosphor-icons/react/dist/ssr';
+import Reveal from '../design-system/motion/Reveal.astro';
+
+const TERMS = [
+  {
+    glyph: UserCircleDashedIcon,
+    heading: 'No account',
+    body: 'Nothing to sign up for. Open a tool and start working.',
+  },
+  {
+    glyph: InfinityIcon,
+    heading: 'No limits',
+    body: 'Convert one file or a thousand. Same price every time: zero.',
+  },
+  {
+    glyph: ProhibitIcon,
+    heading: 'No ads, no trackers',
+    body: "We don't sell your attention or your data. There's nothing to sell.",
+  },
+];
+---
+
+<section id="price" class="price">
+  <div class="shell">
+    <Reveal from="mask">
+      <p class="eyebrow">the price</p>
+      <h2 class="price__heading">Free. Actually free.</h2>
+      <p class="price__sub">
+        No trials that expire, no upgrade prompts, and no watermarks stamped on your files.
+        Here's the whole deal.
+      </p>
+    </Reveal>
+
+    <ul class="price__grid">
+      {
+        TERMS.map(({ glyph: Glyph, heading, body }) => (
+          <li>
+            <Reveal>
+              <article class="term">
+                <span class="term__icon">
+                  <Glyph size="2rem" weight="duotone" aria-hidden />
+                </span>
+                <h3 class="term__heading">{heading}</h3>
+                <p class="term__body">{body}</p>
+              </article>
+            </Reveal>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .price {
+    text-align: center;
+  }
+
+  .price__heading {
+    margin-top: var(--space-xs);
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-tight);
+  }
+
+  .price__sub {
+    max-width: var(--width-prose);
+    margin: var(--space-sm) auto 0;
+    color: var(--color-ink-soft);
+  }
+
+  .price__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: var(--space-sm);
+    margin-top: var(--space-xl);
+    list-style: none;
+  }
+
+  /* Reveal wraps each card, so the card has to fill its wrapper or a short one in a
+     row of three would sit at its own height instead of on the shared baseline. */
+  .price__grid > li,
+  .price__grid :global(.reveal) {
+    height: 100%;
+  }
+
+  .term {
+    height: 100%;
+    padding: var(--space-lg);
+    border: var(--card-border);
+    border-radius: var(--card-radius);
+    box-shadow: var(--card-shadow);
+    background-color: var(--color-card);
+    text-align: start;
+    transition:
+      transform var(--dur-base) var(--ease-out),
+      box-shadow var(--dur-base) var(--ease-out);
+  }
+
+  .term:hover {
+    transform: translate(var(--card-lift), var(--card-lift));
+    box-shadow: var(--card-shadow-hover);
+  }
+
+  .term__icon {
+    display: grid;
+    place-items: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    margin-bottom: var(--space-sm);
+    border-radius: var(--radius-sm);
+    background-color: var(--color-paper-dim);
+    color: var(--color-ink);
+  }
+
+  .term__heading {
+    font-size: var(--text-xl);
+    font-weight: var(--weight-bold);
+  }
+
+  .term__body {
+    margin-top: var(--space-3xs);
+    color: var(--color-ink-soft);
+  }
+</style>
