@@ -33,7 +33,7 @@ const hasWatermark = watermark ?? (size === 'lg' || size === 'md');
        second, competing icon. */
     hasWatermark && (
       <span class="card__watermark" aria-hidden="true">
-        <Glyph size="var(--watermark-size)" weight="duotone" />
+        <Glyph size="100%" weight="duotone" />
       </span>
     )
   }
@@ -87,13 +87,32 @@ const hasWatermark = watermark ?? (size === 'lg' || size === 'md');
    */
   .card__watermark {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    translate: -50% -50%;
+    top: 1.5rem;
+    right: 1.5rem;
+    width: var(--watermark-size);
+    height: var(--watermark-size);
     color: var(--color-ink);
-    opacity: 0.07;
+    opacity: 0.22;
     pointer-events: none;
-    --watermark-size: 8rem;
+    --watermark-size: 7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+      transform var(--dur-slow) var(--ease-out),
+      opacity var(--dur-base) var(--ease-out);
+    will-change: transform, opacity;
+  }
+
+  .card__watermark :global(svg) {
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+  }
+
+  a.card:hover .card__watermark {
+    transform: scale(1.04);
+    opacity: 0.32;
   }
 
   .card__icon {
@@ -154,18 +173,22 @@ const hasWatermark = watermark ?? (size === 'lg' || size === 'md');
      weight, the watermark and the feature card's colour all follow the same gate:
      mobile is the plain card throughout, no exceptions. */
   @media (width >= 64rem) {
-    /* Back to the corner bleed at this width, overriding the mobile default above —
-       the desktop treatment reads as texture peeking from behind the content rather
-       than as a centred second icon competing with the real one. */
-    .card__watermark {
-      top: -12%;
-      left: auto;
-      right: -10%;
-      translate: none;
+    .card[data-size='sm'] {
+      --watermark-size: 9.5rem;
     }
 
-    .card[data-size='sm'] {
-      --watermark-size: 9rem;
+    .card[data-size='sm'] .card__watermark {
+      top: 50%;
+      right: 1.5rem;
+      transform: translateY(-50%);
+    }
+
+    .card[data-size='sm']:has(.card__watermark) {
+      background-image: radial-gradient(
+        ellipse at 85% 50%,
+        color-mix(in srgb, var(--color-ink) 6%, transparent) 0%,
+        transparent 65%
+      );
     }
 
     .card[data-size='md'] {
@@ -174,6 +197,16 @@ const hasWatermark = watermark ?? (size === 'lg' || size === 'md');
       --watermark-size: 15rem;
       padding: var(--space-lg);
       box-shadow: var(--shadow-brut);
+      background-image: radial-gradient(
+        ellipse at 80% 30%,
+        color-mix(in srgb, var(--color-ink) 6%, transparent) 0%,
+        transparent 70%
+      );
+    }
+
+    .card[data-size='md'] .card__watermark {
+      top: 1rem;
+      right: 1rem;
     }
 
     .card[data-size='md'] .card__name {
@@ -186,6 +219,17 @@ const hasWatermark = watermark ?? (size === 'lg' || size === 'md');
       --watermark-size: 19rem;
       padding: var(--space-lg);
       box-shadow: var(--shadow-brut-lifted);
+      background-image: radial-gradient(
+        ellipse at 78% 35%,
+        color-mix(in srgb, var(--color-signal) 8%, transparent) 0%,
+        color-mix(in srgb, var(--color-ink) 5%, transparent) 45%,
+        transparent 75%
+      );
+    }
+
+    .card[data-size='lg'] .card__watermark {
+      top: 1rem;
+      right: 1rem;
     }
 
     .card[data-size='lg'] .card__name {
