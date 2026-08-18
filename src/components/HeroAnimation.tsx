@@ -59,6 +59,12 @@ export const SHOWCASE_VIDEOS: ShowcaseVideo[] = [
 const CROSSFADE_DURATION_MS = 250;
 const TRANSITION_TRIGGER_LEAD_SEC = 0.28;
 
+const applyPlaybackRate = (vid: HTMLVideoElement, videoDef?: ShowcaseVideo) => {
+  const rate = videoDef?.playbackRate ?? DEFAULT_PLAYBACK_RATE;
+  vid.playbackRate = rate;
+  vid.defaultPlaybackRate = rate;
+};
+
 export function HeroAnimation() {
   const containerRef = useRef<HTMLDivElement>(null);
   const video0Ref = useRef<HTMLVideoElement>(null);
@@ -80,12 +86,6 @@ export function HeroAnimation() {
 
   // Keep activeLayerRef in sync
   activeLayerRef.current = activeLayer;
-
-  const applyPlaybackRate = (vid: HTMLVideoElement, videoDef?: ShowcaseVideo) => {
-    const rate = videoDef?.playbackRate ?? DEFAULT_PLAYBACK_RATE;
-    vid.playbackRate = rate;
-    vid.defaultPlaybackRate = rate;
-  };
 
   useEffect(() => {
     const video0 = video0Ref.current;

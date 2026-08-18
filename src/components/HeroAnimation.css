@@ -33,6 +33,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .hero-showcase__video {
-    transition: none !important;
+    transition: none;
   }
 }
