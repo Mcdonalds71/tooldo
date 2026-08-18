@@ -20,7 +20,7 @@ overrides:
   # build instead. Pin to the patch inside the major each parent already expects.
   sharp: '>=0.35.0 <0.36.0'
   js-yaml: '>=4.3.1 <5'
-  nanoid: '>=3.3.17 <4'
+  nanoid: '>=3.3.18 <4'
 
 allowBuilds:
   esbuild: true
@@ -28,3 +28,6 @@ allowBuilds:
   # Wrangler shells out to workerd, whose install script fetches the platform binary.
   # Skip it and the deploy step fails on a runtime that never finished installing.
   workerd: true
+
+minimumReleaseAgeExclude:
+  - nanoid@3.3.18
