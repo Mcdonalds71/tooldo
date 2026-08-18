@@ -18,10 +18,10 @@ test('the home page shows every registered tool', async ({ page }) => {
  * Runs under the reduced-motion project too, which is the point: the bento has to
  * reach its resting state from CSS alone, without waiting on GSAP.
  */
-test('the hero bento shows the preview, the badge, and the promise', async ({ page }) => {
+test('the hero bento shows the video showcase, the badge, and the promise', async ({ page }) => {
   await page.goto('/');
 
-  await expect(page.locator('.preview__saved')).toHaveText(/86%/);
+  await expect(page.locator('.hero-showcase')).toBeVisible();
   await expect(page.getByRole('link', { name: 'Explore', exact: true })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Read the privacy promise' })).toBeVisible();
 });
