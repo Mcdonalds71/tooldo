@@ -3,6 +3,30 @@ import { HeroAnimation } from './HeroAnimation';
 ---
 
 <div class="preview-wrapper">
+  <svg width="0" height="0" style="position: absolute;" aria-hidden="true">
+    <defs>
+      <clipPath id="hero-preview-clip" clipPathUnits="objectBoundingBox">
+        <path
+          d="
+            M 0, 0.03
+            Q 0,0 0.018,0
+            L 0.90, 0
+            Q 0.92,0 0.935,0.025
+            L 0.985,0.115
+            Q 1,0.14 1,0.17
+            L 1, 0.97
+            Q 1,1 0.982,1
+            L 0.095, 1
+            Q 0.075,1 0.06,0.975
+            L 0.012,0.89
+            Q 0,0.865 0,0.835
+            Z
+          "
+        ></path>
+      </clipPath>
+    </defs>
+  </svg>
+
   <article class="preview">
     <div class="preview__inner">
       <HeroAnimation client:load />
@@ -14,34 +38,18 @@ import { HeroAnimation } from './HeroAnimation';
   .preview-wrapper {
     position: relative;
     width: 100%;
+    max-width: 100%;
     filter: drop-shadow(6px 6px 0 var(--color-ink, #1c1a15));
-    --hero-chamfer-tr: clamp(2.5rem, 5.5vw, 4rem);
-    --hero-chamfer-bl: clamp(2rem, 4.5vw, 3.2rem);
-    --corner-r: 5px;
-    --chamfer-r: 5px;
   }
 
   .preview {
     position: relative;
     width: 100%;
-    aspect-ratio: 16 / 10.2;
-    min-height: 20rem;
+    aspect-ratio: 16 / 9;
+    min-height: 18rem;
     background-color: var(--color-ink, #1c1a15);
     padding: 2.5px;
-    clip-path: polygon(
-      0 var(--corner-r),
-      var(--corner-r) 0,
-      calc(100% - var(--hero-chamfer-tr) - var(--chamfer-r)) 0,
-      calc(100% - var(--hero-chamfer-tr) + var(--chamfer-r)) var(--chamfer-r),
-      calc(100% - var(--chamfer-r)) calc(var(--hero-chamfer-tr) - var(--chamfer-r)),
-      100% calc(var(--hero-chamfer-tr) + var(--chamfer-r)),
-      100% calc(100% - var(--corner-r)),
-      calc(100% - var(--corner-r)) 100%,
-      calc(var(--hero-chamfer-bl) + var(--chamfer-r)) 100%,
-      calc(var(--hero-chamfer-bl) - var(--chamfer-r)) calc(100% - var(--chamfer-r)),
-      var(--chamfer-r) calc(100% - var(--hero-chamfer-bl) + var(--chamfer-r)),
-      0 calc(100% - var(--hero-chamfer-bl) - var(--chamfer-r))
-    );
+    clip-path: url(#hero-preview-clip);
     display: flex;
   }
 
@@ -51,27 +59,12 @@ import { HeroAnimation } from './HeroAnimation';
     height: 100%;
     overflow: hidden;
     background-color: var(--color-card);
-    clip-path: polygon(
-      0 var(--corner-r),
-      var(--corner-r) 0,
-      calc(100% - var(--hero-chamfer-tr) - var(--chamfer-r)) 0,
-      calc(100% - var(--hero-chamfer-tr) + var(--chamfer-r)) var(--chamfer-r),
-      calc(100% - var(--chamfer-r)) calc(var(--hero-chamfer-tr) - var(--chamfer-r)),
-      100% calc(var(--hero-chamfer-tr) + var(--chamfer-r)),
-      100% calc(100% - var(--corner-r)),
-      calc(100% - var(--corner-r)) 100%,
-      calc(var(--hero-chamfer-bl) + var(--chamfer-r)) 100%,
-      calc(var(--hero-chamfer-bl) - var(--chamfer-r)) calc(100% - var(--chamfer-r)),
-      var(--chamfer-r) calc(100% - var(--hero-chamfer-bl) + var(--chamfer-r)),
-      0 calc(100% - var(--hero-chamfer-bl) - var(--chamfer-r))
-    );
+    clip-path: url(#hero-preview-clip);
   }
 
   @media (width < 56rem) {
     .preview-wrapper {
       filter: drop-shadow(4px 4px 0 var(--color-ink, #1c1a15));
-      --hero-chamfer-tr: 2.2rem;
-      --hero-chamfer-bl: 1.8rem;
     }
 
     .preview {
