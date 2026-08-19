@@ -79,7 +79,17 @@ const liveTools = tools.filter((t) => t.status === 'live');
   </div>
 
   <div class="footer__wordmarkWrap" aria-hidden="true">
-    <p class="footer__wordmark">{SITE.name.toLowerCase()}</p>
+    <svg class="footer__wordmarkSvg" viewBox="0 0 1000 190" preserveAspectRatio="none">
+      <text
+        x="-8"
+        y="160"
+        textLength="1016"
+        lengthAdjust="spacingAndGlyphs"
+        class="footer__wordmarkText"
+      >
+        {SITE.name.toLowerCase()}
+      </text>
+    </svg>
   </div>
 </footer>
 
@@ -235,25 +245,25 @@ const liveTools = tools.filter((t) => t.status === 'live');
     display: flex;
     justify-content: center;
     pointer-events: none;
-    margin-top: var(--space-lg);
-    margin-bottom: -0.05em;
+    margin-top: var(--space-xl);
+    line-height: 0;
   }
 
-  .footer__wordmark {
+  .footer__wordmarkSvg {
+    width: 100%;
+    height: auto;
+    max-height: 23vw;
+    display: block;
+  }
+
+  .footer__wordmarkText {
     font-family: var(--font-display);
-    font-size: clamp(5rem, 23.5vw, 100vw);
     font-weight: var(--weight-bold);
-    line-height: 0.75;
     letter-spacing: -0.045em;
     text-transform: lowercase;
-    white-space: nowrap;
-    text-align: center;
-    width: 100%;
-    color: rgba(255, 255, 255, 0.045);
+    fill: rgba(255, 255, 255, 0.045);
+    font-size: 250px;
     user-select: none;
-    margin: 0;
-    padding: 0;
-    display: block;
   }
 
   @media (width < 56rem) {
@@ -276,10 +286,6 @@ const liveTools = tools.filter((t) => t.status === 'live');
       flex-direction: column;
       align-items: flex-start;
       gap: var(--space-2xs);
-    }
-
-    .footer__wordmark {
-      font-size: clamp(3.5rem, 23.5vw, 100vw);
     }
   }
 </style>
