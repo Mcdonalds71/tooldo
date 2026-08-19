@@ -2,7 +2,6 @@
 import { DeviceMobileIcon, LightningIcon, WifiSlashIcon } from '@phosphor-icons/react/dist/ssr';
 import Reveal from '../design-system/motion/Reveal.astro';
 import { SITE } from '../lib/site';
-import OfflineSimulator from './OfflineSimulator';
 
 /**
  * Deliberately careful copy. The service worker precaches the site but not each tool's
@@ -44,7 +43,16 @@ const PILLS = [
 
       <div class="install__stage">
         <Reveal from="right">
-          <OfflineSimulator client:visible />
+          <div class="install__mockup-wrap">
+            <img
+              class="install__mockup"
+              src="/INSTALL IT ONCE SECTION.png"
+              alt="tooldo installed on mobile home screen"
+              width="1016"
+              height="1738"
+              loading="lazy"
+            />
+          </div>
         </Reveal>
       </div>
     </div>
@@ -103,13 +111,33 @@ const PILLS = [
 
   .install__stage {
     position: relative;
-    display: grid;
-    place-items: center;
-    min-height: 21rem;
-    padding: var(--space-xl) var(--space-md);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 24rem;
     overflow: hidden;
-    background-color: var(--color-char);
+    background-color: var(--color-char, #1c1a15);
     border-left: var(--brut-border);
+    padding-inline: var(--space-md);
+  }
+
+  .install__mockup-wrap {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    max-width: 18rem;
+    margin-top: -1.5rem;
+    filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.4));
+  }
+
+  .install__mockup {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    user-select: none;
+    pointer-events: none;
   }
 
   @media (width < 56rem) {
@@ -122,13 +150,17 @@ const PILLS = [
     }
 
     .install__stage {
-      min-height: 17rem;
-      padding: var(--space-sm);
+      min-height: 20rem;
+      border-left: none;
+      border-top: var(--brut-border);
+      padding-inline: var(--space-sm);
     }
 
-    /* Left/right entrances need the two halves to actually sit side by side to read
-       as arriving toward each other — stacked on a phone, they'd both just slide up
-       from the bottom regardless, so both settle for the up-and-fade instead. */
+    .install__mockup-wrap {
+      max-width: 15rem;
+      margin-top: -1rem;
+    }
+
     .install__text :global(.reveal),
     .install__stage :global(.reveal) {
       animation-name: reveal-in-up;
