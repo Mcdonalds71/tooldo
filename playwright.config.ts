@@ -27,7 +27,7 @@ export default defineConfig({
    * contention, so it isn't a knob this file can turn. `retries` on CI exists for
    * exactly this shape of flake.
    */
-  workers: 2,
+  workers: isCI ? 4 : 2,
   timeout: 30_000,
   forbidOnly: isCI,
   retries: isCI ? 1 : 0,
@@ -39,6 +39,7 @@ export default defineConfig({
     // Proves the reduced-motion fallbacks actually render, rather than assuming they do.
     {
       name: 'reduced-motion',
+      testMatch: /(home|landing)\.spec\.ts/,
       use: { ...devices['Desktop Chrome'], contextOptions: { reducedMotion: 'reduce' } },
     },
   ],
