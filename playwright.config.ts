@@ -28,8 +28,9 @@ export default defineConfig({
    * exactly this shape of flake.
    */
   workers: 2,
+  timeout: 30_000,
   forbidOnly: isCI,
-  retries: isCI ? 2 : 0,
+  retries: isCI ? 1 : 0,
   reporter: isCI ? 'github' : 'list',
   use: { baseURL, trace: 'on-first-retry' },
   projects: [

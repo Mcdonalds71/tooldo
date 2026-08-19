@@ -218,10 +218,13 @@ function cellVars(cell: BentoCell, order: number): string {
     /* Shrinking toward the top edge keeps the card's header pinned where the eye is
        already resting; scaling from the centre would slide it down as it shrinks.
        The explicit `brightness(1)` gives the recede tween below a real starting
-       filter to interpolate from, rather than animating from the implicit `none`. */
+       filter to interpolate from, rather than animating from the implicit `none`.
+       We disable transition on transform so CSS doesn't lag against GSAP ScrollTrigger scrub. */
     .tools__item :global(.card) {
       transform-origin: top center;
       filter: brightness(1);
+      transition: box-shadow var(--dur-base) var(--ease-out), background-color var(--dur-base) var(--ease-out);
+      will-change: transform, filter;
     }
   }
 
@@ -278,19 +281,21 @@ function cellVars(cell: BentoCell, order: number): string {
     const pinOffset = rootFontSize * 5.5;
 
     // The last card is never covered by anything, so it never recedes.
-    const tweens = items.slice(0, -1).map((item) =>
-      gsap.to(item.querySelector('.card'), {
-        scale: 0.9,
-        filter: 'brightness(0.82)',
-        ease: 'none',
+    const tweens = items.slice(0, -1).map((item) => {
+      const card = item.querySelector('.card');
+      return gsap.to(card, {
+        scale: 0.92,
+        filter: 'brightness(0.85)',
+        ease: 'power1.out',
         scrollTrigger: {
           trigger: item,
           start: `top ${pinOffset}px`,
           end: `bottom ${pinOffset}px`,
-          scrub: true,
+          scrub: 0.5,
+          invalidateOnRefresh: true,
         },
-      }),
-    );
+      });
+    });
 
     // Cleaning up here is what stops these surviving a resize up into the bento.
     return () => {
