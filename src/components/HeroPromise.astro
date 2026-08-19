@@ -14,7 +14,7 @@ import { ArrowRightIcon } from '@phosphor-icons/react/dist/ssr';
 
       <a class="promise__go" href="/privacy">
         <span class="promise__go-icon" aria-hidden>
-          <ArrowRightIcon size="1.1rem" weight="bold" />
+          <ArrowRightIcon size="0.95rem" weight="bold" />
         </span>
         Read the privacy promise
       </a>
@@ -26,18 +26,16 @@ import { ArrowRightIcon } from '@phosphor-icons/react/dist/ssr';
   .promise-wrapper {
     position: relative;
     width: 100%;
-    height: 100%;
     filter: drop-shadow(6px 6px 0 var(--color-ink, #1c1a15));
-    --promise-chamfer-tr: clamp(2rem, 4.5vw, 3rem);
-    --promise-chamfer-bl: clamp(1.6rem, 3.5vw, 2.4rem);
-    --corner-r: 10px;
-    --chamfer-r: 6px;
+    --promise-chamfer-tr: clamp(1.8rem, 3.8vw, 2.5rem);
+    --promise-chamfer-bl: clamp(1.4rem, 3vw, 2rem);
+    --corner-r: 5px;
+    --chamfer-r: 5px;
   }
 
   .promise {
     position: relative;
     width: 100%;
-    height: 100%;
     background-color: var(--color-ink, #1c1a15);
     padding: 2.5px;
     clip-path: polygon(
@@ -60,12 +58,11 @@ import { ArrowRightIcon } from '@phosphor-icons/react/dist/ssr';
   .promise__inner {
     position: relative;
     width: 100%;
-    height: 100%;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: var(--space-md);
-    padding: var(--space-lg);
+    gap: var(--space-xs);
+    padding: 1.1rem;
     background-color: var(--color-card);
     clip-path: polygon(
       0 var(--corner-r),
@@ -88,15 +85,19 @@ import { ArrowRightIcon } from '@phosphor-icons/react/dist/ssr';
   .promise__eyebrow {
     font-family: var(--font-display);
     font-weight: var(--weight-semibold);
-    font-size: var(--text-sm);
+    font-size: 0.78rem;
     letter-spacing: normal;
     color: var(--color-ink);
+    margin: 0;
   }
 
   .promise__copy {
     color: var(--color-ink-soft);
-    font-size: var(--text-sm);
-    text-wrap: pretty;
+    font-size: 0.82rem;
+    line-height: 1.45;
+    text-align: justify;
+    text-justify: inter-word;
+    margin: 0;
   }
 
   /* The arrow keeps its weight, but the words carry the destination — an arrow alone
@@ -105,19 +106,19 @@ import { ArrowRightIcon } from '@phosphor-icons/react/dist/ssr';
     display: inline-flex;
     align-items: center;
     gap: var(--space-2xs);
-    margin-top: auto;
+    margin-top: var(--space-2xs);
     color: var(--color-ink);
     font-family: var(--font-display);
     font-weight: var(--weight-semibold);
-    font-size: var(--text-sm);
+    font-size: 0.8rem;
     text-decoration: none;
   }
 
   .promise__go-icon {
     display: grid;
     place-items: center;
-    width: var(--tap-target-min);
-    height: var(--tap-target-min);
+    width: 1.6rem;
+    height: 1.6rem;
     border: var(--brut-border);
     border-radius: var(--radius-full);
     background-color: var(--color-ink);
@@ -133,14 +134,30 @@ import { ArrowRightIcon } from '@phosphor-icons/react/dist/ssr';
   @media (width < 56rem) {
     .promise-wrapper {
       filter: drop-shadow(4px 4px 0 var(--color-ink, #1c1a15));
-      --promise-chamfer-tr: clamp(1.5rem, 4vw, 2.2rem);
-      --promise-chamfer-bl: clamp(1.2rem, 3vw, 1.8rem);
-      --corner-r: 8px;
-      --chamfer-r: 4px;
+      --promise-chamfer-tr: 1.8rem;
+      --promise-chamfer-bl: 1.4rem;
     }
 
     .promise {
       padding: 2px;
+    }
+
+    .promise__inner {
+      padding: 0.85rem;
+      gap: 0.4rem;
+    }
+
+    .promise__eyebrow {
+      font-size: 0.75rem;
+    }
+
+    .promise__copy {
+      font-size: 0.78rem;
+      line-height: 1.4;
+    }
+
+    .promise__go {
+      font-size: 0.75rem;
     }
   }
 </style>

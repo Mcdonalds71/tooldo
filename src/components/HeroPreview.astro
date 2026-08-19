@@ -15,17 +15,17 @@ import { HeroAnimation } from './HeroAnimation';
     position: relative;
     width: 100%;
     filter: drop-shadow(6px 6px 0 var(--color-ink, #1c1a15));
-    --hero-chamfer-tr: clamp(2.5rem, 5.5vw, 4.2rem);
+    --hero-chamfer-tr: clamp(2.5rem, 5.5vw, 4rem);
     --hero-chamfer-bl: clamp(2rem, 4.5vw, 3.2rem);
-    --corner-r: 10px;
-    --chamfer-r: 6px;
+    --corner-r: 5px;
+    --chamfer-r: 5px;
   }
 
   .preview {
     position: relative;
     width: 100%;
-    aspect-ratio: 16 / 9;
-    min-height: 18rem;
+    aspect-ratio: 16 / 10.2;
+    min-height: 20rem;
     background-color: var(--color-ink, #1c1a15);
     padding: 2.5px;
     clip-path: polygon(
@@ -70,15 +70,13 @@ import { HeroAnimation } from './HeroAnimation';
   @media (width < 56rem) {
     .preview-wrapper {
       filter: drop-shadow(4px 4px 0 var(--color-ink, #1c1a15));
-      --hero-chamfer-tr: clamp(1.8rem, 5vw, 2.8rem);
-      --hero-chamfer-bl: clamp(1.5rem, 4vw, 2.2rem);
-      --corner-r: 8px;
-      --chamfer-r: 4px;
+      --hero-chamfer-tr: 2.2rem;
+      --hero-chamfer-bl: 1.8rem;
     }
 
     .preview {
-      aspect-ratio: 16 / 9;
-      min-height: 12rem;
+      aspect-ratio: 16 / 10.5;
+      min-height: 15rem;
       padding: 2px;
     }
   }
