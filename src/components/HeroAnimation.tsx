@@ -81,11 +81,13 @@ export function HeroAnimation() {
 
   const currentIndexRef = useRef(0);
   const activeLayerRef = useRef<0 | 1>(0);
+  const layerVideosRef = useRef(layerVideos);
   const isTransitioningRef = useRef(false);
   const isVisibleRef = useRef(true);
 
-  // Keep activeLayerRef in sync
+  // Keep refs in sync
   activeLayerRef.current = activeLayer;
+  layerVideosRef.current = layerVideos;
 
   useEffect(() => {
     const video0 = video0Ref.current;
@@ -206,7 +208,7 @@ export function HeroAnimation() {
     const handleLoadedMetadata = (e: Event) => {
       const vid = e.currentTarget as HTMLVideoElement;
       const isLayer0 = vid === video0;
-      const layerDef = isLayer0 ? layerVideos[0] : layerVideos[1];
+      const layerDef = isLayer0 ? layerVideosRef.current[0] : layerVideosRef.current[1];
       applyPlaybackRate(vid, layerDef);
     };
 
@@ -227,6 +229,32 @@ export function HeroAnimation() {
       }
     };
 
+    const tryPlayActive = () => {
+      const currentActiveVideo = activeLayerRef.current === 0 ? video0 : video1;
+      const currentActiveDef = SHOWCASE_VIDEOS[currentIndexRef.current];
+      if (currentActiveVideo) {
+        currentActiveVideo.muted = true;
+        currentActiveVideo.defaultMuted = true;
+        currentActiveVideo.playsInline = true;
+        applyPlaybackRate(currentActiveVideo, currentActiveDef);
+
+        const play = () => {
+          if (isVisibleRef.current) {
+            currentActiveVideo.play().catch(() => {});
+          }
+        };
+
+        if (currentActiveVideo.readyState >= 2) {
+          play();
+        } else {
+          currentActiveVideo.load();
+          play();
+          currentActiveVideo.addEventListener('canplay', play, { once: true });
+          currentActiveVideo.addEventListener('loadeddata', play, { once: true });
+        }
+      }
+    };
+
     video0.addEventListener('timeupdate', handleTimeUpdate);
     video0.addEventListener('loadedmetadata', handleLoadedMetadata);
     video0.addEventListener('play', handleLoadedMetadata);
@@ -239,15 +267,25 @@ export function HeroAnimation() {
     video1.addEventListener('ended', handleEnded);
     video1.addEventListener('error', handleError);
 
-    // Initial start
-    if (isVisibleRef.current) {
-      applyPlaybackRate(video0, SHOWCASE_VIDEOS[0]);
-      video0.play().catch(() => {});
-    }
+    // Initial playback
+    tryPlayActive();
+
+    // Listen for Astro SPA page navigation restores and visibility changes
+    const handleRestore = () => {
+      tryPlayActive();
+    };
+    document.addEventListener('astro:page-load', handleRestore);
+    document.addEventListener('astro:after-swap', handleRestore);
+    document.addEventListener('visibilitychange', handleRestore);
+    window.addEventListener('pageshow', handleRestore);
 
     return () => {
       isMounted = false;
       observer.disconnect();
+      document.removeEventListener('astro:page-load', handleRestore);
+      document.removeEventListener('astro:after-swap', handleRestore);
+      document.removeEventListener('visibilitychange', handleRestore);
+      window.removeEventListener('pageshow', handleRestore);
       video0.removeEventListener('timeupdate', handleTimeUpdate);
       video0.removeEventListener('loadedmetadata', handleLoadedMetadata);
       video0.removeEventListener('play', handleLoadedMetadata);
@@ -259,7 +297,7 @@ export function HeroAnimation() {
       video1.removeEventListener('ended', handleEnded);
       video1.removeEventListener('error', handleError);
     };
-  }, [reducedMotion, layerVideos]);
+  }, [reducedMotion]);
 
   return (
     <div className="hero-showcase" ref={containerRef} aria-hidden="true">

@@ -99,7 +99,7 @@ const liveTools = tools.filter((t) => t.status === 'live');
     isolation: isolate;
     overflow: hidden;
     padding-top: var(--space-2xl);
-    padding-bottom: var(--space-sm);
+    padding-bottom: 0;
     background-color: var(--color-char);
     color: var(--color-line);
   }
@@ -246,7 +246,9 @@ const liveTools = tools.filter((t) => t.status === 'live');
     justify-content: center;
     pointer-events: none;
     margin-top: var(--space-xl);
+    margin-bottom: 0;
     line-height: 0;
+    font-size: 0;
   }
 
   .footer__wordmarkSvg {
@@ -254,6 +256,8 @@ const liveTools = tools.filter((t) => t.status === 'live');
     height: auto;
     max-height: 23vw;
     display: block;
+    vertical-align: bottom;
+    margin-bottom: -6px;
   }
 
   .footer__wordmarkText {
@@ -269,7 +273,7 @@ const liveTools = tools.filter((t) => t.status === 'live');
   @media (width < 56rem) {
     .footer {
       padding-top: var(--space-xl);
-      padding-bottom: var(--space-xs);
+      padding-bottom: 0;
     }
 
     .footer__inner {
