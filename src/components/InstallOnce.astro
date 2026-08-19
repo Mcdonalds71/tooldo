@@ -101,31 +101,15 @@ const PILLS = [
     font-size: var(--text-xs);
   }
 
-  /* The one charcoal surface on the page. An inverse panel is what makes a phone read
-     as a lit screen rather than a paper cut-out sitting on more paper. */
   .install__stage {
     position: relative;
     display: grid;
     place-items: center;
     min-height: 21rem;
-    padding: var(--space-md);
+    padding: var(--space-xl) var(--space-md);
     overflow: hidden;
     background-color: var(--color-char);
-  }
-
-  .install__stage::before {
-    content: '';
-    position: absolute;
-    top: -30%;
-    width: 26rem;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    pointer-events: none;
-    background: radial-gradient(
-      circle,
-      color-mix(in srgb, var(--color-signal) 42%, transparent),
-      transparent 70%
-    );
+    border-left: var(--brut-border);
   }
 
   @media (width < 56rem) {

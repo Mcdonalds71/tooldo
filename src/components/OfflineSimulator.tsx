@@ -16,7 +16,7 @@ export default function OfflineSimulator() {
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const [progress, setProgress] = useState<number>(100);
   const [resultText, setResultText] = useState<string | null>(
-    'Executed locally in 34ms • 0 bytes sent to network',
+    'Executed locally in 32ms • Zero server requests',
   );
 
   const toggleAirplaneMode = () => {
@@ -35,7 +35,7 @@ export default function OfflineSimulator() {
         if (p >= 100) {
           clearInterval(interval);
           const duration = Math.max(18, Date.now() - startTime);
-          setResultText(`Executed locally in ${duration}ms • 0 bytes sent to network`);
+          setResultText(`Executed locally in ${duration}ms • Zero server requests`);
           setIsRunning(false);
           return 100;
         }
@@ -58,12 +58,12 @@ export default function OfflineSimulator() {
         >
           {isAirplaneMode ? (
             <>
-              <AirplaneTiltIcon size={16} weight="bold" />
+              <AirplaneTiltIcon size={15} weight="bold" />
               <span>Airplane Mode: ON</span>
             </>
           ) : (
             <>
-              <WifiHighIcon size={16} weight="bold" />
+              <WifiHighIcon size={15} weight="bold" />
               <span>Airplane Mode: OFF</span>
             </>
           )}
@@ -94,7 +94,7 @@ export default function OfflineSimulator() {
       {/* Telemetry Stats Grid */}
       <div className="offline-sim__telemetry">
         <div className="offline-sim__stat">
-          <span className="offline-sim__stat-label">Network I/O</span>
+          <span className="offline-sim__stat-label">01 / Network I/O</span>
           <span
             className={`offline-sim__stat-value ${
               isAirplaneMode ? 'offline-sim__stat-value--highlight' : ''
@@ -105,14 +105,14 @@ export default function OfflineSimulator() {
         </div>
 
         <div className="offline-sim__stat">
-          <span className="offline-sim__stat-label">Cloud Requests</span>
-          <span className="offline-sim__stat-value offline-sim__stat-value--highlight">
+          <span className="offline-sim__stat-label">02 / Cloud Requests</span>
+          <span className="offline-sim__stat-value">
             <ShieldCheckIcon size={14} weight="bold" />0
           </span>
         </div>
 
         <div className="offline-sim__stat">
-          <span className="offline-sim__stat-label">Execution Engine</span>
+          <span className="offline-sim__stat-label">03 / Engine</span>
           <span className="offline-sim__stat-value">
             <CpuIcon size={14} weight="bold" />
             Local WASM
@@ -145,7 +145,7 @@ export default function OfflineSimulator() {
             ) : (
               <>
                 <LightningIcon size={15} weight="bold" />
-                Test Offline Run
+                Run In-Memory Test
               </>
             )}
           </button>
@@ -159,7 +159,7 @@ export default function OfflineSimulator() {
         {/* Result Message */}
         {resultText && (
           <div className="offline-sim__result">
-            <CheckCircleIcon size={14} weight="fill" />
+            <CheckCircleIcon size={14} weight="bold" />
             <span>{resultText}</span>
           </div>
         )}
