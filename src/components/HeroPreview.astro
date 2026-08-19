@@ -1,6 +1,5 @@
 ---
 import { formatBytes } from '../lib/formatBytes';
-import { HeroAnimation } from './HeroAnimation';
 
 /**
  * The frame a tool animation will live in. Until the tools exist it holds the one
@@ -33,9 +32,7 @@ const saved = Math.round((1 - after / before) * 100);
   </div>
 
   <!-- The tool's own animation mounts here once that tool is built. -->
-  <div class="preview__stage" data-slot="animation">
-    <HeroAnimation client:load />
-  </div>
+  <div class="preview__stage" data-slot="animation"></div>
 </article>
 
 <style>
