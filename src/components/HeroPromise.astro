@@ -9,17 +9,17 @@ import { ArrowRightIcon } from '@phosphor-icons/react/dist/ssr';
         <path
           d="
             M 0, 0.04
-            Q 0,0 0.03,0
-            L 0.86, 0
-            Q 0.89,0 0.91,0.035
-            L 0.975,0.14
-            Q 1,0.175 1,0.21
+            Q 0,0 0.025,0
+            L 0.88, 0
+            Q 0.905,0 0.92,0.025
+            L 0.98,0.12
+            Q 1,0.15 1,0.18
             L 1, 0.96
-            Q 1,1 0.97,1
-            L 0.13, 1
-            Q 0.10,1 0.08,0.965
-            L 0.02,0.865
-            Q 0,0.83 0,0.79
+            Q 1,1 0.975,1
+            L 0.12, 1
+            Q 0.095,1 0.08,0.975
+            L 0.02,0.88
+            Q 0,0.85 0,0.82
             Z
           "
         ></path>
@@ -50,7 +50,6 @@ import { ArrowRightIcon } from '@phosphor-icons/react/dist/ssr';
   .promise-wrapper {
     position: relative;
     width: 100%;
-    max-width: 100%;
     filter: drop-shadow(6px 6px 0 var(--color-ink, #1c1a15));
   }
 
@@ -128,34 +127,39 @@ import { ArrowRightIcon } from '@phosphor-icons/react/dist/ssr';
 
   @media (width < 56rem) {
     .promise-wrapper {
+      width: calc(100% - 4px);
       filter: drop-shadow(4px 4px 0 var(--color-ink, #1c1a15));
     }
 
     .promise {
+      aspect-ratio: 16 / 12.5;
+      min-height: 11.5rem;
       padding: 2px;
     }
 
     .promise__inner {
-      padding: 0.85rem;
-      gap: 0.4rem;
+      padding: var(--space-md);
+      gap: var(--space-xs);
     }
 
     .promise__eyebrow {
-      font-size: 0.75rem;
+      font-size: 0.82rem;
     }
 
     .promise__copy {
-      font-size: 0.78rem;
-      line-height: 1.4;
+      font-size: 0.82rem;
+      line-height: 1.45;
     }
 
     .promise__go {
-      font-size: 0.75rem;
+      font-size: 0.82rem;
+      margin-top: auto;
+      padding-top: 0.35rem;
     }
 
     .promise__go-icon {
-      width: 1.5rem;
-      height: 1.5rem;
+      width: 1.65rem;
+      height: 1.65rem;
     }
   }
 </style>

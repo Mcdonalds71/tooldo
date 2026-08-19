@@ -8,18 +8,18 @@ import { HeroAnimation } from './HeroAnimation';
       <clipPath id="hero-preview-clip" clipPathUnits="objectBoundingBox">
         <path
           d="
-            M 0, 0.03
-            Q 0,0 0.018,0
-            L 0.90, 0
-            Q 0.92,0 0.935,0.025
-            L 0.985,0.115
-            Q 1,0.14 1,0.17
-            L 1, 0.97
-            Q 1,1 0.982,1
-            L 0.095, 1
-            Q 0.075,1 0.06,0.975
-            L 0.012,0.89
-            Q 0,0.865 0,0.835
+            M 0, 0.04
+            Q 0,0 0.025,0
+            L 0.88, 0
+            Q 0.905,0 0.92,0.025
+            L 0.98,0.12
+            Q 1,0.15 1,0.18
+            L 1, 0.96
+            Q 1,1 0.975,1
+            L 0.12, 1
+            Q 0.095,1 0.08,0.975
+            L 0.02,0.88
+            Q 0,0.85 0,0.82
             Z
           "
         ></path>
@@ -38,7 +38,6 @@ import { HeroAnimation } from './HeroAnimation';
   .preview-wrapper {
     position: relative;
     width: 100%;
-    max-width: 100%;
     filter: drop-shadow(6px 6px 0 var(--color-ink, #1c1a15));
   }
 
@@ -64,12 +63,13 @@ import { HeroAnimation } from './HeroAnimation';
 
   @media (width < 56rem) {
     .preview-wrapper {
+      width: calc(100% - 4px);
       filter: drop-shadow(4px 4px 0 var(--color-ink, #1c1a15));
     }
 
     .preview {
-      aspect-ratio: 16 / 10.5;
-      min-height: 15rem;
+      aspect-ratio: 16 / 10;
+      min-height: 14rem;
       padding: 2px;
     }
   }
