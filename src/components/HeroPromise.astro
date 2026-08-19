@@ -2,33 +2,85 @@
 import { ArrowRightIcon } from '@phosphor-icons/react/dist/ssr';
 ---
 
-<article class="promise">
-  <p class="promise__eyebrow">Runs locally &bull; No tracking &bull; Open source</p>
+<div class="promise-wrapper">
+  <article class="promise">
+    <div class="promise__inner">
+      <p class="promise__eyebrow">Runs locally &bull; No tracking &bull; Open source</p>
 
-  <p class="promise__copy">
-    Convert, compress, clean, and edit files directly in your browser. Everything runs
-    on your device, so your files stay private. No accounts. No cloud processing.
-  </p>
+      <p class="promise__copy">
+        Convert, compress, clean, and edit files directly in your browser. Everything runs
+        on your device, so your files stay private. No accounts. No cloud processing.
+      </p>
 
-  <a class="promise__go" href="/privacy">
-    <span class="promise__go-icon" aria-hidden>
-      <ArrowRightIcon size="1.1rem" weight="bold" />
-    </span>
-    Read the privacy promise
-  </a>
-</article>
+      <a class="promise__go" href="/privacy">
+        <span class="promise__go-icon" aria-hidden>
+          <ArrowRightIcon size="1.1rem" weight="bold" />
+        </span>
+        Read the privacy promise
+      </a>
+    </div>
+  </article>
+</div>
 
 <style>
+  .promise-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(6px 6px 0 var(--color-ink, #1c1a15));
+    --promise-chamfer-tr: clamp(2rem, 4.5vw, 3rem);
+    --promise-chamfer-bl: clamp(1.6rem, 3.5vw, 2.4rem);
+    --corner-r: 10px;
+    --chamfer-r: 6px;
+  }
+
   .promise {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: var(--color-ink, #1c1a15);
+    padding: 2.5px;
+    clip-path: polygon(
+      0 var(--corner-r),
+      var(--corner-r) 0,
+      calc(100% - var(--promise-chamfer-tr) - var(--chamfer-r)) 0,
+      calc(100% - var(--promise-chamfer-tr) + var(--chamfer-r)) var(--chamfer-r),
+      calc(100% - var(--chamfer-r)) calc(var(--promise-chamfer-tr) - var(--chamfer-r)),
+      100% calc(var(--promise-chamfer-tr) + var(--chamfer-r)),
+      100% calc(100% - var(--corner-r)),
+      calc(100% - var(--corner-r)) 100%,
+      calc(var(--promise-chamfer-bl) + var(--chamfer-r)) 100%,
+      calc(var(--promise-chamfer-bl) - var(--chamfer-r)) calc(100% - var(--chamfer-r)),
+      var(--chamfer-r) calc(100% - var(--promise-chamfer-bl) + var(--chamfer-r)),
+      0 calc(100% - var(--promise-chamfer-bl) - var(--chamfer-r))
+    );
+    display: flex;
+  }
+
+  .promise__inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     gap: var(--space-md);
     padding: var(--space-lg);
-    border: var(--card-border);
-    border-radius: var(--bento-radius);
-    box-shadow: var(--card-shadow);
     background-color: var(--color-card);
+    clip-path: polygon(
+      0 var(--corner-r),
+      var(--corner-r) 0,
+      calc(100% - var(--promise-chamfer-tr) - var(--chamfer-r)) 0,
+      calc(100% - var(--promise-chamfer-tr) + var(--chamfer-r)) var(--chamfer-r),
+      calc(100% - var(--chamfer-r)) calc(var(--promise-chamfer-tr) - var(--chamfer-r)),
+      100% calc(var(--promise-chamfer-tr) + var(--chamfer-r)),
+      100% calc(100% - var(--corner-r)),
+      calc(100% - var(--corner-r)) 100%,
+      calc(var(--promise-chamfer-bl) + var(--chamfer-r)) 100%,
+      calc(var(--promise-chamfer-bl) - var(--chamfer-r)) calc(100% - var(--chamfer-r)),
+      var(--chamfer-r) calc(100% - var(--promise-chamfer-bl) + var(--chamfer-r)),
+      0 calc(100% - var(--promise-chamfer-bl) - var(--chamfer-r))
+    );
   }
 
   /* Display face at reading case — it carries the claims, so it should read as a line
@@ -37,7 +89,6 @@ import { ArrowRightIcon } from '@phosphor-icons/react/dist/ssr';
     font-family: var(--font-display);
     font-weight: var(--weight-semibold);
     font-size: var(--text-sm);
-    /* Display type is drawn tight; this line needs its bullets to breathe. */
     letter-spacing: normal;
     color: var(--color-ink);
   }
@@ -77,5 +128,19 @@ import { ArrowRightIcon } from '@phosphor-icons/react/dist/ssr';
 
   .promise__go:hover .promise__go-icon {
     translate: 3px 0;
+  }
+
+  @media (width < 56rem) {
+    .promise-wrapper {
+      filter: drop-shadow(4px 4px 0 var(--color-ink, #1c1a15));
+      --promise-chamfer-tr: clamp(1.5rem, 4vw, 2.2rem);
+      --promise-chamfer-bl: clamp(1.2rem, 3vw, 1.8rem);
+      --corner-r: 8px;
+      --chamfer-r: 4px;
+    }
+
+    .promise {
+      padding: 2px;
+    }
   }
 </style>

@@ -15,8 +15,10 @@ import { HeroAnimation } from './HeroAnimation';
     position: relative;
     width: 100%;
     filter: drop-shadow(6px 6px 0 var(--color-ink, #1c1a15));
-    --hero-chamfer-tr: clamp(2.5rem, 6vw, 4.5rem);
-    --hero-chamfer-bl: clamp(2rem, 5vw, 3.5rem);
+    --hero-chamfer-tr: clamp(2.5rem, 5.5vw, 4.2rem);
+    --hero-chamfer-bl: clamp(2rem, 4.5vw, 3.2rem);
+    --corner-r: 10px;
+    --chamfer-r: 6px;
   }
 
   .preview {
@@ -27,14 +29,18 @@ import { HeroAnimation } from './HeroAnimation';
     background-color: var(--color-ink, #1c1a15);
     padding: 2.5px;
     clip-path: polygon(
-      0 14px,
-      14px 0,
-      calc(100% - var(--hero-chamfer-tr)) 0,
-      100% var(--hero-chamfer-tr),
-      100% calc(100% - 14px),
-      calc(100% - 14px) 100%,
-      var(--hero-chamfer-bl) 100%,
-      0 calc(100% - var(--hero-chamfer-bl))
+      0 var(--corner-r),
+      var(--corner-r) 0,
+      calc(100% - var(--hero-chamfer-tr) - var(--chamfer-r)) 0,
+      calc(100% - var(--hero-chamfer-tr) + var(--chamfer-r)) var(--chamfer-r),
+      calc(100% - var(--chamfer-r)) calc(var(--hero-chamfer-tr) - var(--chamfer-r)),
+      100% calc(var(--hero-chamfer-tr) + var(--chamfer-r)),
+      100% calc(100% - var(--corner-r)),
+      calc(100% - var(--corner-r)) 100%,
+      calc(var(--hero-chamfer-bl) + var(--chamfer-r)) 100%,
+      calc(var(--hero-chamfer-bl) - var(--chamfer-r)) calc(100% - var(--chamfer-r)),
+      var(--chamfer-r) calc(100% - var(--hero-chamfer-bl) + var(--chamfer-r)),
+      0 calc(100% - var(--hero-chamfer-bl) - var(--chamfer-r))
     );
     display: flex;
   }
@@ -46,20 +52,28 @@ import { HeroAnimation } from './HeroAnimation';
     overflow: hidden;
     background-color: var(--color-card);
     clip-path: polygon(
-      0 14px,
-      14px 0,
-      calc(100% - var(--hero-chamfer-tr)) 0,
-      100% var(--hero-chamfer-tr),
-      100% calc(100% - 14px),
-      calc(100% - 14px) 100%,
-      var(--hero-chamfer-bl) 100%,
-      0 calc(100% - var(--hero-chamfer-bl))
+      0 var(--corner-r),
+      var(--corner-r) 0,
+      calc(100% - var(--hero-chamfer-tr) - var(--chamfer-r)) 0,
+      calc(100% - var(--hero-chamfer-tr) + var(--chamfer-r)) var(--chamfer-r),
+      calc(100% - var(--chamfer-r)) calc(var(--hero-chamfer-tr) - var(--chamfer-r)),
+      100% calc(var(--hero-chamfer-tr) + var(--chamfer-r)),
+      100% calc(100% - var(--corner-r)),
+      calc(100% - var(--corner-r)) 100%,
+      calc(var(--hero-chamfer-bl) + var(--chamfer-r)) 100%,
+      calc(var(--hero-chamfer-bl) - var(--chamfer-r)) calc(100% - var(--chamfer-r)),
+      var(--chamfer-r) calc(100% - var(--hero-chamfer-bl) + var(--chamfer-r)),
+      0 calc(100% - var(--hero-chamfer-bl) - var(--chamfer-r))
     );
   }
 
   @media (width < 56rem) {
     .preview-wrapper {
       filter: drop-shadow(4px 4px 0 var(--color-ink, #1c1a15));
+      --hero-chamfer-tr: clamp(1.8rem, 5vw, 2.8rem);
+      --hero-chamfer-bl: clamp(1.5rem, 4vw, 2.2rem);
+      --corner-r: 8px;
+      --chamfer-r: 4px;
     }
 
     .preview {
