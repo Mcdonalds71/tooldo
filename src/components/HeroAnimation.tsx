@@ -1,9 +1,4 @@
-import {
-  ArrowsInLineHorizontalIcon,
-  CheckCircleIcon,
-  FileImageIcon,
-  ImagesIcon,
-} from '@phosphor-icons/react/dist/ssr';
+import { ArrowsInLineHorizontal, CheckCircle, FileImage, Images } from '@phosphor-icons/react/dist/ssr';
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { useReducedMotion } from '../design-system/motion';
@@ -46,7 +41,7 @@ export function HeroAnimation() {
   if (reduced) {
     return (
       <div className="hero-anim">
-        <ImagesIcon size="3rem" weight="duotone" className="hero-anim__icon" />
+        <Images size="3rem" weight="duotone" className="hero-anim__icon" />
       </div>
     );
   }
@@ -64,7 +59,7 @@ export function HeroAnimation() {
               exit={{ opacity: 0, scale: 0.9 }}
               transition={{ duration: 0.4 }}
             >
-              <FileImageIcon size="2.5rem" weight="duotone" className="hero-anim__icon" />
+              <FileImage size="2.5rem" weight="duotone" className="hero-anim__icon" />
             </motion.div>
           )}
 
@@ -77,7 +72,7 @@ export function HeroAnimation() {
               exit={{ opacity: 0, scale: 0.7 }}
               transition={{ duration: 1.8, ease: 'easeInOut' }}
             >
-              <ArrowsInLineHorizontalIcon
+              <ArrowsInLineHorizontal
                 size="2.5rem"
                 weight="duotone"
                 className="hero-anim__icon hero-anim__icon--action"
@@ -100,7 +95,7 @@ export function HeroAnimation() {
               exit={{ opacity: 0 }}
               transition={{ type: 'spring', bounce: 0.5 }}
             >
-              <CheckCircleIcon
+              <CheckCircle
                 size="2.5rem"
                 weight="fill"
                 className="hero-anim__icon hero-anim__icon--success"
