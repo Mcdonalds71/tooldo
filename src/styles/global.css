@@ -15,12 +15,25 @@
     }
   }
 
+  html,
   body {
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
     background-color: var(--color-paper);
     color: var(--color-ink);
     font-family: var(--font-sans);
     line-height: var(--leading-body);
     -webkit-font-smoothing: antialiased;
+  }
+
+  main#main {
+    flex: 1 0 auto;
   }
 
   h1,
