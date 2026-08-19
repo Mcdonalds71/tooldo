@@ -42,9 +42,9 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'pnpm build && pnpm exec astro preview --port 4322',
+    command: 'pnpm exec astro preview --port 4322',
     url: baseURL,
     reuseExistingServer: false,
-    timeout: 180_000,
+    timeout: 120_000,
   },
 });
