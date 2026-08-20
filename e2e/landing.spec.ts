@@ -53,25 +53,45 @@ test('every section boundary has the same gap above and below', async ({ page })
     const dividers = [...document.querySelectorAll('.divider')];
     const sections = order.map((sel) => document.querySelector(sel));
 
+    /* A bounding box is not what a reader sees. An element inside an `overflow: hidden`
+       ancestor still reports its full, unclipped rect, so measuring boxes alone counts
+       pixels the browser never paints: the install section's phone is deliberately
+       pulled up so it bleeds off the top of its own dark stage, and the clipped part of
+       it was being read as the section starting 22px higher than it does.
+
+       So the clip travels down the walk, and every element is measured by the part of
+       it that actually survives its ancestors' clipping. */
     function paintedBounds(root: Element) {
       let top = Number.POSITIVE_INFINITY;
       let bottom = Number.NEGATIVE_INFINITY;
-      const walk = (el: Element) => {
+
+      const walk = (el: Element, clipTop: number, clipBottom: number) => {
         const cs = getComputedStyle(el);
         if (cs.display === 'none' || cs.visibility === 'hidden' || cs.opacity === '0') return;
+
         const r = el.getBoundingClientRect();
+        const visibleTop = Math.max(r.top, clipTop);
+        const visibleBottom = Math.min(r.bottom, clipBottom);
         const paints =
           el.childElementCount === 0 ||
           cs.backgroundColor !== 'rgba(0, 0, 0, 0)' ||
           cs.borderTopWidth !== '0px' ||
           cs.borderBottomWidth !== '0px';
-        if (paints && r.height > 0 && r.width > 0) {
-          top = Math.min(top, r.top);
-          bottom = Math.max(bottom, r.bottom);
+
+        if (paints && visibleBottom > visibleTop && r.width > 0) {
+          top = Math.min(top, visibleTop);
+          bottom = Math.max(bottom, visibleBottom);
         }
-        for (const c of el.children) walk(c);
+
+        // Anything that isn't `visible` on the block axis clips its descendants.
+        const clips = cs.overflowY !== 'visible';
+        const nextTop = clips ? Math.max(clipTop, r.top) : clipTop;
+        const nextBottom = clips ? Math.min(clipBottom, r.bottom) : clipBottom;
+
+        for (const c of el.children) walk(c, nextTop, nextBottom);
       };
-      walk(root);
+
+      walk(root, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
       return { top, bottom };
     }
 

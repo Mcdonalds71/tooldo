@@ -402,19 +402,24 @@ reading the source:
   Performance sits around 80 and moves a few points run to run; the remaining cost is
   simply that two video clips must arrive before the hero can play.
 
-**Known failing test on `main`, and it is a real spacing bug, not a flaky one.**
-`e2e/landing.spec.ts` → "every section boundary has the same gap above and below" fails
-on the desktop and reduced-motion projects (mobile passes). The `.proof → .install`
-boundary measures **64 above, 42 below**, where every other boundary on the page is a
-symmetric 64. This is what turns CI red on pushes to `main`.
+**A bounding box is not what a reader sees, and the gap test had to learn that twice.**
+"every section boundary has the same gap above and below" was red on `main` for the
+`.proof → .install` boundary, reporting 42 below against 64 everywhere else, and it had
+been red since the `InstallOnce` rewrite (`a47d885`).
 
-It predates the current round of work: confirmed by checking out `ee007b1` and running
-the same test there, where it fails identically. `git log` points at the `InstallOnce`
-rewrite (`a47d885` replaced the simulator with a phone mockup, `96fb05c` restyled the
-offline simulator before it) as where the 22px went. The divider system itself is fine,
-which is why only this one boundary is off. Fixing it means finding what inside
-`InstallOnce` eats into its own top edge, the same class of problem the `.proof__stamp`
-rotation caused earlier in this file. Not yet done.
+The layout was never wrong. `.install` sits exactly 64px below its divider, confirmed
+against the live DOM and a screenshot of the boundary. `.install__mockup-wrap` carries
+`margin-top: -1.5rem` so the phone bleeds off the top of its own dark stage, and
+`.install__stage` clips it with `overflow: hidden`, so those 24px are never painted. But
+`getBoundingClientRect` reports an element's full rect regardless of what an ancestor
+clips, and `paintedBounds` walked boxes without tracking the clip. It was counting
+pixels the browser throws away.
+
+`paintedBounds` now carries the clip down the walk and measures each element by the part
+of it that survives its ancestors. Note this is the *opposite* conclusion to the
+`.proof__stamp` case above, where a rotated element genuinely did overhang its section
+and the fix was to move it. Same symptom, and the only way to tell them apart is to look
+at the rendered page rather than the numbers.
 
 ## Invoice Generator: payment details
 
