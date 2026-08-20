@@ -31,12 +31,19 @@
 # names as the only analytics this site would ever add, and the reason it's a named
 # exception here rather than a plain 'self' the way it used to read.
 #
+# res.cloudinary.com appears twice, in media-src and img-src, for one thing: the hero's
+# showcase clips and the still frame each clip paints while it buffers. The poster is a
+# frame of the video already allowed by media-src, so listing the same origin under
+# img-src grants nothing media-src didn't. It's here because it was missing: the posters
+# were silently blocked and logged a CSP violation on every load until this was added.
+# No tool fetches anything from it, and no visitor file ever goes to it.
+#
 # Everything else stays locked down. blob: is allowed for images, media and workers
 # because tools preview and download their own output through object URLs — never a
 # remote fetch.
 
 /*
-  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; frame-src 'none'; form-action 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://cloudflareinsights.com; worker-src 'self' blob:; media-src 'self' blob: https://res.cloudinary.com; manifest-src 'self'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; frame-src 'none'; form-action 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://res.cloudinary.com; font-src 'self'; connect-src 'self' https://cloudflareinsights.com; worker-src 'self' blob:; media-src 'self' blob: https://res.cloudinary.com; manifest-src 'self'; upgrade-insecure-requests
   Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
