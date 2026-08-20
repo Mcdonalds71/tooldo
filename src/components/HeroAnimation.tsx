@@ -29,6 +29,20 @@ function posterFor(src: string): string {
     .replace(/\.mp4$/, '.jpg');
 }
 
+/**
+ * The clips were exported at roughly 6.5 Mbps, which is Blu-ray territory for what is
+ * really flat UI and text, and it put ~104MB behind a hero that renders at 734px wide.
+ * Cloudinary transcodes on delivery, so asking for quality 90 keeps the original
+ * 1636x1080 (nothing is downscaled) and still drops the set to ~25MB.
+ *
+ * Deliberately not `q_auto`: its automatic target visibly softens the small type in
+ * the invoice clip, which is exactly the detail these recordings exist to show. 90 was
+ * checked against the originals side by side before it was applied.
+ */
+function deliverySrc(src: string): string {
+  return src.replace('/video/upload/', '/video/upload/q_90/');
+}
+
 export const SHOWCASE_VIDEOS: ShowcaseVideo[] = [
   {
     id: 'invoice-generator',
@@ -319,7 +333,7 @@ export function HeroAnimation() {
     <div className="hero-showcase" ref={containerRef} aria-hidden="true">
       <video
         ref={video0Ref}
-        src={layerVideos[0].src}
+        src={deliverySrc(layerVideos[0].src)}
         poster={posterFor(layerVideos[0].src)}
         style={{
           objectFit: layerVideos[0].objectFit ?? 'cover',
@@ -336,7 +350,7 @@ export function HeroAnimation() {
       />
       <video
         ref={video1Ref}
-        src={layerVideos[1].src}
+        src={deliverySrc(layerVideos[1].src)}
         poster={posterFor(layerVideos[1].src)}
         style={{
           objectFit: layerVideos[1].objectFit ?? 'cover',
