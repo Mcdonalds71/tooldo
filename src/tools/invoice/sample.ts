@@ -9,7 +9,12 @@ export function sampleInvoiceData(): InvoiceData {
       address: '148 Baker Street, Austin, TX 78701',
       email: 'hello@northwindstudio.com',
       phone: '(512) 555-0142',
-      paymentDetails: 'Northwind Studio LLC\nFirst National · 0123456789\nRouting 021000021',
+      /* Deliberately the full international shape, not a two-line domestic one: an
+         account name, the bank and account type, the numbers a foreign transfer needs,
+         and a billing address long enough to wrap. It shows what the field is for, and
+         it is the layout case most likely to collide with the notes below it. */
+      paymentDetails:
+        'Northwind Studio LLC\nFirst National Bank · Checking\nAccount 0123456789 · Routing 021000021\nSWIFT NFNBUS33XXX\n148 Baker Street, Austin, TX 78701',
       logoDataUrl: null,
     },
     client: {

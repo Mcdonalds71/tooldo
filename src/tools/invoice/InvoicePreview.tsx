@@ -99,11 +99,9 @@ export function InvoicePreview({
       </section>
 
       {business.paymentDetails.trim() ? (
-        <section className="invoice-preview__notes">
+        <section className="invoice-preview__payment">
           <p className="invoice-preview__label">Payment details</p>
-          <p className="invoice-preview__muted invoice-preview__muted--typed">
-            {business.paymentDetails}
-          </p>
+          <p className="invoice-preview__payment-body">{business.paymentDetails}</p>
         </section>
       ) : null}
 

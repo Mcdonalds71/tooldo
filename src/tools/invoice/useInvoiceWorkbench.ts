@@ -132,10 +132,19 @@ export function useInvoiceWorkbench() {
     setClient(sample.client);
     setDetails(sample.details);
     setLineItems(sample.lineItems);
-    // Real saved business info is more useful in the demo than fake info would be —
-    // only fill it in when there's nothing real to show yet.
-    if (!business.name) updateBusiness(sample.business);
-  }, [business.name, updateBusiness]);
+    /* Real saved business info is more useful in the demo than fake info would be, so
+       the sample only fills the gaps. Field by field rather than all-or-nothing on the
+       name: anyone who saved a profile before payment details existed has a name and no
+       payment block, and the old check meant the sample could never demonstrate the
+       part of the invoice they had not seen yet. */
+    updateBusiness({
+      name: business.name || sample.business.name,
+      address: business.address || sample.business.address,
+      email: business.email || sample.business.email,
+      phone: business.phone || sample.business.phone,
+      paymentDetails: business.paymentDetails || sample.business.paymentDetails,
+    });
+  }, [business, updateBusiness]);
 
   const downloadInvoice = useCallback(async () => {
     const controller = new AbortController();

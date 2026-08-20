@@ -27,6 +27,9 @@ interface Palette {
   readonly inkSoft: RGB;
   readonly line: RGB;
   readonly signal: RGB;
+  /** The paper tone, used as a fill on the white page so a block can sit on its own
+   *  panel without a border loud enough to compete with the totals rule. */
+  readonly panel: RGB;
 }
 
 /**
@@ -51,6 +54,7 @@ export async function drawInvoicePage(
     inkSoft: rgb(0.341, 0.325, 0.29),
     line: rgb(0.851, 0.827, 0.773),
     signal: rgb(1, 0.231, 0.078),
+    panel: rgb(0.957, 0.941, 0.906),
   };
 
   let y = PAGE_HEIGHT - MARGIN;
@@ -64,8 +68,16 @@ export async function drawInvoicePage(
      pleasantries. */
   y -= 32;
   if (data.business.paymentDetails.trim()) {
-    y = drawTextBlock(page, fonts, palette, 'PAYMENT DETAILS', data.business.paymentDetails, y);
-    y -= 18;
+    y = drawTextBlock(
+      page,
+      fonts,
+      palette,
+      'PAYMENT DETAILS',
+      data.business.paymentDetails,
+      y,
+      true,
+    );
+    y -= 26;
   }
 
   if (data.details.notes.trim()) {
@@ -241,8 +253,50 @@ function drawTotals(
   return y;
 }
 
-/** A labelled run of free text, used for both the payment block and the notes. Returns
- *  the y it finished at so a second block can be stacked under the first. */
+/**
+ * How many lines pdf-lib will actually paint, counting both the newlines somebody typed
+ * and its own wrapping of any line too wide for the column.
+ *
+ * Worth doing properly rather than counting newlines: an international payment block
+ * carries a billing address, that address wraps, and a block measured short would be
+ * drawn straight through by whatever is stacked beneath it.
+ */
+function countRenderedLines(text: string, font: PDFFont, size: number, maxWidth: number): number {
+  let total = 0;
+
+  for (const paragraph of text.split('\n')) {
+    const words = paragraph.split(' ').filter(Boolean);
+    if (words.length === 0) {
+      total += 1;
+      continue;
+    }
+
+    let line = '';
+    let lines = 1;
+    for (const word of words) {
+      const candidate = line ? `${line} ${word}` : word;
+      if (line && font.widthOfTextAtSize(candidate, size) > maxWidth) {
+        lines += 1;
+        line = word;
+      } else {
+        line = candidate;
+      }
+    }
+    total += lines;
+  }
+
+  return total;
+}
+
+/**
+ * A labelled run of free text. Returns the y it finished at, so a second block can be
+ * stacked underneath without overlapping it.
+ *
+ * `emphasis` puts the block on its own panel with a signal-coloured rule down the left
+ * edge. Payment details get it and notes do not, because one of them is the instruction
+ * for how to actually pay and the other is a pleasantry, and an invoice should not make
+ * a reader hunt for the first.
+ */
 function drawTextBlock(
   page: PDFPage,
   fonts: Fonts,
@@ -250,25 +304,48 @@ function drawTextBlock(
   label: string,
   body: string,
   top: number,
+  emphasis = false,
 ): number {
   const LINE_HEIGHT = 13;
-  drawLeft(page, fonts.bold, 8, label, MARGIN, top, palette.inkSoft);
+  const SIZE = 9;
+  const PAD = emphasis ? 12 : 0;
+  const RULE_WIDTH = 3;
+
+  const textLeft = MARGIN + (emphasis ? PAD + RULE_WIDTH : 0);
+  const textWidth = CONTENT_WIDTH - (emphasis ? PAD * 2 + RULE_WIDTH : 0);
+  const lines = countRenderedLines(body, fonts.regular, SIZE, textWidth);
+  const bodyHeight = lines * LINE_HEIGHT;
+
+  if (emphasis) {
+    const height = bodyHeight + 16 + PAD * 2;
+    page.drawRectangle({
+      x: MARGIN,
+      y: top + 10 - height,
+      width: CONTENT_WIDTH,
+      height,
+      color: palette.panel,
+    });
+    page.drawRectangle({
+      x: MARGIN,
+      y: top + 10 - height,
+      width: RULE_WIDTH,
+      height,
+      color: palette.signal,
+    });
+  }
+
+  drawLeft(page, fonts.bold, 8, label, textLeft, top, palette.inkSoft);
   page.drawText(body, {
-    x: MARGIN,
+    x: textLeft,
     y: top - 16,
-    size: 9,
+    size: SIZE,
     font: fonts.regular,
-    color: palette.inkSoft,
+    color: emphasis ? palette.ink : palette.inkSoft,
     lineHeight: LINE_HEIGHT,
-    maxWidth: CONTENT_WIDTH,
+    maxWidth: textWidth,
   });
 
-  /* pdf-lib draws from the top line downward without reporting how far it got, so the
-     height has to be counted here. Only the newlines the person typed are counted, not
-     pdf-lib's own wrapping of an over-long line, which makes this a floor rather than an
-     exact measure — fine, since it only decides where the next block starts. */
-  const lines = body.split('\n').length;
-  return top - 16 - lines * LINE_HEIGHT;
+  return top - 16 - bodyHeight - (emphasis ? PAD : 0);
 }
 
 function drawLeft(

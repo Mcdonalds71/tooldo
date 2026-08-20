@@ -273,6 +273,25 @@
   white-space: pre-line;
 }
 
+/* The one block on the invoice that is an instruction rather than information, so it
+   gets a panel and a signal rule while the notes underneath stay plain. Mirrors what
+   `drawTextBlock` paints into the PDF, since the preview promises to match it. */
+.invoice-preview__payment {
+  margin-top: var(--space-md);
+  padding: var(--space-sm);
+  border-left: 3px solid var(--color-signal);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background-color: var(--color-paper);
+}
+
+.invoice-preview__payment-body {
+  margin-top: var(--space-3xs);
+  font-size: var(--text-xs);
+  line-height: var(--leading-body);
+  white-space: pre-line;
+  color: var(--color-ink);
+}
+
 .invoice-preview__meta {
   text-align: right;
   flex-shrink: 0;
