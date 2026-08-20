@@ -1,6 +1,7 @@
 import { InvoiceError } from './errors';
 import { lineItemAmount, round2, toSafeNumber } from './money';
 import { drawInvoicePage } from './pdfLayout';
+import { toPdfSafeInvoice } from './pdfText';
 import type { GenerateInvoiceResult, InvoiceData, InvoiceTotals, LineItem } from './types';
 
 type PdfLib = typeof import('pdf-lib');
@@ -41,13 +42,18 @@ export async function generateInvoicePdf(
     throw new InvoiceError('EmptyLineItemsError', 'Add at least one line item before downloading');
   }
 
+  /* Before anything is drawn, so an unsupported character fails the run cleanly rather
+     than part-way through a page. Totals come from the original data, since the
+     substitution only ever touches text. */
+  const drawable = toPdfSafeInvoice(data);
+
   const { PDFDocument } = await loadPdfLib();
   const totals = calculateTotals(data.lineItems, data.details.taxRate, data.details.discountRate);
 
   const doc = await PDFDocument.create();
   onProgress?.(0.2);
 
-  await drawInvoicePage(doc, data, totals);
+  await drawInvoicePage(doc, drawable, totals);
   onProgress?.(0.8);
 
   doc.setCreator('tooldo');

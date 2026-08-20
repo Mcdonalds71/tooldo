@@ -152,6 +152,32 @@ describe('generateInvoicePdf', () => {
     expect(doc.getPageCount()).toBe(1);
   });
 
+  /* The end-to-end version of what `pdfText.test.ts` covers in isolation: a naira sign
+     in the payment block used to throw out of pdf-lib and reach the visitor as "the
+     invoice didn't generate, try again". */
+  it('generates rather than throwing when the payment block holds a naira sign', async () => {
+    const nigerian = invoice({
+      business: {
+        ...EMPTY_BUSINESS_PROFILE,
+        name: 'Lagos Studio',
+        paymentDetails: 'GTBank\n0123456789\nBalance ₦45,000',
+      },
+    });
+
+    const result = await generateInvoicePdf(nigerian);
+    const doc = await PDFDocument.load(result.bytes);
+
+    expect(doc.getPageCount()).toBe(1);
+  });
+
+  it('names the character when the font genuinely cannot draw it', async () => {
+    const unsupported = invoice({
+      business: { ...EMPTY_BUSINESS_PROFILE, name: '株式会社' },
+    });
+
+    await expect(generateInvoicePdf(unsupported)).rejects.toThrow(/cannot draw/);
+  });
+
   it('reports progress up to completion', async () => {
     const seen: number[] = [];
 
