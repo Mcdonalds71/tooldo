@@ -13,6 +13,22 @@ export interface ShowcaseVideo {
 
 export const DEFAULT_PLAYBACK_RATE = 1.4;
 
+/**
+ * A still of the clip's own first frame, which the browser can paint while the video
+ * itself is still arriving. Without one the showcase is an empty box until enough
+ * video has buffered to render, and on a slow connection that box is what Largest
+ * Contentful Paint ends up measuring.
+ *
+ * Cloudinary renders this from the same asset, so it cannot drift out of sync with
+ * the clip: swap the extension for `.jpg` and ask for frame zero. Roughly 40KB
+ * against a multi-megabyte clip, and it costs the video nothing.
+ */
+function posterFor(src: string): string {
+  return src
+    .replace('/video/upload/', '/video/upload/so_0,w_900,q_auto,f_auto/')
+    .replace(/\.mp4$/, '.jpg');
+}
+
 export const SHOWCASE_VIDEOS: ShowcaseVideo[] = [
   {
     id: 'invoice-generator',
@@ -304,6 +320,7 @@ export function HeroAnimation() {
       <video
         ref={video0Ref}
         src={layerVideos[0].src}
+        poster={posterFor(layerVideos[0].src)}
         style={{
           objectFit: layerVideos[0].objectFit ?? 'cover',
           objectPosition: layerVideos[0].objectPosition ?? 'top center',
@@ -320,6 +337,7 @@ export function HeroAnimation() {
       <video
         ref={video1Ref}
         src={layerVideos[1].src}
+        poster={posterFor(layerVideos[1].src)}
         style={{
           objectFit: layerVideos[1].objectFit ?? 'cover',
           objectPosition: layerVideos[1].objectPosition ?? 'top center',

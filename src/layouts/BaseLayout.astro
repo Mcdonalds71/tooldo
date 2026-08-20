@@ -48,6 +48,15 @@ const REGISTER_WORKER = `if('serviceWorker' in navigator){
     <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="theme-color" content="#f4f0e7" />
 
+    {
+      /* The hero's showcase clips are served from Cloudinary, so the browser otherwise
+         pays a DNS lookup, TCP handshake and TLS negotiation to a second origin before
+         the first byte of video arrives. Warming the connection in the head overlaps
+         all three with the rest of the page load. */
+    }
+    <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
+    <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+
     <link
       rel="preload"
       href="/fonts/clash-display-variable.woff2"
