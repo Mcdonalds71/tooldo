@@ -316,7 +316,7 @@ Checking a real production build against the actual deploy target, not just type
 and unit tests, is what caught the ffmpeg problem before it ever reached `main` — the
 reason this tool was given its own session in the first place.
 
-## Landing page (built on `feat/pdf-toolbox`, not yet merged to `main`)
+## Landing page
 
 All nine tools are live — the roster `lib/tools.ts` and CLAUDE.md name is complete.
 The site is also genuinely offline-capable now (ADR 0017), which closes a real gap
@@ -367,8 +367,90 @@ finished resting frame (same as reduced-motion), which is correct, just static.
 Revisit with `git log` around this note for the exact bisection trail if picked back
 up.
 
-**Still open:** the hero showcase card's tool animation or process/userflow video —
-the stage has been reserved for it since the hero was first built, never filled in.
+**The hero showcase stage is filled.** `HeroAnimation.tsx` crossfades five screen
+recordings of real tools, two `<video>` layers swapping between them, and it survives
+Astro's client-side navigation by re-arming playback on `astro:page-load`,
+`astro:after-swap`, `pageshow` and `visibilitychange` rather than assuming a mount.
+That was the last item the build spec had left open.
+
+## Live on tooldo.online, and what shipped after the domain went up
+
+The custom domain is connected (Cloudflare zone, nameservers moved from Namecheap, the
+Worker bound as a Custom Domain rather than a Route). Four things were fixed in the
+first hours of it being live, all found by measuring the deployed site rather than
+reading the source:
+
+- **The footer's faint text failed AA, and the palette was why.** `--color-ink-faint` is
+  tuned to clear 4.5:1 *against paper*. On the charcoal footer that logic runs backwards:
+  darkening faint text only helps on a light surface. It measured 3.23:1 and was the only
+  thing costing the site a perfect Lighthouse accessibility score. `--color-line`, which
+  the rest of the footer already used on that background, measures 11.65:1. Any future
+  inverse surface has the same trap waiting.
+- **The hero clips were ~104MB.** Exported at roughly 6.5 Mbps, near Blu-ray bitrate, for
+  footage that is flat UI and text, behind a hero that renders at 734px wide. Cloudinary
+  transcodes on delivery, so `q_90` in the URL takes the set to ~25MB with **no** change
+  in resolution. `q_auto` was rejected on inspection: it visibly softens the small type in
+  the invoice clip, which is the detail those recordings exist to show. Applied through
+  one helper (`deliverySrc`) so `SHOWCASE_VIDEOS` stays the canonical list.
+- **The poster frames were blocked by our own CSP and nobody noticed.** `media-src`
+  trusted `res.cloudinary.com` for the clips, but a poster is an *image*, and `img-src`
+  did not list it. Every poster was blocked, painted nothing, and logged a violation on
+  every load, which cost 8 points of Lighthouse best practices. The lesson generalises:
+  adding a third-party origin means checking *every* directive that origin will be
+  fetched under, not just the obvious one.
+- Measured on the live site afterwards: **100 accessibility, 100 best practices, 100 SEO.**
+  Performance sits around 80 and moves a few points run to run; the remaining cost is
+  simply that two video clips must arrive before the hero can play.
+
+**Known failing test on `main`, and it is a real spacing bug, not a flaky one.**
+`e2e/landing.spec.ts` → "every section boundary has the same gap above and below" fails
+on the desktop and reduced-motion projects (mobile passes). The `.proof → .install`
+boundary measures **64 above, 42 below**, where every other boundary on the page is a
+symmetric 64. This is what turns CI red on pushes to `main`.
+
+It predates the current round of work: confirmed by checking out `ee007b1` and running
+the same test there, where it fails identically. `git log` points at the `InstallOnce`
+rewrite (`a47d885` replaced the simulator with a phone mockup, `96fb05c` restyled the
+offline simulator before it) as where the 22px went. The divider system itself is fine,
+which is why only this one boundary is off. Fixing it means finding what inside
+`InstallOnce` eats into its own top edge, the same class of problem the `.proof__stamp`
+rotation caused earlier in this file. Not yet done.
+
+## Invoice Generator: payment details
+
+An invoice exists to get somebody paid and there was nowhere to say how. The only
+workaround was the Notes field, wrong twice over: it prints under a heading that says
+NOTES, and it lives in `InvoiceDetails`, the half of the state deliberately never saved,
+so an account number would have been retyped on every single invoice. Bank details are
+the most stable thing about a business, so `paymentDetails` sits on `BusinessProfile`
+alongside the name and logo, and persists with them. Free text rather than fixed fields,
+because the shape differs per country and guessing would be worse than a box.
+
+Three things worth knowing if this area is touched again:
+
+- **Adding a field to a persisted shape is a migration.** `isBusinessProfile` rejected
+  anything that did not match exactly, so shipping a new required field would have
+  silently wiped the saved details of everyone who had already used the tool. It now
+  validates only the fields that have always existed and merges the record over
+  `EMPTY_BUSINESS_PROFILE`.
+- **pdf-lib's standard fonts encode WinAnsi and throw on everything else**, which
+  includes ₦ and ₹ and every non-Latin script. ADR 0010 already met this once, which is
+  why `formatMoney` prints a code rather than a symbol; free text was never covered. A
+  naira sign in the payment block threw, and with no error code it surfaced as "the
+  invoice didn't generate, try again" — advice that can never work. `pdfText.ts` now
+  substitutes the symbols for currencies this tool offers, flattens the smart punctuation
+  word processors insert silently, and raises a typed `UnsupportedCharacterError` naming
+  the character for anything genuinely undrawable. It runs once over the data before any
+  drawing starts, so a rejection fails cleanly instead of leaving half a page.
+  **Still not supported:** Chinese, Arabic, Cyrillic and similar. Fixing that properly
+  means embedding a Unicode font, which is a few hundred KB on a tool that sells itself
+  on being light. It fails with a clear message instead, and there is no FAQ answer for
+  it yet.
+- **A text block's height is not its newline count.** `drawTextBlock` measures wrapped
+  lines against real font metrics, because an international payment block carries a
+  billing address, that address wraps, and a block measured short gets drawn straight
+  through by the notes beneath it. Verified by reading text coordinates back out of a
+  generated PDF, not by trusting the arithmetic.
 
 **Not in the PDF tool, deliberately.** Compression, because pdf-lib copies page streams
 untouched and anything honest would mean re-encoding images and losing quality — the FAQ

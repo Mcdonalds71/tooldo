@@ -118,8 +118,9 @@ Read [`docs/progress.md`](docs/progress.md) first in a new session. It carries w
 built, what is next, and the decisions that aren't obvious from the code.
 
 - **Repo:** https://github.com/Mcdonalds71/tooldo (public, MIT)
-- **Live:** https://tooldo.emmanuelonugwu-c.workers.dev — Cloudflare Workers, builds from
-  `main` on push. `tooldo.online` is not connected yet.
+- **Live:** https://tooldo.online — Cloudflare Workers, builds from `main` on push. The
+  `tooldo.emmanuelonugwu-c.workers.dev` address still resolves and is what CI and the
+  Lighthouse runs used before the domain was attached.
 - **Deploy setup:** [`docs/deploy.md`](docs/deploy.md). Nothing needs configuring per
   environment; the build is self-contained.
 
