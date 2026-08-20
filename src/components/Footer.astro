@@ -204,10 +204,14 @@ const liveTools = tools.filter((t) => t.status === 'live');
     color: var(--color-paper);
   }
 
+  /* `--color-ink-faint` is tuned to clear AA against paper, so on this charcoal panel
+     it runs the wrong way: darkening faint text only helps on a light surface. Against
+     `--color-char` it lands at 3.23:1, under the 4.5:1 small text needs. The line tone
+     is what the rest of this footer already uses on the same background. */
   .footer__nav-meta {
     font-family: var(--font-mono);
     font-size: var(--text-xs);
-    color: var(--color-ink-faint);
+    color: var(--color-line);
   }
 
   .footer__bottom {
@@ -221,7 +225,9 @@ const liveTools = tools.filter((t) => t.status === 'live');
     gap: var(--space-sm);
     font-family: var(--font-mono);
     font-size: var(--text-xs);
-    color: var(--color-ink-faint);
+    /* Same inverse-surface reason as `.footer__nav-meta` above — `.footer__copyright`
+       and `.footer__meta` both inherit their colour from here. */
+    color: var(--color-line);
   }
 
   .footer__copyright a {
