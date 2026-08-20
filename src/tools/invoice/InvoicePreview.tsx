@@ -98,10 +98,19 @@ export function InvoicePreview({
         </div>
       </section>
 
+      {business.paymentDetails.trim() ? (
+        <section className="invoice-preview__notes">
+          <p className="invoice-preview__label">Payment details</p>
+          <p className="invoice-preview__muted invoice-preview__muted--typed">
+            {business.paymentDetails}
+          </p>
+        </section>
+      ) : null}
+
       {details.notes.trim() ? (
         <section className="invoice-preview__notes">
           <p className="invoice-preview__label">Notes</p>
-          <p className="invoice-preview__muted">{details.notes}</p>
+          <p className="invoice-preview__muted invoice-preview__muted--typed">{details.notes}</p>
         </section>
       ) : null}
     </Card>

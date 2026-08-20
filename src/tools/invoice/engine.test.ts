@@ -131,6 +131,27 @@ describe('generateInvoicePdf', () => {
     expect(doc.getPageCount()).toBe(1);
   });
 
+  /* Multi-line payment details are the normal case, not the exception: an account name
+     over an account number over a sort code. pdf-lib throws on a character its font
+     cannot encode, and a newline is exactly the kind of thing that gets missed, so this
+     guards the shape people will actually type rather than a single tidy line. */
+  it('draws multi-line payment details without failing', async () => {
+    const withPayment = invoice({
+      business: {
+        ...EMPTY_BUSINESS_PROFILE,
+        name: 'Acme Studio',
+        paymentDetails: 'Acme Studio LLC\nFirst National · 0123456789\nRouting 021000021',
+      },
+      details: { ...EMPTY_DETAILS, notes: 'Payment due within 14 days.' },
+    });
+
+    const result = await generateInvoicePdf(withPayment);
+    const doc = await PDFDocument.load(result.bytes);
+
+    // Both blocks are drawn, and neither pushes the invoice onto a second page.
+    expect(doc.getPageCount()).toBe(1);
+  });
+
   it('reports progress up to completion', async () => {
     const seen: number[] = [];
 

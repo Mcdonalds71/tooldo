@@ -266,6 +266,13 @@
   line-height: var(--leading-body);
 }
 
+/* Payment details and notes are typed as several short lines, an account name over an
+   account number over a sort code, and HTML would otherwise run them together into one.
+   `pre-line` keeps the breaks the person typed while still wrapping long lines. */
+.invoice-preview__muted--typed {
+  white-space: pre-line;
+}
+
 .invoice-preview__meta {
   text-align: right;
   flex-shrink: 0;

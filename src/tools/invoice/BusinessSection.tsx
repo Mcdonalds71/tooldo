@@ -2,6 +2,7 @@ import { TrashIcon, UploadSimpleIcon } from '@phosphor-icons/react/dist/ssr';
 import { useRef } from 'react';
 import { Button } from '../../design-system/components/Button';
 import { Card } from '../../design-system/components/Card';
+import { TextAreaField } from '../../design-system/components/TextAreaField';
 import { TextField } from '../../design-system/components/TextField';
 import type { BusinessProfile } from './types';
 import type { InvoiceActions } from './useInvoiceWorkbench';
@@ -14,7 +15,11 @@ export interface BusinessSectionProps {
 export function BusinessSection({ business, actions }: BusinessSectionProps) {
   const logoInput = useRef<HTMLInputElement>(null);
   const hasSavedDetails = Boolean(
-    business.name || business.address || business.email || business.phone,
+    business.name ||
+      business.address ||
+      business.email ||
+      business.phone ||
+      business.paymentDetails,
   );
 
   return (
@@ -94,6 +99,12 @@ export function BusinessSection({ business, actions }: BusinessSectionProps) {
           placeholder="148 Baker Street, Austin, TX"
         />
       </div>
+      <TextAreaField
+        label="Payment details"
+        value={business.paymentDetails}
+        onChange={(paymentDetails) => actions.updateBusiness({ paymentDetails })}
+        placeholder={'Northwind Studio\nFirst National · 0123456789\nSort code 04-00-04'}
+      />
       <p className="invoice-form__hint">Saved on this device so you don't retype it next time.</p>
     </Card>
   );

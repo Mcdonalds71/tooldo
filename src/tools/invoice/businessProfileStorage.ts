@@ -14,7 +14,13 @@ export function loadBusinessProfile(): BusinessProfile {
     if (!raw) return EMPTY_BUSINESS_PROFILE;
 
     const parsed: unknown = JSON.parse(raw);
-    return isBusinessProfile(parsed) ? parsed : EMPTY_BUSINESS_PROFILE;
+    if (!isBusinessProfile(parsed)) return EMPTY_BUSINESS_PROFILE;
+
+    /* `paymentDetails` was added after this key had already been shipping, so a profile
+       saved before then is valid and simply lacks the field. Filling it in here rather
+       than rejecting the record is the difference between an older visitor keeping the
+       details they saved and silently losing all of them on their next visit. */
+    return { ...EMPTY_BUSINESS_PROFILE, ...parsed };
   } catch {
     // Corrupted JSON, or storage unavailable entirely (private browsing, disabled) —
     // either way the form still works this session, just starting blank.
@@ -38,7 +44,10 @@ export function clearBusinessProfile(): void {
   }
 }
 
-function isBusinessProfile(value: unknown): value is BusinessProfile {
+/** Deliberately checks only the fields that have always been there, so adding one later
+ *  never invalidates a record someone already has saved. `loadBusinessProfile` fills any
+ *  newer field in from the empty profile. */
+function isBusinessProfile(value: unknown): value is Partial<BusinessProfile> {
   if (typeof value !== 'object' || value === null) return false;
   const record = value as Record<string, unknown>;
 
@@ -47,6 +56,7 @@ function isBusinessProfile(value: unknown): value is BusinessProfile {
     typeof record.address === 'string' &&
     typeof record.email === 'string' &&
     typeof record.phone === 'string' &&
+    (record.paymentDetails === undefined || typeof record.paymentDetails === 'string') &&
     (record.logoDataUrl === null || typeof record.logoDataUrl === 'string')
   );
 }

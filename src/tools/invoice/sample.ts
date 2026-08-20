@@ -9,6 +9,7 @@ export function sampleInvoiceData(): InvoiceData {
       address: '148 Baker Street, Austin, TX 78701',
       email: 'hello@northwindstudio.com',
       phone: '(512) 555-0142',
+      paymentDetails: 'Northwind Studio LLC\nFirst National · 0123456789\nRouting 021000021',
       logoDataUrl: null,
     },
     client: {

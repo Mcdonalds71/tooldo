@@ -13,6 +13,15 @@ export interface BusinessProfile {
   readonly address: string;
   readonly email: string;
   readonly phone: string;
+  /**
+   * Where the money should go: account name and number, bank, sort code, a payment link,
+   * whatever the sender's country expects. Free text on purpose, because the shape of
+   * this differs per country and guessing at fields would be worse than a box.
+   *
+   * It lives on the profile rather than in `notes` because it is the same on every
+   * invoice a business ever sends, and the profile is the half that gets saved.
+   */
+  readonly paymentDetails: string;
   /** A small embedded image, already re-encoded to a data URL — never a File held in state. */
   readonly logoDataUrl: string | null;
 }
@@ -93,6 +102,7 @@ export const EMPTY_BUSINESS_PROFILE: BusinessProfile = {
   address: '',
   email: '',
   phone: '',
+  paymentDetails: '',
   logoDataUrl: null,
 };
 

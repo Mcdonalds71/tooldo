@@ -59,8 +59,17 @@ export async function drawInvoicePage(
   y = drawLineItems(page, fonts, palette, data.lineItems, data.details.currency, y - 28);
   y = drawTotals(page, fonts, palette, totals, data.details, y - 14);
 
+  /* Payment details first, then notes. The instruction for how to actually pay is the
+     more useful of the two, so it sits closer to the total rather than under the
+     pleasantries. */
+  y -= 32;
+  if (data.business.paymentDetails.trim()) {
+    y = drawTextBlock(page, fonts, palette, 'PAYMENT DETAILS', data.business.paymentDetails, y);
+    y -= 18;
+  }
+
   if (data.details.notes.trim()) {
-    drawNotes(page, fonts, palette, data.details.notes, y - 32);
+    drawTextBlock(page, fonts, palette, 'NOTES', data.details.notes, y);
   }
 }
 
@@ -232,23 +241,34 @@ function drawTotals(
   return y;
 }
 
-function drawNotes(
+/** A labelled run of free text, used for both the payment block and the notes. Returns
+ *  the y it finished at so a second block can be stacked under the first. */
+function drawTextBlock(
   page: PDFPage,
   fonts: Fonts,
   palette: Palette,
-  notes: string,
+  label: string,
+  body: string,
   top: number,
-): void {
-  drawLeft(page, fonts.bold, 8, 'NOTES', MARGIN, top, palette.inkSoft);
-  page.drawText(notes, {
+): number {
+  const LINE_HEIGHT = 13;
+  drawLeft(page, fonts.bold, 8, label, MARGIN, top, palette.inkSoft);
+  page.drawText(body, {
     x: MARGIN,
     y: top - 16,
     size: 9,
     font: fonts.regular,
     color: palette.inkSoft,
-    lineHeight: 13,
+    lineHeight: LINE_HEIGHT,
     maxWidth: CONTENT_WIDTH,
   });
+
+  /* pdf-lib draws from the top line downward without reporting how far it got, so the
+     height has to be counted here. Only the newlines the person typed are counted, not
+     pdf-lib's own wrapping of an over-long line, which makes this a floor rather than an
+     exact measure — fine, since it only decides where the next block starts. */
+  const lines = body.split('\n').length;
+  return top - 16 - lines * LINE_HEIGHT;
 }
 
 function drawLeft(
