@@ -6,6 +6,7 @@ export interface ShowcaseVideo {
   readonly id: string;
   readonly title: string;
   readonly src: string;
+  readonly poster: string;
   readonly playbackRate?: number;
   readonly objectFit?: 'cover' | 'contain';
   readonly objectPosition?: string;
@@ -13,41 +14,12 @@ export interface ShowcaseVideo {
 
 export const DEFAULT_PLAYBACK_RATE = 1.4;
 
-/**
- * A still of the clip's own first frame, which the browser can paint while the video
- * itself is still arriving. Without one the showcase is an empty box until enough
- * video has buffered to render, and on a slow connection that box is what Largest
- * Contentful Paint ends up measuring.
- *
- * Cloudinary renders this from the same asset, so it cannot drift out of sync with
- * the clip: swap the extension for `.jpg` and ask for frame zero. Roughly 40KB
- * against a multi-megabyte clip, and it costs the video nothing.
- */
-function posterFor(src: string): string {
-  return src
-    .replace('/video/upload/', '/video/upload/so_0,w_900,q_auto,f_auto/')
-    .replace(/\.mp4$/, '.jpg');
-}
-
-/**
- * The clips were exported at roughly 6.5 Mbps, which is Blu-ray territory for what is
- * really flat UI and text, and it put ~104MB behind a hero that renders at 734px wide.
- * Cloudinary transcodes on delivery, so asking for quality 90 keeps the original
- * 1636x1080 (nothing is downscaled) and still drops the set to ~25MB.
- *
- * Deliberately not `q_auto`: its automatic target visibly softens the small type in
- * the invoice clip, which is exactly the detail these recordings exist to show. 90 was
- * checked against the originals side by side before it was applied.
- */
-function deliverySrc(src: string): string {
-  return src.replace('/video/upload/', '/video/upload/q_90/');
-}
-
 export const SHOWCASE_VIDEOS: ShowcaseVideo[] = [
   {
     id: 'invoice-generator',
     title: 'Invoice Generator',
-    src: 'https://res.cloudinary.com/dlvhsczpp/video/upload/v1787072042/invoive_generator_xv5670.mp4',
+    src: '/videos/invoice-generator.mp4',
+    poster: '/videos/posters/invoice-generator.jpg',
     playbackRate: 1.4,
     objectFit: 'cover',
     objectPosition: 'top center',
@@ -55,7 +27,8 @@ export const SHOWCASE_VIDEOS: ShowcaseVideo[] = [
   {
     id: 'qr-code-generator',
     title: 'QR Code Generator',
-    src: 'https://res.cloudinary.com/dlvhsczpp/video/upload/v1787072035/QR_Code_generator_j0hhlr.mp4',
+    src: '/videos/qr-code-generator.mp4',
+    poster: '/videos/posters/qr-code-generator.jpg',
     playbackRate: 1.4,
     objectFit: 'cover',
     objectPosition: 'center center',
@@ -63,7 +36,8 @@ export const SHOWCASE_VIDEOS: ShowcaseVideo[] = [
   {
     id: 'timezone-finder',
     title: 'Timezone Finder',
-    src: 'https://res.cloudinary.com/dlvhsczpp/video/upload/v1787072043/timezone_finder_y25t0h.mp4',
+    src: '/videos/timezone-finder.mp4',
+    poster: '/videos/posters/timezone-finder.jpg',
     playbackRate: 1.4,
     objectFit: 'cover',
     objectPosition: 'top center',
@@ -71,7 +45,8 @@ export const SHOWCASE_VIDEOS: ShowcaseVideo[] = [
   {
     id: 'image-converter',
     title: 'Image Converter',
-    src: 'https://res.cloudinary.com/dlvhsczpp/video/upload/v1787072041/Image_converter_t4desq.mp4',
+    src: '/videos/image-converter.mp4',
+    poster: '/videos/posters/image-converter.jpg',
     playbackRate: 1.4,
     objectFit: 'cover',
     objectPosition: 'top center',
@@ -79,7 +54,8 @@ export const SHOWCASE_VIDEOS: ShowcaseVideo[] = [
   {
     id: 'pdf-merge',
     title: 'PDF Merge',
-    src: 'https://res.cloudinary.com/dlvhsczpp/video/upload/v1787072207/pdf_merge_hn4tvd.mp4',
+    src: '/videos/pdf-merge.mp4',
+    poster: '/videos/posters/pdf-merge.jpg',
     playbackRate: 1.4,
     objectFit: 'cover',
     objectPosition: 'top center',
@@ -105,8 +81,8 @@ export function HeroAnimation() {
   // Layer 0 or Layer 1 is currently the active (visible) layer
   const [activeLayer, setActiveLayer] = useState<0 | 1>(0);
   const [layerVideos, setLayerVideos] = useState<{ 0: ShowcaseVideo; 1: ShowcaseVideo }>({
-    0: SHOWCASE_VIDEOS[0] ?? { id: '', title: '', src: '' },
-    1: SHOWCASE_VIDEOS[1] ?? { id: '', title: '', src: '' },
+    0: SHOWCASE_VIDEOS[0] ?? { id: '', title: '', src: '', poster: '' },
+    1: SHOWCASE_VIDEOS[1] ?? { id: '', title: '', src: '', poster: '' },
   });
 
   const currentIndexRef = useRef(0);
@@ -204,7 +180,12 @@ export function HeroAnimation() {
 
         // Prepare the subsequent video on the now-inactive layer
         const subsequentIndex = (nextIndex + 1) % SHOWCASE_VIDEOS.length;
-        const subsequentDef = SHOWCASE_VIDEOS[subsequentIndex] ?? { id: '', title: '', src: '' };
+        const subsequentDef = SHOWCASE_VIDEOS[subsequentIndex] ?? {
+          id: '',
+          title: '',
+          src: '',
+          poster: '',
+        };
 
         setLayerVideos((prev) => ({
           ...prev,
@@ -333,8 +314,8 @@ export function HeroAnimation() {
     <div className="hero-showcase" ref={containerRef} aria-hidden="true">
       <video
         ref={video0Ref}
-        src={deliverySrc(layerVideos[0].src)}
-        poster={posterFor(layerVideos[0].src)}
+        src={layerVideos[0].src}
+        poster={layerVideos[0].poster}
         style={{
           objectFit: layerVideos[0].objectFit ?? 'cover',
           objectPosition: layerVideos[0].objectPosition ?? 'top center',
@@ -350,8 +331,8 @@ export function HeroAnimation() {
       />
       <video
         ref={video1Ref}
-        src={deliverySrc(layerVideos[1].src)}
-        poster={posterFor(layerVideos[1].src)}
+        src={layerVideos[1].src}
+        poster={layerVideos[1].poster}
         style={{
           objectFit: layerVideos[1].objectFit ?? 'cover',
           objectPosition: layerVideos[1].objectPosition ?? 'top center',
